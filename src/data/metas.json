@@ -1,0 +1,5082 @@
+[
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q1 2026",
+  "meta": 240000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q1 2026",
+  "meta": 125000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q1 2026",
+  "meta": 525000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q1 2026",
+  "meta": 336206.9
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 1636000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 128000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ACESSO",
+  "periodo": "Q1 2026",
+  "meta": 250000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ANEURISMA",
+  "periodo": "Q1 2026",
+  "meta": 1125000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "AVC",
+  "periodo": "Q1 2026",
+  "meta": 60000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "MAVS",
+  "periodo": "Q1 2026",
+  "meta": 750000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "RAPIDMEDICAL",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ANEURISMA",
+  "periodo": "Q1 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q1 2026",
+  "meta": 615000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q1 2026",
+  "meta": 224000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q1 2026",
+  "meta": 373750.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q1 2026",
+  "meta": 245000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q1 2026",
+  "meta": 70000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q1 2026",
+  "meta": 126000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q1 2026",
+  "meta": 34722.22
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q1 2026",
+  "meta": 369500.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q1 2026",
+  "meta": 180000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q1 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q1 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q1 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "CANULAS",
+  "periodo": "Q1 2026",
+  "meta": 77400.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "CEC",
+  "periodo": "Q1 2026",
+  "meta": 116000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "VALVULAS",
+  "periodo": "Q1 2026",
+  "meta": 150000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q1 2026",
+  "meta": 75000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q1 2026",
+  "meta": 36000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q1 2026",
+  "meta": 58333.33
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q1 2026",
+  "meta": 423750.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q1 2026",
+  "meta": 260000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q1 2026",
+  "meta": 270000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q1 2026",
+  "meta": 147413.82
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "NIPRO",
+  "topico": "CP",
+  "tipo": "CEC",
+  "periodo": "Q1 2026",
+  "meta": 250000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 400000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 400000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 1122000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 220000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q1 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q1 2026",
+  "meta": 72000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q1 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q1 2026",
+  "meta": 108750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q1 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q1 2026",
+  "meta": 45000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q1 2026",
+  "meta": 163750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q1 2026",
+  "meta": 38793.1
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 210000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 1200000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 184000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 703791.05
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 720000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q1 2026",
+  "meta": 638750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q1 2026",
+  "meta": 125000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q1 2026",
+  "meta": 525000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q1 2026",
+  "meta": 31034.48
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q1 2026",
+  "meta": 900000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q1 2026",
+  "meta": 192000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q1 2026",
+  "meta": 450000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q1 2026",
+  "meta": 167500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q1 2026",
+  "meta": 43750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q1 2026",
+  "meta": 154583.33
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q1 2026",
+  "meta": 23611.11
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q1 2026",
+  "meta": 171346.15
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q1 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q1 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q1 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q1 2026",
+  "meta": 13333.33
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q1 2026",
+  "meta": 15000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q1 2026",
+  "meta": 12000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q1 2026",
+  "meta": 4861.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q1 2026",
+  "meta": 97500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q1 2026",
+  "meta": 80000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q1 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q1 2026",
+  "meta": 25862.07
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 200000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 76666.67
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 231940.3
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q1 2026",
+  "meta": 262500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q1 2026",
+  "meta": 416000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q1 2026",
+  "meta": 31250.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q1 2026",
+  "meta": 391000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q1 2026",
+  "meta": 300000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q1 2026",
+  "meta": 60000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q1 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q1 2026",
+  "meta": 72000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q1 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q1 2026",
+  "meta": 108750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP PIAUÍ",
+  "periodo": "Q1 2026",
+  "meta": 108000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q1 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q1 2026",
+  "meta": 45000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q1 2026",
+  "meta": 163750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q1 2026",
+  "meta": 38793.1
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q1 2026",
+  "meta": 700000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 311777.78
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 315902.98
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q1 2026",
+  "meta": 810000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q1 2026",
+  "meta": 270000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q1 2026",
+  "meta": 600000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q1 2026",
+  "meta": 72500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q1 2026",
+  "meta": 335000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q1 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q1 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "VINICIUS PRIMO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q1 2026",
+  "meta": 311777.78
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "VINICIUS PRIMO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q1 2026",
+  "meta": 315902.98
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q1 2026",
+  "meta": 40500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q1 2026",
+  "meta": 12000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q1 2026",
+  "meta": 13287.04
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q2 2026",
+  "meta": 240000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q2 2026",
+  "meta": 125000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q2 2026",
+  "meta": 525000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q2 2026",
+  "meta": 336206.9
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 1636000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 128000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ACESSO",
+  "periodo": "Q2 2026",
+  "meta": 250000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ANEURISMA",
+  "periodo": "Q2 2026",
+  "meta": 1125000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "AVC",
+  "periodo": "Q2 2026",
+  "meta": 60000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "MAVS",
+  "periodo": "Q2 2026",
+  "meta": 750000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "RAPIDMEDICAL",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ANEURISMA",
+  "periodo": "Q2 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q2 2026",
+  "meta": 615000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q2 2026",
+  "meta": 224000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q2 2026",
+  "meta": 373750.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q2 2026",
+  "meta": 245000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q2 2026",
+  "meta": 70000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q2 2026",
+  "meta": 126000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q2 2026",
+  "meta": 34722.22
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q2 2026",
+  "meta": 369500.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q2 2026",
+  "meta": 180000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q2 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q2 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q2 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "CANULAS",
+  "periodo": "Q2 2026",
+  "meta": 77400.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "CEC",
+  "periodo": "Q2 2026",
+  "meta": 116000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "VALVULAS",
+  "periodo": "Q2 2026",
+  "meta": 150000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q2 2026",
+  "meta": 75000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q2 2026",
+  "meta": 36000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q2 2026",
+  "meta": 58333.33
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q2 2026",
+  "meta": 423750.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q2 2026",
+  "meta": 260000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q2 2026",
+  "meta": 270000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q2 2026",
+  "meta": 147413.82
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "NIPRO",
+  "topico": "CP",
+  "tipo": "CEC",
+  "periodo": "Q2 2026",
+  "meta": 250000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 400000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 400000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 1122000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 220000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q2 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q2 2026",
+  "meta": 72000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q2 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q2 2026",
+  "meta": 108750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q2 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q2 2026",
+  "meta": 45000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q2 2026",
+  "meta": 163750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q2 2026",
+  "meta": 38793.1
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 210000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 1200000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 184000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 703791.05
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 720000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q2 2026",
+  "meta": 638750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q2 2026",
+  "meta": 125000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q2 2026",
+  "meta": 525000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q2 2026",
+  "meta": 31034.48
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q2 2026",
+  "meta": 900000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q2 2026",
+  "meta": 192000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q2 2026",
+  "meta": 450000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q2 2026",
+  "meta": 167500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q2 2026",
+  "meta": 43750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q2 2026",
+  "meta": 210000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q2 2026",
+  "meta": 23611.11
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q2 2026",
+  "meta": 171346.15
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q2 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q2 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q2 2026",
+  "meta": 13333.33
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q2 2026",
+  "meta": 6666.67
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q2 2026",
+  "meta": 15000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q2 2026",
+  "meta": 12000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q2 2026",
+  "meta": 4861.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q2 2026",
+  "meta": 97500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q2 2026",
+  "meta": 80000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q2 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q2 2026",
+  "meta": 25862.07
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 200000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 76666.67
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 231940.3
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q2 2026",
+  "meta": 262500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q2 2026",
+  "meta": 416000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q2 2026",
+  "meta": 31250.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q2 2026",
+  "meta": 391000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q2 2026",
+  "meta": 300000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q2 2026",
+  "meta": 60000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q2 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q2 2026",
+  "meta": 72000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q2 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q2 2026",
+  "meta": 108750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP PIAUÍ",
+  "periodo": "Q2 2026",
+  "meta": 108000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q2 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q2 2026",
+  "meta": 45000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q2 2026",
+  "meta": 163750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q2 2026",
+  "meta": 38793.1
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q2 2026",
+  "meta": 700000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 311777.78
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 315902.98
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q2 2026",
+  "meta": 810000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q2 2026",
+  "meta": 270000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q2 2026",
+  "meta": 600000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q2 2026",
+  "meta": 72500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q2 2026",
+  "meta": 335000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q2 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q2 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "VINICIUS PRIMO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q2 2026",
+  "meta": 311777.78
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "VINICIUS PRIMO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q2 2026",
+  "meta": 315902.98
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q2 2026",
+  "meta": 40500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q2 2026",
+  "meta": 12000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q2 2026",
+  "meta": 11666.67
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q3 2026",
+  "meta": 240000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q3 2026",
+  "meta": 125000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q3 2026",
+  "meta": 525000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q3 2026",
+  "meta": 336206.9
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 1636000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 128000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ACESSO",
+  "periodo": "Q3 2026",
+  "meta": 250000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ANEURISMA",
+  "periodo": "Q3 2026",
+  "meta": 1125000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "AVC",
+  "periodo": "Q3 2026",
+  "meta": 60000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "MAVS",
+  "periodo": "Q3 2026",
+  "meta": 750000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "RAPIDMEDICAL",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ANEURISMA",
+  "periodo": "Q3 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q3 2026",
+  "meta": 615000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q3 2026",
+  "meta": 224000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q3 2026",
+  "meta": 373750.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q3 2026",
+  "meta": 245000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q3 2026",
+  "meta": 70000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q3 2026",
+  "meta": 126000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q3 2026",
+  "meta": 34722.22
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q3 2026",
+  "meta": 369500.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q3 2026",
+  "meta": 180000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q3 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q3 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q3 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "CANULAS",
+  "periodo": "Q3 2026",
+  "meta": 77400.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "CEC",
+  "periodo": "Q3 2026",
+  "meta": 116000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "VALVULAS",
+  "periodo": "Q3 2026",
+  "meta": 150000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q3 2026",
+  "meta": 75000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q3 2026",
+  "meta": 36000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q3 2026",
+  "meta": 58333.33
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q3 2026",
+  "meta": 423750.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q3 2026",
+  "meta": 260000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q3 2026",
+  "meta": 270000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q3 2026",
+  "meta": 147413.82
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "NIPRO",
+  "topico": "CP",
+  "tipo": "CEC",
+  "periodo": "Q3 2026",
+  "meta": 250000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 400000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 400000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 1122000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 220000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q3 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q3 2026",
+  "meta": 72000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q3 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q3 2026",
+  "meta": 108750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q3 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q3 2026",
+  "meta": 45000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q3 2026",
+  "meta": 163750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q3 2026",
+  "meta": 38793.1
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 210000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 1200000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 184000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 703791.05
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 720000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q3 2026",
+  "meta": 638750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q3 2026",
+  "meta": 125000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q3 2026",
+  "meta": 525000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q3 2026",
+  "meta": 31034.48
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q3 2026",
+  "meta": 900000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q3 2026",
+  "meta": 192000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q3 2026",
+  "meta": 450000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q3 2026",
+  "meta": 167500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q3 2026",
+  "meta": 43750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q3 2026",
+  "meta": 210000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q3 2026",
+  "meta": 23611.11
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q3 2026",
+  "meta": 171346.15
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q3 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q3 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q3 2026",
+  "meta": 13333.33
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q3 2026",
+  "meta": 13333.33
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q3 2026",
+  "meta": 15000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q3 2026",
+  "meta": 12000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q3 2026",
+  "meta": 4861.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q3 2026",
+  "meta": 97500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q3 2026",
+  "meta": 80000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q3 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q3 2026",
+  "meta": 25862.07
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 200000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 76666.67
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 231940.3
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q3 2026",
+  "meta": 262500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q3 2026",
+  "meta": 416000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q3 2026",
+  "meta": 31250.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q3 2026",
+  "meta": 391000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q3 2026",
+  "meta": 300000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q3 2026",
+  "meta": 60000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q3 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q3 2026",
+  "meta": 72000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q3 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q3 2026",
+  "meta": 108750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP PIAUÍ",
+  "periodo": "Q3 2026",
+  "meta": 108000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q3 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q3 2026",
+  "meta": 45000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q3 2026",
+  "meta": 163750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q3 2026",
+  "meta": 38793.1
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q3 2026",
+  "meta": 700000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 311777.78
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 315902.98
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q3 2026",
+  "meta": 810000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q3 2026",
+  "meta": 270000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q3 2026",
+  "meta": 600000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q3 2026",
+  "meta": 72500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q3 2026",
+  "meta": 335000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q3 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q3 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "VINICIUS PRIMO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q3 2026",
+  "meta": 311777.78
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "VINICIUS PRIMO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q3 2026",
+  "meta": 315902.98
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q3 2026",
+  "meta": 40500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q3 2026",
+  "meta": 12000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q3 2026",
+  "meta": 11666.67
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "ANNALINE ALBUQUERQUE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "FAGNER FREIRE",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "HELIO DA SILVA",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 818000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "JOEL GONCALVES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 64000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q4 2026",
+  "meta": 240000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q4 2026",
+  "meta": 125000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q4 2026",
+  "meta": 525000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "MARIANA MARTINS",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q4 2026",
+  "meta": 336206.9
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 1636000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 246000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 322000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL FORTALEZA",
+  "rep": "WARLEY GUSMAO",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 128000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ACESSO",
+  "periodo": "Q4 2026",
+  "meta": 250000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ANEURISMA",
+  "periodo": "Q4 2026",
+  "meta": 1125000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "AVC",
+  "periodo": "Q4 2026",
+  "meta": 60000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "BALT",
+  "topico": "NEUROVASCULAR",
+  "tipo": "MAVS",
+  "periodo": "Q4 2026",
+  "meta": 750000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ANDRE GOMES",
+  "uf": "",
+  "marca": "RAPIDMEDICAL",
+  "topico": "NEUROVASCULAR",
+  "tipo": "ANEURISMA",
+  "periodo": "Q4 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q4 2026",
+  "meta": 615000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q4 2026",
+  "meta": 224000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q4 2026",
+  "meta": 373750.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q4 2026",
+  "meta": 245000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q4 2026",
+  "meta": 70000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q4 2026",
+  "meta": 126000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q4 2026",
+  "meta": 34722.22
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q4 2026",
+  "meta": 369500.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q4 2026",
+  "meta": 180000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q4 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q4 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "ELVIS ARAUJO",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q4 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "CANULAS",
+  "periodo": "Q4 2026",
+  "meta": 77400.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "CEC",
+  "periodo": "Q4 2026",
+  "meta": 116000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "BRAILE",
+  "topico": "CARDIO PULMONAR",
+  "tipo": "VALVULAS",
+  "periodo": "Q4 2026",
+  "meta": 150000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q4 2026",
+  "meta": 75000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q4 2026",
+  "meta": 36000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q4 2026",
+  "meta": 58333.33
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q4 2026",
+  "meta": 423750.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q4 2026",
+  "meta": 260000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q4 2026",
+  "meta": 270000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q4 2026",
+  "meta": 147413.82
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "FABIO CHAVES",
+  "uf": "",
+  "marca": "NIPRO",
+  "topico": "CP",
+  "tipo": "CEC",
+  "periodo": "Q4 2026",
+  "meta": 250000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 400000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 400000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 1122000.0
+ },
+ {
+  "gr": "BIOSAUDE FILIAL MANAUS",
+  "rep": "GEAN CARLOS",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 220000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q4 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q4 2026",
+  "meta": 72000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q4 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q4 2026",
+  "meta": 72500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q4 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q4 2026",
+  "meta": 45000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q4 2026",
+  "meta": 163750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "ALEX SILVEIRA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q4 2026",
+  "meta": 38793.1
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 210000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 1200000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 184000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 703791.05
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "EVERTON NUNES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 720000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q4 2026",
+  "meta": 638750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q4 2026",
+  "meta": 125000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q4 2026",
+  "meta": 525000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "FABIA SUSSUARANA",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q4 2026",
+  "meta": 31034.48
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q4 2026",
+  "meta": 900000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q4 2026",
+  "meta": 192000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q4 2026",
+  "meta": 450000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q4 2026",
+  "meta": 111666.67
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q4 2026",
+  "meta": 43750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q4 2026",
+  "meta": 210000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q4 2026",
+  "meta": 23611.11
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q4 2026",
+  "meta": 171346.15
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q4 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q4 2026",
+  "meta": 20000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q4 2026",
+  "meta": 13333.33
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q4 2026",
+  "meta": 13333.33
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q4 2026",
+  "meta": 15000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q4 2026",
+  "meta": 12000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q4 2026",
+  "meta": 4861.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q4 2026",
+  "meta": 97500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q4 2026",
+  "meta": 80000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q4 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q4 2026",
+  "meta": 25862.07
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 200000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 76666.67
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 231940.3
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "MILENI NUNES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 0.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ATHERECTOMY",
+  "periodo": "Q4 2026",
+  "meta": 262500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "BALOON",
+  "periodo": "Q4 2026",
+  "meta": 416000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "EMBOLIZATION",
+  "periodo": "Q4 2026",
+  "meta": 31250.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "STENT PERIF",
+  "periodo": "Q4 2026",
+  "meta": 391000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "THROMBECTOMY",
+  "periodo": "Q4 2026",
+  "meta": 300000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "NATALIA VALENTE",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "PI - PERIFERAL INTERVENTION",
+  "tipo": "ULTRASOUND",
+  "periodo": "Q4 2026",
+  "meta": 60000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q4 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q4 2026",
+  "meta": 72000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q4 2026",
+  "meta": 112500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q4 2026",
+  "meta": 72500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "CIRCA SCIENTIFIC IN",
+  "topico": "CAS",
+  "tipo": "EP PIAUÍ",
+  "periodo": "Q4 2026",
+  "meta": 108000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "AORTIC",
+  "periodo": "Q4 2026",
+  "meta": 135000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "CARDIOFORM",
+  "periodo": "Q4 2026",
+  "meta": 45000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL INTERVENT",
+  "periodo": "Q4 2026",
+  "meta": 163750.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "GORE",
+  "topico": "ENDOVASCULAR",
+  "tipo": "PERIFERAL VASCULAR",
+  "periodo": "Q4 2026",
+  "meta": 38793.1
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CAS",
+  "tipo": "CRIO",
+  "periodo": "Q4 2026",
+  "meta": 700000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 311777.78
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 315902.98
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "RONEI GOMES",
+  "uf": "",
+  "marca": "MICROPORT",
+  "topico": "CAS",
+  "tipo": "EP",
+  "periodo": "Q4 2026",
+  "meta": 810000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "COMPLEX PCI",
+  "periodo": "Q4 2026",
+  "meta": 270000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "PCI GUIDANCE",
+  "periodo": "Q4 2026",
+  "meta": 600000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STENT C",
+  "periodo": "Q4 2026",
+  "meta": 72500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "BOSTON",
+  "topico": "IC - CARDIO INTERVENTIONAL",
+  "tipo": "STRUCTURAL HEART",
+  "periodo": "Q4 2026",
+  "meta": 335000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIA",
+  "periodo": "Q4 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "THANIA VIEIRA",
+  "uf": "",
+  "marca": "COCOON",
+  "topico": "SHCD-COCOON",
+  "tipo": "CIV",
+  "periodo": "Q4 2026",
+  "meta": 50000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "VINICIUS PRIMO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "HP - DESFIBRILADORES",
+  "periodo": "Q4 2026",
+  "meta": 311777.78
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "VINICIUS PRIMO",
+  "uf": "",
+  "marca": "MEDTRONIC",
+  "topico": "CRM",
+  "tipo": "LP - MARCAPASSO",
+  "periodo": "Q4 2026",
+  "meta": 315902.98
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "BIA",
+  "periodo": "Q4 2026",
+  "meta": 40500.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "CRITICAL CARE",
+  "periodo": "Q4 2026",
+  "meta": 12000.0
+ },
+ {
+  "gr": "BIOSAUDE MATRIZ",
+  "rep": "WELBA NUNES",
+  "uf": "",
+  "marca": "GETINGE",
+  "topico": "CP",
+  "tipo": "ENXERTOS",
+  "periodo": "Q4 2026",
+  "meta": 11666.67
+ }
+]
