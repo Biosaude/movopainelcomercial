@@ -60,6 +60,11 @@ const INITIAL_METAS: Meta[] = (rawMetas as Array<Record<string, unknown>>).map((
   gr: str(m.gr), rep: str(m.rep), marca: str(m.marca), uf: str(m.uf),
   topico: str(m.topico), tipo: str(m.tipo), periodo: str(m.periodo), meta: Number(m.meta) || 0,
   ufHospital: str(m.ufHospital) || undefined,
+  mes: str(m.mes) || undefined,
+  cliente: str(m.cliente) || undefined,
+  medico: str(m.medico) || undefined,
+  assessor: str(m.assessor) || undefined,
+  ufCliente: str(m.ufCliente) || undefined,
   metaFinanceira: m.metaFinanceira === undefined || m.metaFinanceira === null || m.metaFinanceira === ""
     ? undefined : Number(m.metaFinanceira) || 0,
 }));
@@ -139,12 +144,17 @@ function matchesMeta(m: Meta, f: Filters, skip?: FilterKey) {
   return (
     has("anos", f.anos, anoLabel(m.periodo)) &&
     has("trimestres", f.trimestres, periodoQ(m.periodo)) &&
+    (skip === "meses" || f.meses.length === 0 || !str(m.mes) || f.meses.includes(label(m.mes))) &&
     has("grs", f.grs, normGR(m.gr)) &&
     has("ufs", f.ufs, ufLabel(m.uf)) &&
+    (skip === "ufsCliente" || f.ufsCliente.length === 0 || !str(m.ufCliente) || f.ufsCliente.includes(ufLabel(m.ufCliente))) &&
     (skip === "ufsHospital" || f.ufsHospital.length === 0 || !str(m.ufHospital) || f.ufsHospital.includes(ufLabel(m.ufHospital))) &&
     has("marcas", f.marcas.map(normMarca), normMarca(m.marca)) &&
     has("topicos", f.topicos.map(topicoCode), topicoCode(m.topico)) &&
     has("tipos", f.tipos.map(normTipo), normTipo(label(m.tipo))) &&
+    (skip === "clientes" || f.clientes.length === 0 || !str(m.cliente) || f.clientes.includes(label(m.cliente))) &&
+    (skip === "medicos" || f.medicos.length === 0 || !str(m.medico) || f.medicos.includes(label(m.medico))) &&
+    (skip === "assessores" || f.assessores.length === 0 || !str(m.assessor) || f.assessores.includes(label(m.assessor))) &&
     has("reps", f.reps.map(normRep), normRep(m.rep))
   );
 }
@@ -382,10 +392,16 @@ function Dashboard() {
   const gapMeta = metaTotal > 0 ? fat2026ComMeta - metaTotal : 0;
 
   /* --------- Séries --------- */
+  const metasFinanceirasFiltradas = useMemo(
+    () => filteredMetas.filter((m) => periodoYear(m.periodo) === 2026 && m.metaFinanceira !== undefined),
+    [filteredMetas],
+  );
+  const metaFinanceira2026 = metasFinanceirasFiltradas.reduce((total, m) => total + (m.metaFinanceira ?? 0), 0);
+
   const byPeriodo = useMemo(() => {
-    const m = new Map<string, { p: string; v2025: number; v2026: number; meta: number }>();
+    const m = new Map<string, { p: string; v2025: number; v2026: number; meta: number; metaFinanceira: number }>();
     const ensure = (q: string) => {
-      const cur = m.get(q) || { p: q, v2025: 0, v2026: 0, meta: 0 };
+      const cur = m.get(q) || { p: q, v2025: 0, v2026: 0, meta: 0, metaFinanceira: 0 };
       m.set(q, cur);
       return cur;
     };
@@ -396,28 +412,9 @@ function Dashboard() {
       else if (periodoYear(d.periodo) === 2026) cur.v2026 += d.valor;
     });
     filteredMetas.forEach((mt) => { ensure(periodoQ(mt.periodo)).meta += mt.meta; });
+    metasFinanceirasFiltradas.forEach((mt) => { ensure(periodoQ(mt.periodo)).metaFinanceira += mt.metaFinanceira ?? 0; });
     return Array.from(m.values()).sort((a, b) => a.p.localeCompare(b.p));
-  }, [filtered, filteredMetas]);
-
-  /**
-   * A meta financeira é geral. Na planilha ela pode aparecer repetida nas
-   * linhas da Meta de Venda; por isso consideramos uma única ocorrência de
-   * cada valor por trimestre, sem aplicar filtros de dimensões inexistentes.
-   */
-  const metaFinanceira2026 = useMemo(() => {
-    const valoresPorTrimestre = new Map<string, Set<number>>();
-    metasData.forEach((m) => {
-      if (periodoYear(m.periodo) !== 2026 || !(m.metaFinanceira && m.metaFinanceira > 0)) return;
-      const q = periodoQ(m.periodo);
-      const valores = valoresPorTrimestre.get(q) ?? new Set<number>();
-      valores.add(m.metaFinanceira);
-      valoresPorTrimestre.set(q, valores);
-    });
-    return Array.from(valoresPorTrimestre.values()).reduce(
-      (total, valores) => total + Array.from(valores).reduce((subtotal, valor) => subtotal + valor, 0),
-      0,
-    );
-  }, [metasData]);
+  }, [filtered, filteredMetas, metasFinanceirasFiltradas]);
 
   const byGR = useMemo(() => {
     const m = new Map<string, number>();
@@ -524,7 +521,7 @@ function Dashboard() {
   const byUFCliente = useMemo(() => byUFGeneric((d) => d.ufCliente), [filtered2026]);
   const byUFHospital = useMemo(() => byUFGeneric((d) => d.ufHospital), [filtered2026]);
 
-  /** Realizado FY26 × Meta de Venda por UF do Hospital (a Meta Financeira NÃO entra aqui — é meta geral) */
+  /** Realizado FY26 × Meta de Venda por UF do Hospital. */
   const ufHospitalPerformance = useMemo(() => {
     const map = new Map<string, { name: string; fat: number; meta: number }>();
     const ensure = (uf: string) => {
@@ -723,7 +720,7 @@ function Dashboard() {
             tooltip={metaFinanceira2026 > 0 ? fmtBRLFull(metaFinanceira2026) : "Sem meta financeira cadastrada para 2026"}
             icon={DollarSign}
             accent="info"
-            sub="Meta geral do ano fiscal"
+            sub={`${fmtInt(metasFinanceirasFiltradas.length)} registros no recorte`}
           />
           <KpiCard
             title="Cobertura 2026" value={cobertura === null ? "Sem meta" : fmtPct(cobertura, 2)}
@@ -770,6 +767,7 @@ function Dashboard() {
                     <Bar dataKey="v2026" name="FY 26" fill={COLOR_2026} radius={[4, 4, 0, 0]} cursor="pointer"
                       onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })} />
                     <Line type="monotone" dataKey="meta" name="Meta de Venda 2026" stroke={COLOR_META} strokeWidth={2.5} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="metaFinanceira" name="Meta Financeira 2026" stroke="#7c3aed" strokeWidth={2.5} dot={{ r: 4 }} />
                   </ComposedChart>
                 </ResponsiveContainer>
               )}
