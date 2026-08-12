@@ -9,9 +9,9 @@ export type Row = {
 };
 export type Meta = {
   gr: string; rep: string; uf: string; marca: string; topico: string; tipo: string; periodo: string; meta: number;
-  /** UF do hospital (opcional — só quando a planilha fornece) */
-  ufHospital?: string;
-  /** Meta Financeira — indicador geral, independente da Meta de Venda */
+  /* Dimensões opcionais preservadas quando existirem na linha importada. */
+  mes?: string; cliente?: string; medico?: string; assessor?: string;
+  ufCliente?: string; ufHospital?: string;
   metaFinanceira?: number;
 };
 
@@ -63,7 +63,9 @@ export const normGR = (s: string) => {
 
 export const metaKey = (m: Meta) => [
   periodoQ(m.periodo), normGR(m.gr), normRep(m.rep), normUF(m.uf),
-  normMarca(m.marca), topicoCode(m.topico), normTipo(m.tipo), normUF(m.ufHospital ?? ""),
+  normMarca(m.marca), topicoCode(m.topico), normTipo(m.tipo), m.mes ?? "",
+  m.cliente ?? "", m.medico ?? "", m.assessor ?? "", normUF(m.ufCliente ?? ""),
+  normUF(m.ufHospital ?? ""),
 ].join("|||");
 
 export const fatKey = (d: Row) => [
@@ -161,7 +163,12 @@ const META_ALIASES: Record<string, keyof Meta> = {
   "gr": "gr", "grupo": "gr",
   "representante": "rep", "rep": "rep", "representante/assessor": "rep",
   "uf": "uf", "estado": "uf", "uf do faturamento": "uf",
+  "uf do cliente": "ufCliente", "uf cliente": "ufCliente",
   "uf do hospital": "ufHospital", "uf hospital": "ufHospital",
+  "cliente": "cliente", "hospital": "cliente",
+  "medico": "medico", "médico": "medico",
+  "assessor": "assessor",
+  "mes": "mes", "mês": "mes",
   "marca": "marca", "marca do produto": "marca",
   "topico": "topico", "tópico": "topico", "tópico do produto": "topico", "topico do produto": "topico",
   "tipo": "tipo", "tipo do produto": "tipo",
@@ -177,7 +184,14 @@ export const FAT_HEADERS = [
   "GR", "Representante", "Assessor", "UF", "UF do Cliente", "UF do Hospital",
   "Cliente", "Médico", "Marca", "Tópico do Produto", "Tipo do Produto", "Mês", "Período", "Valor",
 ];
-export const META_HEADERS = ["GR", "Representante", "UF", "UF do Hospital", "Marca", "Tópico do Produto", "Tipo do Produto", "Período", "Meta de Venda", "Meta Financeira"];
+/**
+ * No modelo exportado, a tabela de metas começa em P: o campo Mês ocupa Y e
+ * Meta Financeira ocupa Z. A importação continua orientada pelo cabeçalho, em
+ * vez de assumir posições, para preservar as dimensões presentes na fonte.
+ * A cópia do valor da coluna D da base de origem para Z pertence à preparação
+ * dessa base; o workbook de origem não faz parte deste repositório.
+ */
+export const META_HEADERS = ["GR", "Representante", "UF", "UF do Hospital", "Marca", "Tópico do Produto", "Tipo do Produto", "Período", "Meta de Venda", "Mês", "Meta Financeira"];
 
 const norm = (s: string) => String(s ?? "").trim().toLowerCase();
 
@@ -315,10 +329,21 @@ export function parseWorkbook(file: ArrayBuffer): ParseResult {
           totalLinhas++;
           if (!rep || !isPeriodoValido(periodo) || (meta === null && metaFin === null)) { linhasInvalidas++; continue; }
           if ((meta ?? 0) === 0 && (metaFin ?? 0) === 0) continue;
+          const optMeta = (idx: number | undefined, upper = false) => {
+            if (idx === undefined) return undefined;
+            const v = String(row[idx] ?? "").trim();
+            if (!v) return undefined;
+            return upper ? v.toUpperCase() : v;
+          };
           metas.push({
             gr: String(row[metaMap.gr!] ?? "").trim(),
             rep,
             uf: String(metaMap.uf !== undefined ? row[metaMap.uf] ?? "" : "").trim().toUpperCase(),
+            mes: optMeta(metaMap.mes as number | undefined),
+            cliente: optMeta(metaMap.cliente as number | undefined),
+            medico: optMeta(metaMap.medico as number | undefined),
+            assessor: optMeta(metaMap.assessor as number | undefined),
+            ufCliente: optMeta(metaMap.ufCliente as number | undefined, true),
             ufHospital: (() => {
               const idx = metaMap.ufHospital as number | undefined;
               if (idx === undefined) return undefined;

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend, Line, LineChart,
+  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend, Line,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
@@ -60,6 +60,11 @@ const INITIAL_METAS: Meta[] = (rawMetas as Array<Record<string, unknown>>).map((
   gr: str(m.gr), rep: str(m.rep), marca: str(m.marca), uf: str(m.uf),
   topico: str(m.topico), tipo: str(m.tipo), periodo: str(m.periodo), meta: Number(m.meta) || 0,
   ufHospital: str(m.ufHospital) || undefined,
+  mes: str(m.mes) || undefined,
+  cliente: str(m.cliente) || undefined,
+  medico: str(m.medico) || undefined,
+  assessor: str(m.assessor) || undefined,
+  ufCliente: str(m.ufCliente) || undefined,
   metaFinanceira: m.metaFinanceira === undefined || m.metaFinanceira === null || m.metaFinanceira === ""
     ? undefined : Number(m.metaFinanceira) || 0,
 }));
@@ -139,12 +144,17 @@ function matchesMeta(m: Meta, f: Filters, skip?: FilterKey) {
   return (
     has("anos", f.anos, anoLabel(m.periodo)) &&
     has("trimestres", f.trimestres, periodoQ(m.periodo)) &&
+    (skip === "meses" || f.meses.length === 0 || !str(m.mes) || f.meses.includes(label(m.mes))) &&
     has("grs", f.grs, normGR(m.gr)) &&
     has("ufs", f.ufs, ufLabel(m.uf)) &&
+    (skip === "ufsCliente" || f.ufsCliente.length === 0 || !str(m.ufCliente) || f.ufsCliente.includes(ufLabel(m.ufCliente))) &&
     (skip === "ufsHospital" || f.ufsHospital.length === 0 || !str(m.ufHospital) || f.ufsHospital.includes(ufLabel(m.ufHospital))) &&
     has("marcas", f.marcas.map(normMarca), normMarca(m.marca)) &&
     has("topicos", f.topicos.map(topicoCode), topicoCode(m.topico)) &&
     has("tipos", f.tipos.map(normTipo), normTipo(label(m.tipo))) &&
+    (skip === "clientes" || f.clientes.length === 0 || !str(m.cliente) || f.clientes.includes(label(m.cliente))) &&
+    (skip === "medicos" || f.medicos.length === 0 || !str(m.medico) || f.medicos.includes(label(m.medico))) &&
+    (skip === "assessores" || f.assessores.length === 0 || !str(m.assessor) || f.assessores.includes(label(m.assessor))) &&
     has("reps", f.reps.map(normRep), normRep(m.rep))
   );
 }
@@ -382,10 +392,16 @@ function Dashboard() {
   const gapMeta = metaTotal > 0 ? fat2026ComMeta - metaTotal : 0;
 
   /* --------- Séries --------- */
+  const metasFinanceirasFiltradas = useMemo(
+    () => filteredMetas.filter((m) => periodoYear(m.periodo) === 2026 && m.metaFinanceira !== undefined),
+    [filteredMetas],
+  );
+  const metaFinanceira2026 = metasFinanceirasFiltradas.reduce((total, m) => total + (m.metaFinanceira ?? 0), 0);
+
   const byPeriodo = useMemo(() => {
-    const m = new Map<string, { p: string; v2025: number; v2026: number; meta: number }>();
+    const m = new Map<string, { p: string; v2025: number; v2026: number; meta: number; metaFinanceira: number }>();
     const ensure = (q: string) => {
-      const cur = m.get(q) || { p: q, v2025: 0, v2026: 0, meta: 0 };
+      const cur = m.get(q) || { p: q, v2025: 0, v2026: 0, meta: 0, metaFinanceira: 0 };
       m.set(q, cur);
       return cur;
     };
@@ -396,38 +412,9 @@ function Dashboard() {
       else if (periodoYear(d.periodo) === 2026) cur.v2026 += d.valor;
     });
     filteredMetas.forEach((mt) => { ensure(periodoQ(mt.periodo)).meta += mt.meta; });
+    metasFinanceirasFiltradas.forEach((mt) => { ensure(periodoQ(mt.periodo)).metaFinanceira += mt.metaFinanceira ?? 0; });
     return Array.from(m.values()).sort((a, b) => a.p.localeCompare(b.p));
-  }, [filtered, filteredMetas]);
-
-  /**
-   * Meta Financeira · indicador geral: não é distribuído por UF e ignora
-   * qualquer filtro de UF (UF, UF do Cliente, UF do Hospital).
-   */
-  const temMetaFinanceira = useMemo(
-    () => metasData.some((m) => (m.metaFinanceira ?? 0) > 0),
-    [metasData],
-  );
-  const byPeriodoFinanceira = useMemo(() => {
-    const fSemUF: Filters = { ...f, ufs: [], ufsCliente: [], ufsHospital: [] };
-    const m = new Map<string, { p: string; realizado: number; metaFin: number }>();
-    const ensure = (q: string) => {
-      const cur = m.get(q) || { p: q, realizado: 0, metaFin: 0 };
-      m.set(q, cur);
-      return cur;
-    };
-    ["Q1", "Q2", "Q3", "Q4"].forEach(ensure);
-    data.forEach((d) => {
-      if (periodoYear(d.periodo) !== 2026) return;
-      if (!matchesFat(d, fSemUF)) return;
-      ensure(periodoQ(d.periodo)).realizado += d.valor;
-    });
-    metasData.forEach((mt) => {
-      const v = mt.metaFinanceira ?? 0;
-      if (!v || !matchesMeta(mt, fSemUF)) return;
-      ensure(periodoQ(mt.periodo)).metaFin += v;
-    });
-    return Array.from(m.values()).sort((a, b) => a.p.localeCompare(b.p));
-  }, [data, metasData, f]);
+  }, [filtered, filteredMetas, metasFinanceirasFiltradas]);
 
   const byGR = useMemo(() => {
     const m = new Map<string, number>();
@@ -534,7 +521,7 @@ function Dashboard() {
   const byUFCliente = useMemo(() => byUFGeneric((d) => d.ufCliente), [filtered2026]);
   const byUFHospital = useMemo(() => byUFGeneric((d) => d.ufHospital), [filtered2026]);
 
-  /** Realizado FY26 × Meta de Venda por UF do Hospital (a Meta Financeira NÃO entra aqui — é meta geral) */
+  /** Realizado FY26 × Meta de Venda por UF do Hospital. */
   const ufHospitalPerformance = useMemo(() => {
     const map = new Map<string, { name: string; fat: number; meta: number }>();
     const ensure = (uf: string) => {
@@ -705,7 +692,7 @@ function Dashboard() {
         </Card>
 
         {/* 2 · KPIs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-3">
           <KpiCard
             title="FY 25" value={fmtCompact(fat2025)} tooltip={fmtBRLFull(fat2025)}
             icon={DollarSign} sub={`${fmtInt(fat2025Rows.length)} registros`} accent="info"
@@ -726,6 +713,14 @@ function Dashboard() {
             icon={Target} accent="warning"
             sub={metaTotal > 0 ? `${fmtInt(filteredMetas.length)} metas no recorte` : "Sem meta"}
             onClick={() => openDrill("Detalhe · Meta de Venda 2026")}
+          />
+          <KpiCard
+            title="Meta Financeira 2026"
+            value={metaFinanceira2026 > 0 ? fmtCompact(metaFinanceira2026) : "Sem meta"}
+            tooltip={metaFinanceira2026 > 0 ? fmtBRLFull(metaFinanceira2026) : "Sem meta financeira cadastrada para 2026"}
+            icon={DollarSign}
+            accent="info"
+            sub={`${fmtInt(metasFinanceirasFiltradas.length)} registros no recorte`}
           />
           <KpiCard
             title="Cobertura 2026" value={cobertura === null ? "Sem meta" : fmtPct(cobertura, 2)}
@@ -752,8 +747,8 @@ function Dashboard() {
           />
         </div>
 
-        {/* 3 · Meta de Venda | Meta Financeira (lado a lado) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* 3 · Evolução trimestral */}
+        <div>
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base">Evolução FY 25 vs FY 26 por Trimestre · Meta de Venda 2026</CardTitle></CardHeader>
             <CardContent>
@@ -772,38 +767,13 @@ function Dashboard() {
                     <Bar dataKey="v2026" name="FY 26" fill={COLOR_2026} radius={[4, 4, 0, 0]} cursor="pointer"
                       onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })} />
                     <Line type="monotone" dataKey="meta" name="Meta de Venda 2026" stroke={COLOR_META} strokeWidth={2.5} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="metaFinanceira" name="Meta Financeira 2026" stroke="#7c3aed" strokeWidth={2.5} dot={{ r: 4 }} />
                   </ComposedChart>
                 </ResponsiveContainer>
               )}
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Realizado FY 26 × Meta Financeira por Trimestre</CardTitle></CardHeader>
-            <CardContent>
-              {!temMetaFinanceira ? (
-                <EmptyState
-                  height={300}
-                  message="Sem Meta Financeira na base atual. Envie a planilha com a coluna 'Meta Financeira' na aba de metas para habilitar esta análise."
-                />
-              ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={byPeriodoFinanceira} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
-                    <XAxis dataKey="p" className="text-xs" />
-                    <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [fmtBRLFull(v), n]} />
-                    <Legend />
-                    <Line type="monotone" dataKey="realizado" name="Realizado FY 26" stroke={COLOR_2026} strokeWidth={2.5} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="metaFin" name="Meta Financeira" stroke={COLOR_META} strokeWidth={2.5} strokeDasharray="5 4" dot={{ r: 4 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              )}
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                Meta geral — não é distribuída por UF e não é afetada pelos filtros de UF.
-              </p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* 4 · FY 26 por GR */}
