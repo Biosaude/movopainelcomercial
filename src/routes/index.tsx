@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend, Line, LineChart,
+  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend, Line,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
@@ -400,34 +400,24 @@ function Dashboard() {
   }, [filtered, filteredMetas]);
 
   /**
-   * Meta Financeira · indicador geral: não é distribuído por UF e ignora
-   * qualquer filtro de UF (UF, UF do Cliente, UF do Hospital).
+   * A meta financeira é geral. Na planilha ela pode aparecer repetida nas
+   * linhas da Meta de Venda; por isso consideramos uma única ocorrência de
+   * cada valor por trimestre, sem aplicar filtros de dimensões inexistentes.
    */
-  const temMetaFinanceira = useMemo(
-    () => metasData.some((m) => (m.metaFinanceira ?? 0) > 0),
-    [metasData],
-  );
-  const byPeriodoFinanceira = useMemo(() => {
-    const fSemUF: Filters = { ...f, ufs: [], ufsCliente: [], ufsHospital: [] };
-    const m = new Map<string, { p: string; realizado: number; metaFin: number }>();
-    const ensure = (q: string) => {
-      const cur = m.get(q) || { p: q, realizado: 0, metaFin: 0 };
-      m.set(q, cur);
-      return cur;
-    };
-    ["Q1", "Q2", "Q3", "Q4"].forEach(ensure);
-    data.forEach((d) => {
-      if (periodoYear(d.periodo) !== 2026) return;
-      if (!matchesFat(d, fSemUF)) return;
-      ensure(periodoQ(d.periodo)).realizado += d.valor;
+  const metaFinanceira2026 = useMemo(() => {
+    const valoresPorTrimestre = new Map<string, Set<number>>();
+    metasData.forEach((m) => {
+      if (periodoYear(m.periodo) !== 2026 || !(m.metaFinanceira && m.metaFinanceira > 0)) return;
+      const q = periodoQ(m.periodo);
+      const valores = valoresPorTrimestre.get(q) ?? new Set<number>();
+      valores.add(m.metaFinanceira);
+      valoresPorTrimestre.set(q, valores);
     });
-    metasData.forEach((mt) => {
-      const v = mt.metaFinanceira ?? 0;
-      if (!v || !matchesMeta(mt, fSemUF)) return;
-      ensure(periodoQ(mt.periodo)).metaFin += v;
-    });
-    return Array.from(m.values()).sort((a, b) => a.p.localeCompare(b.p));
-  }, [data, metasData, f]);
+    return Array.from(valoresPorTrimestre.values()).reduce(
+      (total, valores) => total + Array.from(valores).reduce((subtotal, valor) => subtotal + valor, 0),
+      0,
+    );
+  }, [metasData]);
 
   const byGR = useMemo(() => {
     const m = new Map<string, number>();
@@ -705,7 +695,7 @@ function Dashboard() {
         </Card>
 
         {/* 2 · KPIs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-3">
           <KpiCard
             title="FY 25" value={fmtCompact(fat2025)} tooltip={fmtBRLFull(fat2025)}
             icon={DollarSign} sub={`${fmtInt(fat2025Rows.length)} registros`} accent="info"
@@ -726,6 +716,14 @@ function Dashboard() {
             icon={Target} accent="warning"
             sub={metaTotal > 0 ? `${fmtInt(filteredMetas.length)} metas no recorte` : "Sem meta"}
             onClick={() => openDrill("Detalhe · Meta de Venda 2026")}
+          />
+          <KpiCard
+            title="Meta Financeira 2026"
+            value={metaFinanceira2026 > 0 ? fmtCompact(metaFinanceira2026) : "Sem meta"}
+            tooltip={metaFinanceira2026 > 0 ? fmtBRLFull(metaFinanceira2026) : "Sem meta financeira cadastrada para 2026"}
+            icon={DollarSign}
+            accent="info"
+            sub="Meta geral do ano fiscal"
           />
           <KpiCard
             title="Cobertura 2026" value={cobertura === null ? "Sem meta" : fmtPct(cobertura, 2)}
@@ -752,8 +750,8 @@ function Dashboard() {
           />
         </div>
 
-        {/* 3 · Meta de Venda | Meta Financeira (lado a lado) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* 3 · Evolução trimestral */}
+        <div>
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base">Evolução FY 25 vs FY 26 por Trimestre · Meta de Venda 2026</CardTitle></CardHeader>
             <CardContent>
@@ -778,32 +776,6 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Realizado FY 26 × Meta Financeira por Trimestre</CardTitle></CardHeader>
-            <CardContent>
-              {!temMetaFinanceira ? (
-                <EmptyState
-                  height={300}
-                  message="Sem Meta Financeira na base atual. Envie a planilha com a coluna 'Meta Financeira' na aba de metas para habilitar esta análise."
-                />
-              ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={byPeriodoFinanceira} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
-                    <XAxis dataKey="p" className="text-xs" />
-                    <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [fmtBRLFull(v), n]} />
-                    <Legend />
-                    <Line type="monotone" dataKey="realizado" name="Realizado FY 26" stroke={COLOR_2026} strokeWidth={2.5} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="metaFin" name="Meta Financeira" stroke={COLOR_META} strokeWidth={2.5} strokeDasharray="5 4" dot={{ r: 4 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              )}
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                Meta geral — não é distribuída por UF e não é afetada pelos filtros de UF.
-              </p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* 4 · FY 26 por GR */}
