@@ -4,14 +4,14 @@ export type Row = {
   rep: string; periodo: string; topico: string;
   marca: string; gr: string; uf: string; tipo: string; valor: number;
   /* Dimensões opcionais — presentes apenas quando a planilha carregada as fornece */
-  mes?: string; cliente?: string; medico?: string; assessor?: string;
+  mes?: string; data?: string; cliente?: string; hospital?: string; medico?: string; assessor?: string;
   ufCliente?: string; ufHospital?: string;
 };
 export type Meta = {
   gr: string; rep: string; uf: string; marca: string; topico: string; tipo: string; periodo: string; meta: number;
-  /** UF do hospital (opcional — só quando a planilha fornece) */
-  ufHospital?: string;
-  /** Meta Financeira — indicador geral, independente da Meta de Venda */
+  /* Dimensões opcionais preservadas quando existirem na linha importada. */
+  mes?: string; cliente?: string; medico?: string; assessor?: string;
+  ufCliente?: string; ufHospital?: string;
   metaFinanceira?: number;
 };
 
@@ -33,7 +33,11 @@ export const stripAccents = (s: string) =>
 
 export const normMarca = (s: string) =>
   stripAccents(String(s ?? "")).trim().toUpperCase().replace(/\s+/g, " ");
-export const normUF = (s: string) => normMarca(s);
+/** Normaliza siglas de UF; "SOU" é um identificador inválido observado para Amazonas na fonte comercial. */
+export const normUF = (s: string) => {
+  const uf = normMarca(s);
+  return uf === "SOU" ? "AM" : uf;
+};
 export const normTipo = (s: string) => normMarca(s);
 
 /** Código canônico do tópico: "IC- CARDIO INTERVENTIONAL" → "IC" */
@@ -63,7 +67,9 @@ export const normGR = (s: string) => {
 
 export const metaKey = (m: Meta) => [
   periodoQ(m.periodo), normGR(m.gr), normRep(m.rep), normUF(m.uf),
-  normMarca(m.marca), topicoCode(m.topico), normTipo(m.tipo), normUF(m.ufHospital ?? ""),
+  normMarca(m.marca), topicoCode(m.topico), normTipo(m.tipo), m.mes ?? "",
+  m.cliente ?? "", m.medico ?? "", m.assessor ?? "", normUF(m.ufCliente ?? ""),
+  normUF(m.ufHospital ?? ""),
 ].join("|||");
 
 export const fatKey = (d: Row) => [
@@ -147,10 +153,11 @@ const FAT_ALIASES: Record<string, keyof Row> = {
   "uf": "uf", "estado": "uf", "uf do faturamento": "uf",
   "uf do cliente": "ufCliente", "uf cliente": "ufCliente",
   "uf do hospital": "ufHospital", "uf hospital": "ufHospital",
-  "cliente": "cliente", "hospital": "cliente",
+  "cliente": "cliente", "hospital": "hospital",
   "medico": "medico", "médico": "medico",
   "assessor": "assessor",
   "mes": "mes", "mês": "mes",
+  "data": "data",
   "marca": "marca",
   "topico": "topico", "tópico": "topico", "tópico do produto": "topico", "topico do produto": "topico",
   "tipo": "tipo", "tipo do produto": "tipo", "tipo produto": "tipo",
@@ -161,7 +168,12 @@ const META_ALIASES: Record<string, keyof Meta> = {
   "gr": "gr", "grupo": "gr",
   "representante": "rep", "rep": "rep", "representante/assessor": "rep",
   "uf": "uf", "estado": "uf", "uf do faturamento": "uf",
+  "uf do cliente": "ufCliente", "uf cliente": "ufCliente",
   "uf do hospital": "ufHospital", "uf hospital": "ufHospital",
+  "cliente": "cliente", "hospital": "cliente",
+  "medico": "medico", "médico": "medico",
+  "assessor": "assessor",
+  "mes": "mes", "mês": "mes",
   "marca": "marca", "marca do produto": "marca",
   "topico": "topico", "tópico": "topico", "tópico do produto": "topico", "topico do produto": "topico",
   "tipo": "tipo", "tipo do produto": "tipo",
@@ -174,10 +186,16 @@ const META_ALIASES: Record<string, keyof Meta> = {
 };
 
 export const FAT_HEADERS = [
-  "GR", "Representante", "Assessor", "UF", "UF do Cliente", "UF do Hospital",
-  "Cliente", "Médico", "Marca", "Tópico do Produto", "Tipo do Produto", "Mês", "Período", "Valor",
+  "GR", "Representante", "Assessor", "UF", "Marca", "Tópico do Produto", "Tipo do Produto",
+  "Cliente", "UF do Cliente", "Hospital", "UF do Hospital", "Médico", "Data", "Mês", "Período", "Valor",
 ];
-export const META_HEADERS = ["GR", "Representante", "UF", "UF do Hospital", "Marca", "Tópico do Produto", "Tipo do Produto", "Período", "Meta de Venda", "Meta Financeira"];
+/**
+ * No modelo exportado, a tabela de faturamento ocupa A:P, Q fica vazia e a
+ * tabela de metas ocupa R:Z. A importação continua orientada pelo cabeçalho, em
+ * vez de assumir posições. Na base validada, Y contém Meta e Z contém Meta
+ * Financeira (fórmula Y × 90%); os valores calculados são lidos pelo cabeçalho.
+ */
+export const META_HEADERS = ["GR", "Representante", "UF", "Marca", "Tópico do Produto", "Tipo do Produto", "Período", "Meta", "Meta Financeira"];
 
 const norm = (s: string) => String(s ?? "").trim().toLowerCase();
 
@@ -294,8 +312,10 @@ export function parseWorkbook(file: ArrayBuffer): ParseResult {
             tipo: String(fatMap.tipo !== undefined ? row[fatMap.tipo] ?? "" : "").trim(),
             periodo,
             valor,
+            data: opt(fatMap.data as number | undefined),
             mes: opt(fatMap.mes as number | undefined),
             cliente: opt(fatMap.cliente as number | undefined),
+            hospital: opt(fatMap.hospital as number | undefined),
             medico: opt(fatMap.medico as number | undefined),
             assessor: opt(fatMap.assessor as number | undefined),
             ufCliente: opt(fatMap.ufCliente as number | undefined, true),
@@ -315,10 +335,21 @@ export function parseWorkbook(file: ArrayBuffer): ParseResult {
           totalLinhas++;
           if (!rep || !isPeriodoValido(periodo) || (meta === null && metaFin === null)) { linhasInvalidas++; continue; }
           if ((meta ?? 0) === 0 && (metaFin ?? 0) === 0) continue;
+          const optMeta = (idx: number | undefined, upper = false) => {
+            if (idx === undefined) return undefined;
+            const v = String(row[idx] ?? "").trim();
+            if (!v) return undefined;
+            return upper ? v.toUpperCase() : v;
+          };
           metas.push({
             gr: String(row[metaMap.gr!] ?? "").trim(),
             rep,
             uf: String(metaMap.uf !== undefined ? row[metaMap.uf] ?? "" : "").trim().toUpperCase(),
+            mes: optMeta(metaMap.mes as number | undefined),
+            cliente: optMeta(metaMap.cliente as number | undefined),
+            medico: optMeta(metaMap.medico as number | undefined),
+            assessor: optMeta(metaMap.assessor as number | undefined),
+            ufCliente: optMeta(metaMap.ufCliente as number | undefined, true),
             ufHospital: (() => {
               const idx = metaMap.ufHospital as number | undefined;
               if (idx === undefined) return undefined;
