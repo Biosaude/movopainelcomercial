@@ -49,8 +49,10 @@ const INITIAL_FAT: Row[] = (rawFaturamento as Array<Record<string, unknown>>).ma
   tipo: str(r.tipo),
   periodo: str(r.periodo),
   valor: Number(r.valor) || 0,
+  data: str(r.data) || undefined,
   mes: str(r.mes) || undefined,
   cliente: str(r.cliente) || undefined,
+  hospital: str(r.hospital) || undefined,
   medico: str(r.medico) || undefined,
   assessor: str(r.assessor) || undefined,
   ufCliente: str(r.ufCliente) || undefined,
@@ -125,7 +127,7 @@ function matchesFat(r: Row, f: Filters, skip?: FilterKey) {
     has("trimestres", f.trimestres, periodoQ(r.periodo)) &&
     has("meses", f.meses, label(r.mes)) &&
     has("grs", f.grs, normGR(r.gr)) &&
-    has("ufs", f.ufs, ufLabel(r.uf)) &&
+    (skip === "ufs" || f.ufs.length === 0 || !str(r.uf) || f.ufs.includes(ufLabel(r.uf))) &&
     has("ufsCliente", f.ufsCliente, ufLabel(r.ufCliente)) &&
     has("ufsHospital", f.ufsHospital, ufLabel(r.ufHospital)) &&
     has("marcas", f.marcas.map(normMarca), normMarca(r.marca)) &&
@@ -236,21 +238,21 @@ function ClientRankingCard({ items }: { items: RankItem[] }) {
           <span className="truncate">Ranking de Clientes</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-2">
         {items.length === 0 ? (
           <EmptyState message="A base atual não possui a dimensão Cliente." height={220} />
         ) : (
-          <ol className="space-y-1.5">
+          <ol className="space-y-2 py-1">
             {items.map((c, i) => (
-              <li key={c.name} className="grid grid-cols-[16px_minmax(0,1fr)_58px] items-center gap-2 text-[11px]" title={`${c.name} · ${fmtBRLFull(c.value)}`}>
-                <span className="text-muted-foreground tabular-nums">{i + 1}</span>
+              <li key={c.name} className="grid grid-cols-[20px_minmax(0,1fr)_72px] items-center gap-2 text-[11px]" title={`${c.name} · ${fmtBRLFull(c.value)}`}>
+                <span className="text-center font-semibold text-primary tabular-nums">{i + 1}</span>
                 <span className="min-w-0">
-                  <span className="block truncate font-medium">{c.name}</span>
-                  <span className="mt-0.5 block h-1.5 rounded bg-muted">
-                    <span className="block h-1.5 rounded bg-primary" style={{ width: `${max > 0 ? (c.value / max) * 100 : 0}%` }} />
+                  <span className="block truncate font-medium text-foreground">{c.name}</span>
+                  <span className="mt-1 block h-2 rounded bg-muted">
+                    <span className="block h-2 rounded bg-primary" style={{ width: `${max > 0 ? (c.value / max) * 100 : 0}%` }} />
                   </span>
                 </span>
-                <span className="text-right tabular-nums text-muted-foreground">{fmtCompact(c.value)}</span>
+                <span className="text-right text-[10px] font-medium tabular-nums text-muted-foreground">{fmtCompact(c.value)}</span>
               </li>
             ))}
           </ol>
@@ -315,7 +317,13 @@ function Dashboard() {
     const fromMetas = metasData.filter((m) => matchesMeta(m, f, "grs")).map((m) => normGR(m.gr));
     return unique([...optionsFor("grs", (r) => normGR(r.gr)), ...fromMetas]);
   }, [data, metasData, f]);
-  const ufOptions = useMemo(() => optionsFor("ufs", (r) => ufLabel(r.uf)).filter((u) => u !== SEM_UF), [data, f]);
+  const ufOptions = useMemo(() => {
+    const fromFat = optionsFor("ufs", (r) => ufLabel(r.uf));
+    const fromMetas = metasData
+      .filter((m) => matchesMeta(m, f, "ufs") && str(m.uf))
+      .map((m) => ufLabel(m.uf));
+    return unique([...fromFat, ...fromMetas]).filter((u) => u !== SEM_UF);
+  }, [data, metasData, f]);
   const ufClienteOptions = useMemo(() => optionsFor("ufsCliente", (r) => ufLabel(r.ufCliente)).filter((u) => u !== SEM_UF), [data, f]);
   const ufHospitalOptions = useMemo(() => {
     const fromMetas = metasData
@@ -388,7 +396,7 @@ function Dashboard() {
 
   const diffAbs = fat2026 - fat2025;
   const diffPct = pctVar(fat2026, fat2025);
-  const cobertura = pctAting(fat2026ComMeta, metaTotal);
+  const coberturaMV = pctAting(fat2026, metaTotal);
   const gapMeta = metaTotal > 0 ? fat2026ComMeta - metaTotal : 0;
 
   /* --------- Séries --------- */
@@ -397,6 +405,7 @@ function Dashboard() {
     [filteredMetas],
   );
   const metaFinanceira2026 = metasFinanceirasFiltradas.reduce((total, m) => total + (m.metaFinanceira ?? 0), 0);
+  const coberturaMF = pctAting(fat2026, metaFinanceira2026);
 
   const byPeriodo = useMemo(() => {
     const m = new Map<string, { p: string; v2025: number; v2026: number; meta: number; metaFinanceira: number }>();
@@ -506,7 +515,6 @@ function Dashboard() {
     filtered2026.forEach((d) => m.set(label(d.tipo), (m.get(label(d.tipo)) || 0) + d.valor));
     return Array.from(m, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [filtered2026]);
-  const tipoInformado = byTipo.some((t) => t.name !== NI);
 
   const byUFGeneric = (getter: (d: Row) => string | undefined) => {
     const m = new Map<string, number>();
@@ -517,7 +525,6 @@ function Dashboard() {
     });
     return Array.from(m, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   };
-  const byUF = useMemo(() => byUFGeneric((d) => d.uf), [filtered2026]);
   const byUFCliente = useMemo(() => byUFGeneric((d) => d.ufCliente), [filtered2026]);
   const byUFHospital = useMemo(() => byUFGeneric((d) => d.ufHospital), [filtered2026]);
 
@@ -692,7 +699,7 @@ function Dashboard() {
         </Card>
 
         {/* 2 · KPIs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <KpiCard
             title="FY 25" value={fmtCompact(fat2025)} tooltip={fmtBRLFull(fat2025)}
             icon={DollarSign} sub={`${fmtInt(fat2025Rows.length)} registros`} accent="info"
@@ -723,11 +730,17 @@ function Dashboard() {
             sub={`${fmtInt(metasFinanceirasFiltradas.length)} registros no recorte`}
           />
           <KpiCard
-            title="Cobertura 2026" value={cobertura === null ? "Sem meta" : fmtPct(cobertura, 2)}
-            icon={Flag} accent={cobertura === null ? "info" : cobertura >= 100 ? "success" : cobertura >= 70 ? "warning" : "danger"}
-            sub={`FY 26 ${fmtCompact(fat2026ComMeta)} · MV ${fmtCompact(metaTotal)}`}
-            tooltip={cobertura === null ? "Sem meta cadastrada para esta combinação" : `${fmtBRLFull(fat2026ComMeta)} de ${fmtBRLFull(metaTotal)}`}
+            title="Cobertura MV" value={coberturaMV === null ? "Sem meta" : fmtPct(coberturaMV, 2)}
+            icon={Flag} accent={coberturaMV === null ? "info" : coberturaMV >= 100 ? "success" : coberturaMV >= 70 ? "warning" : "danger"}
+            sub={`FY 26 ${fmtCompact(fat2026)} · MV ${fmtCompact(metaTotal)}`}
+            tooltip={coberturaMV === null ? "Sem meta cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaTotal)}`}
             onClick={() => openDrill("Detalhe · Cobertura da Meta")}
+          />
+          <KpiCard
+            title="Cobertura MF" value={coberturaMF === null ? "Sem meta" : fmtPct(coberturaMF, 2)}
+            icon={Flag} accent={coberturaMF === null ? "info" : coberturaMF >= 100 ? "success" : coberturaMF >= 70 ? "warning" : "danger"}
+            sub={`FY 26 ${fmtCompact(fat2026)} · MF ${fmtCompact(metaFinanceira2026)}`}
+            tooltip={coberturaMF === null ? "Sem MF cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaFinanceira2026)}`}
           />
           <KpiCard
             title="Diferença 25 / 26" value={`${diffAbs >= 0 ? "+" : "-"}${fmtCompact(Math.abs(diffAbs))}`}
@@ -777,7 +790,7 @@ function Dashboard() {
         </div>
 
         {/* 4 · FY 26 por GR */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div>
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base">FY 26 por GR</CardTitle></CardHeader>
             <CardContent>
@@ -821,7 +834,7 @@ function Dashboard() {
 
         {/* Faturamento × Meta por Representante (mantido) */}
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 × Meta por Representante</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 × Meta de Venda por Representante</CardTitle></CardHeader>
           <CardContent>
             {repPerformance.length === 0 ? (
               <EmptyState message="Não há dados para os filtros selecionados." />
@@ -835,7 +848,7 @@ function Dashboard() {
                   <Legend />
                   <Bar dataKey="fat" name="FY 26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
                     onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })} />
-                  <Bar dataKey="meta" name="Meta 2026" fill={COLOR_META} radius={[0, 3, 3, 0]} />
+                  <Bar dataKey="meta" name="Meta de Venda" fill={COLOR_META} radius={[0, 3, 3, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -934,48 +947,6 @@ function Dashboard() {
                     <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
                     <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [fmtBRLFull(v), "FY 26"]} />
                     <Bar dataKey="value" fill="#14b8a6" radius={[3, 3, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 por UF</CardTitle></CardHeader>
-            <CardContent>
-              {byUF.length === 0 ? (
-                <EmptyState message="A base atual não possui UF preenchida nos registros." />
-              ) : (
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={byUF} margin={{ top: 8, right: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
-                    <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [fmtBRLFull(v), "FY 26"]} />
-                    <Bar dataKey="value" fill={COLOR_NEUTRO_FALLBACK} radius={[3, 3, 0, 0]} cursor="pointer"
-                      onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { uf: e.name })} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 por Tipo do Produto</CardTitle></CardHeader>
-            <CardContent>
-              {!tipoInformado ? (
-                <EmptyState message="A base atual não possui Tipo do Produto preenchido no faturamento." />
-              ) : (
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={byTipo.slice(0, 12)} layout="vertical" margin={{ left: 8, right: 40 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
-                    <XAxis type="number" tickFormatter={fmtCompact} className="text-xs" />
-                    <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10 }} interval={0} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [fmtBRLFull(v), "FY 26"]} />
-                    <Bar dataKey="value" fill="#0284c7" radius={[0, 3, 3, 0]} cursor="pointer"
-                      onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { tipo: e.name })} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -1152,5 +1123,3 @@ function Dashboard() {
     </div>
   );
 }
-
-const COLOR_NEUTRO_FALLBACK = "#0ea5e9";
