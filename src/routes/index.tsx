@@ -15,6 +15,7 @@ import { MultiSelectFilter } from "@/components/dashboard/MultiSelectFilter";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { BaseManagement, type LastUpdate } from "@/components/dashboard/BaseManagement";
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
+import { BrazilHospitalMap, isBrazilUF } from "@/components/dashboard/BrazilHospitalMap";
 import { buildDrillRows, type DrillScope } from "@/lib/dashboard/drilldown";
 import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, SEM_UF,
@@ -526,7 +527,30 @@ function Dashboard() {
     return Array.from(m, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   };
   const byUFCliente = useMemo(() => byUFGeneric((d) => d.ufCliente), [filtered2026]);
-  const byUFHospital = useMemo(() => byUFGeneric((d) => d.ufHospital), [filtered2026]);
+  const hospitalMapData = useMemo(() => {
+    const values = new Map<string, number>();
+    let outsideValue = 0;
+    let outsideRecords = 0;
+    filtered2026.forEach((row) => {
+      const uf = normUF(str(row.ufHospital));
+      if (!isBrazilUF(uf)) {
+        outsideValue += row.valor;
+        outsideRecords += 1;
+        return;
+      }
+      values.set(uf, (values.get(uf) ?? 0) + row.valor);
+    });
+    const rows = Array.from(values, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    const representedValue = rows.reduce((total, item) => total + item.value, 0);
+    return {
+      rows,
+      outsideRecords,
+      outsideValue,
+      reconciled: Math.abs(representedValue + outsideValue - fat2026) < 0.01,
+    };
+  }, [filtered2026, fat2026]);
+  const byUFHospital = hospitalMapData.rows;
+  const topUFHospital = byUFHospital.slice(0, 5);
 
   /** Realizado FY26 × Meta de Venda por UF do Hospital. */
   const ufHospitalPerformance = useMemo(() => {
@@ -914,7 +938,7 @@ function Dashboard() {
         </Card>
 
         {/* 7 · UF do Cliente / UF do Hospital / UF */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4">
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento por UF do Cliente</CardTitle></CardHeader>
             <CardContent>
@@ -934,22 +958,26 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento por UF do Hospital</CardTitle></CardHeader>
+          <Card data-map-reconciled={hospitalMapData.reconciled} data-map-outside-records={hospitalMapData.outsideRecords}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento FY26 por UF do Hospital</CardTitle>
+              <p className="text-xs text-muted-foreground">Distribuição geográfica do faturamento por estado</p>
+            </CardHeader>
             <CardContent>
-              {byUFHospital.length === 0 ? (
-                <EmptyState message="A base atual não possui a dimensão UF do Hospital." />
-              ) : (
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={byUFHospital} margin={{ top: 8, right: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
-                    <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [fmtBRLFull(v), "FY 26"]} />
-                    <Bar dataKey="value" fill="#14b8a6" radius={[3, 3, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
+              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px] items-center gap-4">
+                <BrazilHospitalMap data={byUFHospital} />
+                <div className="min-w-0">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Top 5 UFs</p>
+                  <ol className="space-y-2">
+                    {topUFHospital.map((item, index) => (
+                      <li key={item.name} className="grid grid-cols-[20px_28px_1fr] items-center gap-1 text-xs">
+                        <span className="text-muted-foreground">{index + 1}.</span><b>{item.name}</b>
+                        <span className="text-right tabular-nums">{fmtCompact(item.value)}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
