@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend, Line, LineChart,
+  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend, Line,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
@@ -15,6 +15,7 @@ import { MultiSelectFilter } from "@/components/dashboard/MultiSelectFilter";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { BaseManagement, type LastUpdate } from "@/components/dashboard/BaseManagement";
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
+import { BrazilHospitalMap, isBrazilUF } from "@/components/dashboard/BrazilHospitalMap";
 import { buildDrillRows, type DrillScope } from "@/lib/dashboard/drilldown";
 import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, SEM_UF,
@@ -49,8 +50,10 @@ const INITIAL_FAT: Row[] = (rawFaturamento as Array<Record<string, unknown>>).ma
   tipo: str(r.tipo),
   periodo: str(r.periodo),
   valor: Number(r.valor) || 0,
+  data: str(r.data) || undefined,
   mes: str(r.mes) || undefined,
   cliente: str(r.cliente) || undefined,
+  hospital: str(r.hospital) || undefined,
   medico: str(r.medico) || undefined,
   assessor: str(r.assessor) || undefined,
   ufCliente: str(r.ufCliente) || undefined,
@@ -60,6 +63,11 @@ const INITIAL_METAS: Meta[] = (rawMetas as Array<Record<string, unknown>>).map((
   gr: str(m.gr), rep: str(m.rep), marca: str(m.marca), uf: str(m.uf),
   topico: str(m.topico), tipo: str(m.tipo), periodo: str(m.periodo), meta: Number(m.meta) || 0,
   ufHospital: str(m.ufHospital) || undefined,
+  mes: str(m.mes) || undefined,
+  cliente: str(m.cliente) || undefined,
+  medico: str(m.medico) || undefined,
+  assessor: str(m.assessor) || undefined,
+  ufCliente: str(m.ufCliente) || undefined,
   metaFinanceira: m.metaFinanceira === undefined || m.metaFinanceira === null || m.metaFinanceira === ""
     ? undefined : Number(m.metaFinanceira) || 0,
 }));
@@ -120,7 +128,7 @@ function matchesFat(r: Row, f: Filters, skip?: FilterKey) {
     has("trimestres", f.trimestres, periodoQ(r.periodo)) &&
     has("meses", f.meses, label(r.mes)) &&
     has("grs", f.grs, normGR(r.gr)) &&
-    has("ufs", f.ufs, ufLabel(r.uf)) &&
+    (skip === "ufs" || f.ufs.length === 0 || !str(r.uf) || f.ufs.includes(ufLabel(r.uf))) &&
     has("ufsCliente", f.ufsCliente, ufLabel(r.ufCliente)) &&
     has("ufsHospital", f.ufsHospital, ufLabel(r.ufHospital)) &&
     has("marcas", f.marcas.map(normMarca), normMarca(r.marca)) &&
@@ -139,12 +147,17 @@ function matchesMeta(m: Meta, f: Filters, skip?: FilterKey) {
   return (
     has("anos", f.anos, anoLabel(m.periodo)) &&
     has("trimestres", f.trimestres, periodoQ(m.periodo)) &&
+    (skip === "meses" || f.meses.length === 0 || !str(m.mes) || f.meses.includes(label(m.mes))) &&
     has("grs", f.grs, normGR(m.gr)) &&
     has("ufs", f.ufs, ufLabel(m.uf)) &&
+    (skip === "ufsCliente" || f.ufsCliente.length === 0 || !str(m.ufCliente) || f.ufsCliente.includes(ufLabel(m.ufCliente))) &&
     (skip === "ufsHospital" || f.ufsHospital.length === 0 || !str(m.ufHospital) || f.ufsHospital.includes(ufLabel(m.ufHospital))) &&
     has("marcas", f.marcas.map(normMarca), normMarca(m.marca)) &&
     has("topicos", f.topicos.map(topicoCode), topicoCode(m.topico)) &&
     has("tipos", f.tipos.map(normTipo), normTipo(label(m.tipo))) &&
+    (skip === "clientes" || f.clientes.length === 0 || !str(m.cliente) || f.clientes.includes(label(m.cliente))) &&
+    (skip === "medicos" || f.medicos.length === 0 || !str(m.medico) || f.medicos.includes(label(m.medico))) &&
+    (skip === "assessores" || f.assessores.length === 0 || !str(m.assessor) || f.assessores.includes(label(m.assessor))) &&
     has("reps", f.reps.map(normRep), normRep(m.rep))
   );
 }
@@ -226,21 +239,21 @@ function ClientRankingCard({ items }: { items: RankItem[] }) {
           <span className="truncate">Ranking de Clientes</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-2">
         {items.length === 0 ? (
           <EmptyState message="A base atual não possui a dimensão Cliente." height={220} />
         ) : (
-          <ol className="space-y-1.5">
+          <ol className="space-y-2 py-1">
             {items.map((c, i) => (
-              <li key={c.name} className="grid grid-cols-[16px_minmax(0,1fr)_58px] items-center gap-2 text-[11px]" title={`${c.name} · ${fmtBRLFull(c.value)}`}>
-                <span className="text-muted-foreground tabular-nums">{i + 1}</span>
+              <li key={c.name} className="grid grid-cols-[20px_minmax(0,1fr)_72px] items-center gap-2 text-[11px]" title={`${c.name} · ${fmtBRLFull(c.value)}`}>
+                <span className="text-center font-semibold text-primary tabular-nums">{i + 1}</span>
                 <span className="min-w-0">
-                  <span className="block truncate font-medium">{c.name}</span>
-                  <span className="mt-0.5 block h-1.5 rounded bg-muted">
-                    <span className="block h-1.5 rounded bg-primary" style={{ width: `${max > 0 ? (c.value / max) * 100 : 0}%` }} />
+                  <span className="block truncate font-medium text-foreground">{c.name}</span>
+                  <span className="mt-1 block h-2 rounded bg-muted">
+                    <span className="block h-2 rounded bg-primary" style={{ width: `${max > 0 ? (c.value / max) * 100 : 0}%` }} />
                   </span>
                 </span>
-                <span className="text-right tabular-nums text-muted-foreground">{fmtCompact(c.value)}</span>
+                <span className="text-right text-[10px] font-medium tabular-nums text-muted-foreground">{fmtCompact(c.value)}</span>
               </li>
             ))}
           </ol>
@@ -305,7 +318,13 @@ function Dashboard() {
     const fromMetas = metasData.filter((m) => matchesMeta(m, f, "grs")).map((m) => normGR(m.gr));
     return unique([...optionsFor("grs", (r) => normGR(r.gr)), ...fromMetas]);
   }, [data, metasData, f]);
-  const ufOptions = useMemo(() => optionsFor("ufs", (r) => ufLabel(r.uf)).filter((u) => u !== SEM_UF), [data, f]);
+  const ufOptions = useMemo(() => {
+    const fromFat = optionsFor("ufs", (r) => ufLabel(r.uf));
+    const fromMetas = metasData
+      .filter((m) => matchesMeta(m, f, "ufs") && str(m.uf))
+      .map((m) => ufLabel(m.uf));
+    return unique([...fromFat, ...fromMetas]).filter((u) => u !== SEM_UF);
+  }, [data, metasData, f]);
   const ufClienteOptions = useMemo(() => optionsFor("ufsCliente", (r) => ufLabel(r.ufCliente)).filter((u) => u !== SEM_UF), [data, f]);
   const ufHospitalOptions = useMemo(() => {
     const fromMetas = metasData
@@ -378,14 +397,21 @@ function Dashboard() {
 
   const diffAbs = fat2026 - fat2025;
   const diffPct = pctVar(fat2026, fat2025);
-  const cobertura = pctAting(fat2026ComMeta, metaTotal);
+  const coberturaMV = pctAting(fat2026, metaTotal);
   const gapMeta = metaTotal > 0 ? fat2026ComMeta - metaTotal : 0;
 
   /* --------- Séries --------- */
+  const metasFinanceirasFiltradas = useMemo(
+    () => filteredMetas.filter((m) => periodoYear(m.periodo) === 2026 && m.metaFinanceira !== undefined),
+    [filteredMetas],
+  );
+  const metaFinanceira2026 = metasFinanceirasFiltradas.reduce((total, m) => total + (m.metaFinanceira ?? 0), 0);
+  const coberturaMF = pctAting(fat2026, metaFinanceira2026);
+
   const byPeriodo = useMemo(() => {
-    const m = new Map<string, { p: string; v2025: number; v2026: number; meta: number }>();
+    const m = new Map<string, { p: string; v2025: number; v2026: number; meta: number; metaFinanceira: number }>();
     const ensure = (q: string) => {
-      const cur = m.get(q) || { p: q, v2025: 0, v2026: 0, meta: 0 };
+      const cur = m.get(q) || { p: q, v2025: 0, v2026: 0, meta: 0, metaFinanceira: 0 };
       m.set(q, cur);
       return cur;
     };
@@ -396,38 +422,9 @@ function Dashboard() {
       else if (periodoYear(d.periodo) === 2026) cur.v2026 += d.valor;
     });
     filteredMetas.forEach((mt) => { ensure(periodoQ(mt.periodo)).meta += mt.meta; });
+    metasFinanceirasFiltradas.forEach((mt) => { ensure(periodoQ(mt.periodo)).metaFinanceira += mt.metaFinanceira ?? 0; });
     return Array.from(m.values()).sort((a, b) => a.p.localeCompare(b.p));
-  }, [filtered, filteredMetas]);
-
-  /**
-   * Meta Financeira · indicador geral: não é distribuído por UF e ignora
-   * qualquer filtro de UF (UF, UF do Cliente, UF do Hospital).
-   */
-  const temMetaFinanceira = useMemo(
-    () => metasData.some((m) => (m.metaFinanceira ?? 0) > 0),
-    [metasData],
-  );
-  const byPeriodoFinanceira = useMemo(() => {
-    const fSemUF: Filters = { ...f, ufs: [], ufsCliente: [], ufsHospital: [] };
-    const m = new Map<string, { p: string; realizado: number; metaFin: number }>();
-    const ensure = (q: string) => {
-      const cur = m.get(q) || { p: q, realizado: 0, metaFin: 0 };
-      m.set(q, cur);
-      return cur;
-    };
-    ["Q1", "Q2", "Q3", "Q4"].forEach(ensure);
-    data.forEach((d) => {
-      if (periodoYear(d.periodo) !== 2026) return;
-      if (!matchesFat(d, fSemUF)) return;
-      ensure(periodoQ(d.periodo)).realizado += d.valor;
-    });
-    metasData.forEach((mt) => {
-      const v = mt.metaFinanceira ?? 0;
-      if (!v || !matchesMeta(mt, fSemUF)) return;
-      ensure(periodoQ(mt.periodo)).metaFin += v;
-    });
-    return Array.from(m.values()).sort((a, b) => a.p.localeCompare(b.p));
-  }, [data, metasData, f]);
+  }, [filtered, filteredMetas, metasFinanceirasFiltradas]);
 
   const byGR = useMemo(() => {
     const m = new Map<string, number>();
@@ -519,7 +516,6 @@ function Dashboard() {
     filtered2026.forEach((d) => m.set(label(d.tipo), (m.get(label(d.tipo)) || 0) + d.valor));
     return Array.from(m, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [filtered2026]);
-  const tipoInformado = byTipo.some((t) => t.name !== NI);
 
   const byUFGeneric = (getter: (d: Row) => string | undefined) => {
     const m = new Map<string, number>();
@@ -530,11 +526,33 @@ function Dashboard() {
     });
     return Array.from(m, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   };
-  const byUF = useMemo(() => byUFGeneric((d) => d.uf), [filtered2026]);
   const byUFCliente = useMemo(() => byUFGeneric((d) => d.ufCliente), [filtered2026]);
-  const byUFHospital = useMemo(() => byUFGeneric((d) => d.ufHospital), [filtered2026]);
+  const hospitalMapData = useMemo(() => {
+    const values = new Map<string, number>();
+    let outsideValue = 0;
+    let outsideRecords = 0;
+    filtered2026.forEach((row) => {
+      const uf = normUF(str(row.ufHospital));
+      if (!isBrazilUF(uf)) {
+        outsideValue += row.valor;
+        outsideRecords += 1;
+        return;
+      }
+      values.set(uf, (values.get(uf) ?? 0) + row.valor);
+    });
+    const rows = Array.from(values, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    const representedValue = rows.reduce((total, item) => total + item.value, 0);
+    return {
+      rows,
+      outsideRecords,
+      outsideValue,
+      reconciled: Math.abs(representedValue + outsideValue - fat2026) < 0.01,
+    };
+  }, [filtered2026, fat2026]);
+  const byUFHospital = hospitalMapData.rows;
+  const topUFHospital = byUFHospital.slice(0, 5);
 
-  /** Realizado FY26 × Meta de Venda por UF do Hospital (a Meta Financeira NÃO entra aqui — é meta geral) */
+  /** Realizado FY26 × Meta de Venda por UF do Hospital. */
   const ufHospitalPerformance = useMemo(() => {
     const map = new Map<string, { name: string; fat: number; meta: number }>();
     const ensure = (uf: string) => {
@@ -705,7 +723,7 @@ function Dashboard() {
         </Card>
 
         {/* 2 · KPIs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <KpiCard
             title="FY 25" value={fmtCompact(fat2025)} tooltip={fmtBRLFull(fat2025)}
             icon={DollarSign} sub={`${fmtInt(fat2025Rows.length)} registros`} accent="info"
@@ -728,11 +746,25 @@ function Dashboard() {
             onClick={() => openDrill("Detalhe · Meta de Venda 2026")}
           />
           <KpiCard
-            title="Cobertura 2026" value={cobertura === null ? "Sem meta" : fmtPct(cobertura, 2)}
-            icon={Flag} accent={cobertura === null ? "info" : cobertura >= 100 ? "success" : cobertura >= 70 ? "warning" : "danger"}
-            sub={`FY 26 ${fmtCompact(fat2026ComMeta)} · MV ${fmtCompact(metaTotal)}`}
-            tooltip={cobertura === null ? "Sem meta cadastrada para esta combinação" : `${fmtBRLFull(fat2026ComMeta)} de ${fmtBRLFull(metaTotal)}`}
+            title="Meta Financeira 2026"
+            value={metaFinanceira2026 > 0 ? fmtCompact(metaFinanceira2026) : "Sem meta"}
+            tooltip={metaFinanceira2026 > 0 ? fmtBRLFull(metaFinanceira2026) : "Sem meta financeira cadastrada para 2026"}
+            icon={DollarSign}
+            accent="info"
+            sub={`${fmtInt(metasFinanceirasFiltradas.length)} registros no recorte`}
+          />
+          <KpiCard
+            title="Cobertura MV" value={coberturaMV === null ? "Sem meta" : fmtPct(coberturaMV, 2)}
+            icon={Flag} accent={coberturaMV === null ? "info" : coberturaMV >= 100 ? "success" : coberturaMV >= 70 ? "warning" : "danger"}
+            sub={`FY 26 ${fmtCompact(fat2026)} · MV ${fmtCompact(metaTotal)}`}
+            tooltip={coberturaMV === null ? "Sem meta cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaTotal)}`}
             onClick={() => openDrill("Detalhe · Cobertura da Meta")}
+          />
+          <KpiCard
+            title="Cobertura MF" value={coberturaMF === null ? "Sem meta" : fmtPct(coberturaMF, 2)}
+            icon={Flag} accent={coberturaMF === null ? "info" : coberturaMF >= 100 ? "success" : coberturaMF >= 70 ? "warning" : "danger"}
+            sub={`FY 26 ${fmtCompact(fat2026)} · MF ${fmtCompact(metaFinanceira2026)}`}
+            tooltip={coberturaMF === null ? "Sem MF cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaFinanceira2026)}`}
           />
           <KpiCard
             title="Diferença 25 / 26" value={`${diffAbs >= 0 ? "+" : "-"}${fmtCompact(Math.abs(diffAbs))}`}
@@ -752,8 +784,8 @@ function Dashboard() {
           />
         </div>
 
-        {/* 3 · Meta de Venda | Meta Financeira (lado a lado) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* 3 · Evolução trimestral */}
+        <div>
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base">Evolução FY 25 vs FY 26 por Trimestre · Meta de Venda 2026</CardTitle></CardHeader>
             <CardContent>
@@ -772,42 +804,17 @@ function Dashboard() {
                     <Bar dataKey="v2026" name="FY 26" fill={COLOR_2026} radius={[4, 4, 0, 0]} cursor="pointer"
                       onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })} />
                     <Line type="monotone" dataKey="meta" name="Meta de Venda 2026" stroke={COLOR_META} strokeWidth={2.5} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="metaFinanceira" name="Meta Financeira 2026" stroke="#7c3aed" strokeWidth={2.5} dot={{ r: 4 }} />
                   </ComposedChart>
                 </ResponsiveContainer>
               )}
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Realizado FY 26 × Meta Financeira por Trimestre</CardTitle></CardHeader>
-            <CardContent>
-              {!temMetaFinanceira ? (
-                <EmptyState
-                  height={300}
-                  message="Sem Meta Financeira na base atual. Envie a planilha com a coluna 'Meta Financeira' na aba de metas para habilitar esta análise."
-                />
-              ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={byPeriodoFinanceira} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
-                    <XAxis dataKey="p" className="text-xs" />
-                    <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [fmtBRLFull(v), n]} />
-                    <Legend />
-                    <Line type="monotone" dataKey="realizado" name="Realizado FY 26" stroke={COLOR_2026} strokeWidth={2.5} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="metaFin" name="Meta Financeira" stroke={COLOR_META} strokeWidth={2.5} strokeDasharray="5 4" dot={{ r: 4 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              )}
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                Meta geral — não é distribuída por UF e não é afetada pelos filtros de UF.
-              </p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* 4 · FY 26 por GR */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div>
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base">FY 26 por GR</CardTitle></CardHeader>
             <CardContent>
@@ -851,7 +858,7 @@ function Dashboard() {
 
         {/* Faturamento × Meta por Representante (mantido) */}
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 × Meta por Representante</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 × Meta de Venda por Representante</CardTitle></CardHeader>
           <CardContent>
             {repPerformance.length === 0 ? (
               <EmptyState message="Não há dados para os filtros selecionados." />
@@ -865,7 +872,7 @@ function Dashboard() {
                   <Legend />
                   <Bar dataKey="fat" name="FY 26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
                     onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })} />
-                  <Bar dataKey="meta" name="Meta 2026" fill={COLOR_META} radius={[0, 3, 3, 0]} />
+                  <Bar dataKey="meta" name="Meta de Venda" fill={COLOR_META} radius={[0, 3, 3, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -931,7 +938,7 @@ function Dashboard() {
         </Card>
 
         {/* 7 · UF do Cliente / UF do Hospital / UF */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4">
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento por UF do Cliente</CardTitle></CardHeader>
             <CardContent>
@@ -951,64 +958,26 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento por UF do Hospital</CardTitle></CardHeader>
+          <Card data-map-reconciled={hospitalMapData.reconciled} data-map-outside-records={hospitalMapData.outsideRecords}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento FY26 por UF do Hospital</CardTitle>
+              <p className="text-xs text-muted-foreground">Distribuição geográfica do faturamento por estado</p>
+            </CardHeader>
             <CardContent>
-              {byUFHospital.length === 0 ? (
-                <EmptyState message="A base atual não possui a dimensão UF do Hospital." />
-              ) : (
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={byUFHospital} margin={{ top: 8, right: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
-                    <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [fmtBRLFull(v), "FY 26"]} />
-                    <Bar dataKey="value" fill="#14b8a6" radius={[3, 3, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 por UF</CardTitle></CardHeader>
-            <CardContent>
-              {byUF.length === 0 ? (
-                <EmptyState message="A base atual não possui UF preenchida nos registros." />
-              ) : (
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={byUF} margin={{ top: 8, right: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
-                    <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [fmtBRLFull(v), "FY 26"]} />
-                    <Bar dataKey="value" fill={COLOR_NEUTRO_FALLBACK} radius={[3, 3, 0, 0]} cursor="pointer"
-                      onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { uf: e.name })} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 por Tipo do Produto</CardTitle></CardHeader>
-            <CardContent>
-              {!tipoInformado ? (
-                <EmptyState message="A base atual não possui Tipo do Produto preenchido no faturamento." />
-              ) : (
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={byTipo.slice(0, 12)} layout="vertical" margin={{ left: 8, right: 40 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
-                    <XAxis type="number" tickFormatter={fmtCompact} className="text-xs" />
-                    <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10 }} interval={0} />
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [fmtBRLFull(v), "FY 26"]} />
-                    <Bar dataKey="value" fill="#0284c7" radius={[0, 3, 3, 0]} cursor="pointer"
-                      onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { tipo: e.name })} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
+              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px] items-center gap-4">
+                <BrazilHospitalMap data={byUFHospital} />
+                <div className="min-w-0">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Top 5 UFs</p>
+                  <ol className="space-y-2">
+                    {topUFHospital.map((item, index) => (
+                      <li key={item.name} className="grid grid-cols-[20px_28px_1fr] items-center gap-1 text-xs">
+                        <span className="text-muted-foreground">{index + 1}.</span><b>{item.name}</b>
+                        <span className="text-right tabular-nums">{fmtCompact(item.value)}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -1182,5 +1151,3 @@ function Dashboard() {
     </div>
   );
 }
-
-const COLOR_NEUTRO_FALLBACK = "#0ea5e9";
