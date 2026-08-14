@@ -499,6 +499,9 @@ function Dashboard() {
       mfToMv: row.hasMetaFinanceira && row.hasMeta ? pctVar(row.meta, row.metaFinanceira) : null,
     })).sort((a, b) => a.p.localeCompare(b.p));
   }, [filtered, filteredMetas, metasFinanceirasFiltradas]);
+  const periodosVisiveis = byPeriodo.filter((row) =>
+    row.p !== "Q4" || (row.has2026 && Number.isFinite(row.v2026) && row.v2026 > 0)
+  );
 
   const byGR = useMemo(() => {
     const m = new Map<string, number>();
@@ -814,21 +817,21 @@ function Dashboard() {
           />
         </div>
 
-        {/* 3 · Evolução trimestral */}
-        <div>
-          <Card>
-            <CardHeader className="pb-1"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Trimestre</CardTitle></CardHeader>
+        {/* 3 · Evolução por quarter e FY26 por GR */}
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] items-stretch gap-4">
+          <Card className="h-full">
+            <CardHeader className="pb-1"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Quarter.</CardTitle></CardHeader>
             <CardContent>
               {filtered.length === 0 && filteredMetas.length === 0 ? (
                 <EmptyState message="Não há dados para os filtros selecionados." height={300} />
               ) : (
-                <ResponsiveContainer width="100%" height={310}>
+                <ResponsiveContainer width="100%" height={330}>
                   <BarChart
-                    data={byPeriodo}
-                    barGap={isMobile ? 3 : 28}
-                    barCategoryGap={isMobile ? "18%" : "28%"}
-                    maxBarSize={42}
-                    margin={{ top: 34, right: 8, left: 0, bottom: -4 }}
+                    data={periodosVisiveis}
+                    barGap={isMobile ? 3 : 12}
+                    barCategoryGap={isMobile ? "16%" : "22%"}
+                    maxBarSize={isMobile ? 28 : 54}
+                    margin={{ top: 38, right: 8, left: 0, bottom: -4 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
                     <XAxis dataKey="p" className="text-xs" />
@@ -843,22 +846,22 @@ function Dashboard() {
                       onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })}>
                       <LabelList dataKey="v2026" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
                       {!isMobile && <LabelList content={(props) => (
-                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.v2025 ?? 0}
-                          currentValue={byPeriodo[props.index ?? -1]?.v2026 ?? 0} value={byPeriodo[props.index ?? -1]?.fy25ToFy26 ?? null} />
+                        <ComparisonLabel {...props} gap={12} previousValue={periodosVisiveis[props.index ?? -1]?.v2025 ?? 0}
+                          currentValue={periodosVisiveis[props.index ?? -1]?.v2026 ?? 0} value={periodosVisiveis[props.index ?? -1]?.fy25ToFy26 ?? null} />
                       )} />}
                     </Bar>
                     <Bar dataKey="metaFinanceira" name="MF" fill="#7c3aed" radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="metaFinanceira" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
                       {!isMobile && <LabelList content={(props) => (
-                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.v2026 ?? 0}
-                          currentValue={byPeriodo[props.index ?? -1]?.metaFinanceira ?? 0} value={byPeriodo[props.index ?? -1]?.fy26ToMf ?? null} />
+                        <ComparisonLabel {...props} gap={12} previousValue={periodosVisiveis[props.index ?? -1]?.v2026 ?? 0}
+                          currentValue={periodosVisiveis[props.index ?? -1]?.metaFinanceira ?? 0} value={periodosVisiveis[props.index ?? -1]?.fy26ToMf ?? null} />
                       )} />}
                     </Bar>
                     <Bar dataKey="meta" name="MV" fill={COLOR_META} radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="meta" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
                       {!isMobile && <LabelList content={(props) => (
-                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.metaFinanceira ?? 0}
-                          currentValue={byPeriodo[props.index ?? -1]?.meta ?? 0} value={byPeriodo[props.index ?? -1]?.mfToMv ?? null} />
+                        <ComparisonLabel {...props} gap={12} previousValue={periodosVisiveis[props.index ?? -1]?.metaFinanceira ?? 0}
+                          currentValue={periodosVisiveis[props.index ?? -1]?.meta ?? 0} value={periodosVisiveis[props.index ?? -1]?.mfToMv ?? null} />
                       )} />}
                     </Bar>
                   </BarChart>
@@ -867,20 +870,16 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-        </div>
-
-        {/* 4 · FY 26 por GR e distribuição geográfica */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch gap-4">
           <Card className="h-full">
-            <CardHeader className="pb-2"><CardTitle className="text-base">FY 26 por GR</CardTitle></CardHeader>
+            <CardHeader className="pb-1"><CardTitle className="text-base">FY 26 por GR</CardTitle></CardHeader>
             <CardContent>
               {byGR.length === 0 ? (
                 <EmptyState message="Não há dados para os filtros selecionados." />
               ) : (
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={330}>
                   <PieChart>
                     <Pie
-                      data={byGR} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={95}
+                      data={byGR} dataKey="value" nameKey="name" cx="50%" cy="46%" outerRadius={108}
                       label={({ percent }: { percent?: number }) => `${(((percent ?? 0) * 100)).toFixed(0)}%`}
                       onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { gr: e.name })}
                       cursor="pointer"
@@ -894,7 +893,10 @@ function Dashboard() {
               )}
             </CardContent>
           </Card>
+        </div>
 
+        {/* 4 · Distribuição geográfica */}
+        <div>
           <Card className="h-full" data-map-reconciled={hospitalMapData.reconciled} data-map-outside-records={hospitalMapData.outsideRecords}>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento FY26 pela UF do Hospital</CardTitle>
