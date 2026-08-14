@@ -7,11 +7,18 @@ type FeatureCollection = { features: GeoFeature[] };
 type MapStatus = "loading" | "success" | "error";
 
 const IBGE_GEOJSON = "https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo%2Bjson&qualidade=minima&intrarregiao=UF";
-const UF_BY_IBGE: Record<string, string> = {
+export const UF_BY_IBGE: Record<string, string> = {
   "11": "RO", "12": "AC", "13": "AM", "14": "RR", "15": "PA", "16": "AP", "17": "TO",
   "21": "MA", "22": "PI", "23": "CE", "24": "RN", "25": "PB", "26": "PE", "27": "AL",
   "28": "SE", "29": "BA", "31": "MG", "32": "ES", "33": "RJ", "35": "SP", "41": "PR",
   "42": "SC", "43": "RS", "50": "MS", "51": "MT", "52": "GO", "53": "DF",
+};
+export const UF_NAME_BY_CODE: Record<string, string> = {
+  "11": "Rondônia", "12": "Acre", "13": "Amazonas", "14": "Roraima", "15": "Pará", "16": "Amapá", "17": "Tocantins",
+  "21": "Maranhão", "22": "Piauí", "23": "Ceará", "24": "Rio Grande do Norte", "25": "Paraíba", "26": "Pernambuco", "27": "Alagoas",
+  "28": "Sergipe", "29": "Bahia", "31": "Minas Gerais", "32": "Espírito Santo", "33": "Rio de Janeiro", "35": "São Paulo",
+  "41": "Paraná", "42": "Santa Catarina", "43": "Rio Grande do Sul", "50": "Mato Grosso do Sul", "51": "Mato Grosso",
+  "52": "Goiás", "53": "Distrito Federal",
 };
 export const isBrazilUF = (uf: string) => Object.values(UF_BY_IBGE).includes(uf.trim().toUpperCase());
 

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend, Line,
+  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
@@ -18,7 +18,7 @@ import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
 import { BrazilHospitalMap, isBrazilUF } from "@/components/dashboard/BrazilHospitalMap";
 import { buildDrillRows, type DrillScope } from "@/lib/dashboard/drilldown";
 import {
-  ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, SEM_UF,
+  ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, SEM_UF,
   type Meta, type Row,
   fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
   joinKey, normGR, normMarca, normRep, normTipo, normUF, stripAccents,
@@ -384,21 +384,9 @@ function Dashboard() {
     });
     return m;
   }, [filtered]);
-  const metasByJoinKey = useMemo(() => {
-    const m = new Map<string, number>();
-    filteredMetas.forEach((mt) => m.set(joinKey(mt), (m.get(joinKey(mt)) || 0) + mt.meta));
-    return m;
-  }, [filteredMetas]);
-  const fat2026ComMeta = useMemo(() => {
-    let total = 0;
-    metasByJoinKey.forEach((_, k) => { total += fatByJoinKey.get(k)?.fat26 || 0; });
-    return total;
-  }, [metasByJoinKey, fatByJoinKey]);
-
   const diffAbs = fat2026 - fat2025;
   const diffPct = pctVar(fat2026, fat2025);
   const coberturaMV = pctAting(fat2026, metaTotal);
-  const gapMeta = metaTotal > 0 ? fat2026ComMeta - metaTotal : 0;
 
   /* --------- Séries --------- */
   const metasFinanceirasFiltradas = useMemo(
@@ -409,21 +397,40 @@ function Dashboard() {
   const coberturaMF = pctAting(fat2026, metaFinanceira2026);
 
   const byPeriodo = useMemo(() => {
-    const m = new Map<string, { p: string; v2025: number; v2026: number; meta: number; metaFinanceira: number }>();
+    const m = new Map<string, {
+      p: string; v2025: number; v2026: number; meta: number; metaFinanceira: number;
+      has2025: boolean; has2026: boolean; hasMeta: boolean; hasMetaFinanceira: boolean;
+    }>();
     const ensure = (q: string) => {
-      const cur = m.get(q) || { p: q, v2025: 0, v2026: 0, meta: 0, metaFinanceira: 0 };
+      const cur = m.get(q) || {
+        p: q, v2025: 0, v2026: 0, meta: 0, metaFinanceira: 0,
+        has2025: false, has2026: false, hasMeta: false, hasMetaFinanceira: false,
+      };
       m.set(q, cur);
       return cur;
     };
     ["Q1", "Q2", "Q3", "Q4"].forEach(ensure);
     filtered.forEach((d) => {
       const cur = ensure(periodoQ(d.periodo));
-      if (periodoYear(d.periodo) === 2025) cur.v2025 += d.valor;
-      else if (periodoYear(d.periodo) === 2026) cur.v2026 += d.valor;
+      if (periodoYear(d.periodo) === 2025) { cur.v2025 += d.valor; cur.has2025 = true; }
+      else if (periodoYear(d.periodo) === 2026) { cur.v2026 += d.valor; cur.has2026 = true; }
     });
-    filteredMetas.forEach((mt) => { ensure(periodoQ(mt.periodo)).meta += mt.meta; });
-    metasFinanceirasFiltradas.forEach((mt) => { ensure(periodoQ(mt.periodo)).metaFinanceira += mt.metaFinanceira ?? 0; });
-    return Array.from(m.values()).sort((a, b) => a.p.localeCompare(b.p));
+    filteredMetas.forEach((mt) => {
+      const cur = ensure(periodoQ(mt.periodo));
+      cur.meta += mt.meta;
+      cur.hasMeta = true;
+    });
+    metasFinanceirasFiltradas.forEach((mt) => {
+      const cur = ensure(periodoQ(mt.periodo));
+      cur.metaFinanceira += mt.metaFinanceira ?? 0;
+      cur.hasMetaFinanceira = true;
+    });
+    return Array.from(m.values()).map((row) => ({
+      ...row,
+      fy25ToFy26: row.has2025 && row.has2026 ? pctVar(row.v2026, row.v2025) : null,
+      fy26ToMf: row.has2026 && row.hasMetaFinanceira ? pctVar(row.metaFinanceira, row.v2026) : null,
+      mfToMv: row.hasMetaFinanceira && row.hasMeta ? pctVar(row.meta, row.metaFinanceira) : null,
+    })).sort((a, b) => a.p.localeCompare(b.p));
   }, [filtered, filteredMetas, metasFinanceirasFiltradas]);
 
   const byGR = useMemo(() => {
@@ -635,17 +642,22 @@ function Dashboard() {
 
   const evolutionTooltip = ({ active, payload, label: lbl }: TooltipRenderProps) => {
     if (!active || !payload?.length) return null;
-    const d = (payload[0].payload ?? {}) as { v2025: number; v2026: number; meta: number };
-    const v = pctVar(d.v2026, d.v2025);
-    const a = pctAting(d.v2026, d.meta);
+    const d = (payload[0].payload ?? {}) as {
+      v2025: number; v2026: number; meta: number; metaFinanceira: number;
+      fy25ToFy26: number | null; fy26ToMf: number | null; mfToMv: number | null;
+    };
+    const variation = (value: number | null) => value === null ? "—" : fmtSignedPct(value);
     return (
       <div className="rounded-md border bg-card p-3 text-xs shadow-md space-y-1">
         <p className="font-semibold text-sm">{lbl}</p>
-        <p><span className="text-muted-foreground">FY 25: </span>{fmtBRLFull(d.v2025)}</p>
-        <p><span className="text-muted-foreground">FY 26: </span>{fmtBRLFull(d.v2026)}</p>
-        <p><span className="text-muted-foreground">Meta 2026: </span>{d.meta > 0 ? fmtBRLFull(d.meta) : "Sem meta"}</p>
-        <p><span className="text-muted-foreground">Variação: </span>{v === null ? "—" : fmtSignedPct(v)}</p>
-        <p><span className="text-muted-foreground">Cobertura: </span>{a === null ? "Sem meta" : fmtPct(a)}</p>
+        <p><span className="text-muted-foreground">FY25: </span>{fmtBRLFull(d.v2025)}</p>
+        <p><span className="text-muted-foreground">FY26: </span>{fmtBRLFull(d.v2026)}</p>
+        <p><span className="text-muted-foreground">MF: </span>{fmtBRLFull(d.metaFinanceira)}</p>
+        <p><span className="text-muted-foreground">MV: </span>{fmtBRLFull(d.meta)}</p>
+        <div className="my-1.5 border-t" />
+        <p><span className="text-muted-foreground">FY25 → FY26: </span>{variation(d.fy25ToFy26)}</p>
+        <p><span className="text-muted-foreground">FY26 → MF: </span>{variation(d.fy26ToMf)}</p>
+        <p><span className="text-muted-foreground">MF → MV: </span>{variation(d.mfToMv)}</p>
       </div>
     );
   };
@@ -723,7 +735,7 @@ function Dashboard() {
         </Card>
 
         {/* 2 · KPIs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
           <KpiCard
             title="FY 25" value={fmtCompact(fat2025)} tooltip={fmtBRLFull(fat2025)}
             icon={DollarSign} sub={`${fmtInt(fat2025Rows.length)} registros`} accent="info"
@@ -732,38 +744,29 @@ function Dashboard() {
           <KpiCard
             title="FY 26" value={fmtCompact(fat2026)} tooltip={fmtBRLFull(fat2026)}
             icon={TrendingUp} sub={`${fmtInt(filtered2026.length)} registros`} accent="primary"
-            footer={
-              <span className={diffPct === null ? "text-muted-foreground" : diffPct >= 0 ? "text-emerald-600" : "text-red-600"}>
-                {diffPct === null ? "Sem FY 25 no recorte" : `${fmtSignedPct(diffPct)} vs FY 25`}
-              </span>
-            }
             onClick={() => openDrill("Detalhe · FY 26")}
           />
           <KpiCard
             title="MV FY 2026" value={fmtCompact(metaTotal)} tooltip={metaTotal > 0 ? fmtBRLFull(metaTotal) : "Sem meta cadastrada para esta combinação"}
             icon={Target} accent="warning"
-            sub={metaTotal > 0 ? `${fmtInt(filteredMetas.length)} metas no recorte` : "Sem meta"}
             onClick={() => openDrill("Detalhe · Meta de Venda 2026")}
           />
           <KpiCard
-            title="Meta Financeira 2026"
+            title="MF 2026"
             value={metaFinanceira2026 > 0 ? fmtCompact(metaFinanceira2026) : "Sem meta"}
             tooltip={metaFinanceira2026 > 0 ? fmtBRLFull(metaFinanceira2026) : "Sem meta financeira cadastrada para 2026"}
             icon={DollarSign}
             accent="info"
-            sub={`${fmtInt(metasFinanceirasFiltradas.length)} registros no recorte`}
           />
           <KpiCard
             title="Cobertura MV" value={coberturaMV === null ? "Sem meta" : fmtPct(coberturaMV, 2)}
             icon={Flag} accent={coberturaMV === null ? "info" : coberturaMV >= 100 ? "success" : coberturaMV >= 70 ? "warning" : "danger"}
-            sub={`FY 26 ${fmtCompact(fat2026)} · MV ${fmtCompact(metaTotal)}`}
             tooltip={coberturaMV === null ? "Sem meta cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaTotal)}`}
             onClick={() => openDrill("Detalhe · Cobertura da Meta")}
           />
           <KpiCard
             title="Cobertura MF" value={coberturaMF === null ? "Sem meta" : fmtPct(coberturaMF, 2)}
             icon={Flag} accent={coberturaMF === null ? "info" : coberturaMF >= 100 ? "success" : coberturaMF >= 70 ? "warning" : "danger"}
-            sub={`FY 26 ${fmtCompact(fat2026)} · MF ${fmtCompact(metaFinanceira2026)}`}
             tooltip={coberturaMF === null ? "Sem MF cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaFinanceira2026)}`}
           />
           <KpiCard
@@ -773,49 +776,63 @@ function Dashboard() {
             accent={diffAbs >= 0 ? "success" : "danger"}
             onClick={() => openDrill("Detalhe · Diferença 25 / 26")}
           />
-          <KpiCard
-            title="Gap para Meta"
-            value={metaTotal > 0 ? `${gapMeta >= 0 ? "+" : "-"}${fmtCompact(Math.abs(gapMeta))}` : "Sem meta"}
-            tooltip={metaTotal > 0 ? fmtBRLFull(gapMeta) : "Sem meta cadastrada para esta combinação"}
-            icon={Target}
-            sub={metaTotal === 0 ? "Sem meta" : gapMeta >= 0 ? `${fmtCompact(gapMeta)} acima da meta` : `Faltam ${fmtCompact(Math.abs(gapMeta))}`}
-            accent={metaTotal === 0 ? "info" : gapMeta >= 0 ? "success" : "danger"}
-            onClick={() => openDrill("Detalhe · Gap para a Meta")}
-          />
         </div>
 
         {/* 3 · Evolução trimestral */}
         <div>
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Evolução FY 25 vs FY 26 por Trimestre · Meta de Venda 2026</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Trimestre</CardTitle></CardHeader>
             <CardContent>
-              {filtered.length === 0 ? (
+              {filtered.length === 0 && filteredMetas.length === 0 ? (
                 <EmptyState message="Não há dados para os filtros selecionados." height={300} />
               ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <ComposedChart data={byPeriodo} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <>
+                <ResponsiveContainer width="100%" height={340}>
+                  <ComposedChart data={byPeriodo} barGap={2} barCategoryGap="18%" margin={{ top: 36, right: 8, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
                     <XAxis dataKey="p" className="text-xs" />
                     <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
                     <Tooltip content={evolutionTooltip} />
                     <Legend />
-                    <Bar dataKey="v2025" name="FY 25" fill={COLOR_2025} radius={[4, 4, 0, 0]} cursor="pointer"
-                      onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })} />
-                    <Bar dataKey="v2026" name="FY 26" fill={COLOR_2026} radius={[4, 4, 0, 0]} cursor="pointer"
-                      onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })} />
-                    <Line type="monotone" dataKey="meta" name="Meta de Venda 2026" stroke={COLOR_META} strokeWidth={2.5} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="metaFinanceira" name="Meta Financeira 2026" stroke="#7c3aed" strokeWidth={2.5} dot={{ r: 4 }} />
+                    <Bar dataKey="v2025" name="FY25" fill={COLOR_2025} radius={[4, 4, 0, 0]} cursor="pointer"
+                      onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })}>
+                      <LabelList dataKey="v2025" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                    </Bar>
+                    <Bar dataKey="v2026" name="FY26" fill={COLOR_2026} radius={[4, 4, 0, 0]} cursor="pointer"
+                      onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })}>
+                      <LabelList dataKey="v2026" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                    </Bar>
+                    <Bar dataKey="metaFinanceira" name="MF" fill="#7c3aed" radius={[4, 4, 0, 0]}>
+                      <LabelList dataKey="metaFinanceira" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                    </Bar>
+                    <Bar dataKey="meta" name="MV" fill={COLOR_META} radius={[4, 4, 0, 0]}>
+                      <LabelList dataKey="meta" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                    </Bar>
                   </ComposedChart>
                 </ResponsiveContainer>
+                <div className="hidden md:grid grid-cols-4 gap-3 px-[80px] mt-1">
+                  {byPeriodo.map((row) => (
+                    <div key={row.p} className="flex items-center justify-center gap-1 text-[10px]">
+                      {[
+                        ["FY25→FY26", row.fy25ToFy26], ["FY26→MF", row.fy26ToMf], ["MF→MV", row.mfToMv],
+                      ].map(([name, value]) => {
+                        const variation = value as number | null;
+                        const color = variation === null || variation === 0 ? COLOR_NEUTRO : variation > 0 ? COLOR_POS : COLOR_NEG;
+                        return <span key={name as string} title={name as string} className="rounded border bg-card px-1.5 py-0.5 font-semibold" style={{ color }}>{variation === null ? "—" : fmtSignedPct(variation)}</span>;
+                      })}
+                    </div>
+                  ))}
+                </div>
+                </>
               )}
             </CardContent>
           </Card>
 
         </div>
 
-        {/* 4 · FY 26 por GR */}
-        <div>
-          <Card>
+        {/* 4 · FY 26 por GR e distribuição geográfica */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch gap-4">
+          <Card className="h-full">
             <CardHeader className="pb-2"><CardTitle className="text-base">FY 26 por GR</CardTitle></CardHeader>
             <CardContent>
               {byGR.length === 0 ? (
@@ -838,8 +855,30 @@ function Dashboard() {
               )}
             </CardContent>
           </Card>
-        </div>
 
+          <Card className="h-full" data-map-reconciled={hospitalMapData.reconciled} data-map-outside-records={hospitalMapData.outsideRecords}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento FY26 pela UF do Hospital</CardTitle>
+              <p className="text-xs text-muted-foreground">Distribuição geográfica do faturamento por estado</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px] items-center gap-4">
+                <BrazilHospitalMap data={byUFHospital} />
+                <div className="min-w-0">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Top 5 UFs</p>
+                  <ol className="space-y-2">
+                    {topUFHospital.map((item, index) => (
+                      <li key={item.name} className="grid grid-cols-[20px_28px_1fr] items-center gap-1 text-xs">
+                        <span className="text-muted-foreground">{index + 1}.</span><b>{item.name}</b>
+                        <span className="text-right tabular-nums">{fmtCompact(item.value)}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* 5 · Rankings */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
@@ -937,8 +976,8 @@ function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* 7 · UF do Cliente / UF do Hospital / UF */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4">
+        {/* 7 · UF do Cliente */}
+        <div>
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento por UF do Cliente</CardTitle></CardHeader>
             <CardContent>
@@ -958,28 +997,6 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card data-map-reconciled={hospitalMapData.reconciled} data-map-outside-records={hospitalMapData.outsideRecords}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento FY26 por UF do Hospital</CardTitle>
-              <p className="text-xs text-muted-foreground">Distribuição geográfica do faturamento por estado</p>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px] items-center gap-4">
-                <BrazilHospitalMap data={byUFHospital} />
-                <div className="min-w-0">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Top 5 UFs</p>
-                  <ol className="space-y-2">
-                    {topUFHospital.map((item, index) => (
-                      <li key={item.name} className="grid grid-cols-[20px_28px_1fr] items-center gap-1 text-xs">
-                        <span className="text-muted-foreground">{index + 1}.</span><b>{item.name}</b>
-                        <span className="text-right tabular-nums">{fmtCompact(item.value)}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* 8 · Médicos por Tópico do Produto */}
