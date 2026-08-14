@@ -186,7 +186,7 @@ const tooltipStyle = { background: "var(--card)", border: "1px solid var(--borde
 type RankItem = { name: string; value: number };
 
 function RankingCard({
-  title, icon: Icon, items, color, empty, onSelect,
+  title, icon: Icon, items, color, empty, onSelect, expanded = false,
 }: {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -194,7 +194,11 @@ function RankingCard({
   color: string;
   empty: string;
   onSelect?: (name: string) => void;
+  expanded?: boolean;
 }) {
+  const isMobile = useIsMobile();
+  const axisWidth = expanded ? (isMobile ? 126 : 180) : 92;
+  const rowHeight = expanded ? 32 : 26;
   return (
     <Card className="min-w-0">
       <CardHeader className="pb-2">
@@ -207,12 +211,12 @@ function RankingCard({
         {items.length === 0 ? (
           <EmptyState message={empty} height={220} />
         ) : (
-          <ResponsiveContainer width="100%" height={Math.max(220, items.length * 26)}>
-            <BarChart data={items} layout="vertical" margin={{ left: 4, right: 34, top: 4, bottom: 4 }}>
+          <ResponsiveContainer width="100%" height={Math.max(220, items.length * rowHeight)}>
+            <BarChart data={items} layout="vertical" margin={{ left: 4, right: expanded ? 54 : 34, top: 4, bottom: 4 }}>
               <XAxis type="number" hide />
               <YAxis
-                type="category" dataKey="name" width={92}
-                tick={{ fontSize: 9 }} interval={0}
+                type="category" dataKey="name" width={axisWidth}
+                tick={<NameAxisTick maxLength={expanded ? (isMobile ? 18 : 27) : 14} />} interval={0}
               />
               <Tooltip
                 contentStyle={tooltipStyle}
@@ -227,6 +231,19 @@ function RankingCard({
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function NameAxisTick({ x = 0, y = 0, payload, maxLength }: {
+  x?: number; y?: number; payload?: { value?: string }; maxLength: number;
+}) {
+  const name = String(payload?.value ?? "");
+  const visible = name.length > maxLength ? `${name.slice(0, maxLength - 3)}...` : name;
+  return (
+    <text x={x - 4} y={y} dy="0.32em" textAnchor="end" fontSize={9} fill="currentColor">
+      <title>{name}</title>
+      {visible}
+    </text>
   );
 }
 
@@ -269,6 +286,19 @@ type TooltipRenderProps = {
   label?: string | number;
   payload?: Array<{ payload?: unknown }>;
 };
+
+function RepresentativeTooltip({ active, payload }: TooltipRenderProps) {
+  if (!active || !payload?.length) return null;
+  const row = (payload[0].payload ?? {}) as { name: string; fy26: number; mf: number; mv: number };
+  return (
+    <div className="space-y-1 rounded-md border bg-card p-3 text-xs shadow-md">
+      <p className="font-semibold">Representante: {row.name}</p>
+      <p><span className="text-muted-foreground">FY26: </span>{fmtBRLFull(row.fy26)}</p>
+      <p><span className="text-muted-foreground">MF: </span>{fmtBRLFull(row.mf)}</p>
+      <p><span className="text-muted-foreground">MV: </span>{fmtBRLFull(row.mv)}</p>
+    </div>
+  );
+}
 
 type ComparisonLabelProps = {
   x?: number | string;
@@ -421,17 +451,6 @@ function Dashboard() {
   const fat2026 = filtered2026.reduce((s, d) => s + d.valor, 0);
   const metaTotal = filteredMetas.reduce((s, m) => s + m.meta, 0);
 
-  const fatByJoinKey = useMemo(() => {
-    const m = new Map<string, { fat25: number; fat26: number }>();
-    filtered.forEach((d) => {
-      const k = joinKey(d);
-      const cur = m.get(k) || { fat25: 0, fat26: 0 };
-      if (periodoYear(d.periodo) === 2025) cur.fat25 += d.valor;
-      else if (periodoYear(d.periodo) === 2026) cur.fat26 += d.valor;
-      m.set(k, cur);
-    });
-    return m;
-  }, [filtered]);
   const diffAbs = fat2026 - fat2025;
   const diffPct = pctVar(fat2026, fat2025);
   const coberturaMV = pctAting(fat2026, metaTotal);
@@ -487,15 +506,16 @@ function Dashboard() {
     return Array.from(m, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [filtered2026]);
 
-  const rank = (getter: (d: Row) => string | undefined, limit: number): RankItem[] => {
+  const rank = (getter: (d: Row) => string | undefined, limit?: number): RankItem[] => {
     const m = new Map<string, number>();
     filtered2026.forEach((d) => {
       const raw = str(getter(d));
       if (!raw) return;
       m.set(raw, (m.get(raw) || 0) + d.valor);
     });
-    return Array.from(m, ([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value).slice(0, limit);
+    const sorted = Array.from(m, ([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+    return limit === undefined ? sorted : sorted.slice(0, limit);
   };
 
   const topMarcas = useMemo(() => rank((d) => normMarca(d.marca), 10), [filtered2026]);
@@ -510,42 +530,36 @@ function Dashboard() {
       m.set(k, cur);
     });
     return Array.from(m.values()).map((v) => ({ name: v.label, value: v.value }))
-      .sort((a, b) => b.value - a.value).slice(0, 12);
+      .sort((a, b) => b.value - a.value);
   }, [filtered2026]);
-  const topAssessores = useMemo(() => rank((d) => d.assessor, 12), [filtered2026]);
+  const topAssessores = useMemo(() => rank((d) => d.assessor), [filtered2026]);
   const topClientes = useMemo(() => rank((d) => d.cliente, 10), [filtered2026]);
   const topMedicos = useMemo(() => rank((d) => d.medico, 12), [filtered2026]);
 
   const repPerformance = useMemo(() => {
-    const fatMap = new Map<string, number>();
-    const metaMap = new Map<string, { meta: number; label: string }>();
-    const repJoinKeys = new Map<string, Set<string>>();
-    filteredMetas.forEach((m) => {
-      const k = normRep(m.rep);
-      const cur = metaMap.get(k) || { meta: 0, label: m.rep };
-      cur.meta += m.meta;
-      cur.label = m.rep.length > cur.label.length ? m.rep : cur.label;
-      metaMap.set(k, cur);
-      const s = repJoinKeys.get(k) || new Set<string>();
-      s.add(joinKey(m));
-      repJoinKeys.set(k, s);
+    const byRepresentative = new Map<string, { name: string; fy26: number; mf: number; mv: number }>();
+    const ensure = (rawName: string) => {
+      const key = normRep(rawName);
+      if (!key) return null;
+      const current = byRepresentative.get(key) || { name: rawName || key, fy26: 0, mf: 0, mv: 0 };
+      if (rawName.length > current.name.length) current.name = rawName;
+      byRepresentative.set(key, current);
+      return current;
+    };
+    filtered2026.forEach((row) => {
+      const representative = ensure(row.rep);
+      if (representative) representative.fy26 += row.valor;
     });
-    repJoinKeys.forEach((s, k) => {
-      let total = 0;
-      s.forEach((jk) => { total += fatByJoinKey.get(jk)?.fat26 || 0; });
-      fatMap.set(k, total);
+    filteredMetas.filter((m) => periodoYear(m.periodo) === 2026).forEach((m) => {
+      const representative = ensure(m.rep);
+      if (!representative) return;
+      representative.mf += m.metaFinanceira ?? 0;
+      representative.mv += m.meta;
     });
-    filtered2026.forEach((d) => {
-      const k = normRep(d.rep);
-      if (!metaMap.has(k)) fatMap.set(k, (fatMap.get(k) || 0) + d.valor);
-    });
-    const keys = new Set<string>([...fatMap.keys(), ...metaMap.keys()]);
-    return Array.from(keys).map((k) => {
-      const meta = metaMap.get(k)?.meta || 0;
-      const fat = fatMap.get(k) || 0;
-      return { name: metaMap.get(k)?.label || k, fat, meta, ating: pctAting(fat, meta), gap: fat - meta };
-    }).sort((a, b) => b.fat - a.fat).slice(0, 10);
-  }, [filtered2026, filteredMetas, fatByJoinKey]);
+    return Array.from(byRepresentative.values()).sort((a, b) =>
+      b.fy26 - a.fy26 || (b.mf || b.mv) - (a.mf || a.mv)
+    );
+  }, [filtered2026, filteredMetas]);
 
   const byTopico = useMemo(() => {
     const m = new Map<string, { name: string; code: string; value: number; medicos: Set<string>; itens: number }>();
@@ -769,7 +783,7 @@ function Dashboard() {
             onClick={() => openDrill("Detalhe · FY 26")}
           />
           <KpiCard
-            title="MV FY 2026" value={fmtCompact(metaTotal)} tooltip={metaTotal > 0 ? fmtBRLFull(metaTotal) : "Sem meta cadastrada para esta combinação"}
+            title="MV 2026" value={fmtCompact(metaTotal)} tooltip={metaTotal > 0 ? fmtBRLFull(metaTotal) : "Sem meta cadastrada para esta combinação"}
             icon={Target} accent="warning"
             onClick={() => openDrill("Detalhe · Meta de Venda 2026")}
           />
@@ -906,37 +920,42 @@ function Dashboard() {
         </div>
 
         {/* 5 · Rankings */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           <RankingCard title="Ranking de Marcas" icon={Package} items={topMarcas} color={COLOR_2026}
             empty="Não há dados para os filtros selecionados."
             onSelect={(name) => openDrill(`Detalhe · ${name}`, { marca: name })} />
-          <RankingCard title="Ranking de Representantes" icon={Users} items={topReps} color="#f59e0b"
-            empty="Não há dados para os filtros selecionados."
-            onSelect={(name) => openDrill(`Detalhe · ${name}`, { rep: name })} />
-          <RankingCard title="Ranking de Assessores" icon={Award} items={topAssessores} color="#14b8a6"
-            empty="A base atual não possui a dimensão Assessor." />
           <ClientRankingCard items={topClientes} />
           <RankingCard title="Ranking de Médicos" icon={Stethoscope} items={topMedicos} color="#f97316"
             empty="A base atual não possui a dimensão Médico." />
         </div>
 
-        {/* Faturamento × Meta por Representante (mantido) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-3">
+          <RankingCard title="Ranking de Representantes" icon={Users} items={topReps} color="#f59e0b"
+            empty="Não há dados para os filtros selecionados." expanded
+            onSelect={(name) => openDrill(`Detalhe · ${name}`, { rep: name })} />
+          <RankingCard title="Ranking de Assessores" icon={Award} items={topAssessores} color="#14b8a6"
+            empty="A base atual não possui a dimensão Assessor." expanded />
+        </div>
+
+        {/* Comparativo FY26 × MF × MV por representante */}
         <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 × Meta de Venda por Representante</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY26 × MF × MV por Representante</CardTitle></CardHeader>
           <CardContent>
             {repPerformance.length === 0 ? (
               <EmptyState message="Não há dados para os filtros selecionados." />
             ) : (
-              <ResponsiveContainer width="100%" height={Math.max(280, repPerformance.length * 34)}>
-                <BarChart data={repPerformance} layout="vertical" margin={{ left: 8, right: 24 }}>
+              <ResponsiveContainer width="100%" height={Math.max(280, repPerformance.length * 58)}>
+                <BarChart data={repPerformance} layout="vertical" barGap={2} barCategoryGap="18%" margin={{ left: 8, right: 48 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
                   <XAxis type="number" tickFormatter={fmtCompact} className="text-xs" />
-                  <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10 }} interval={0} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [fmtBRLFull(v), n]} />
+                  <YAxis type="category" dataKey="name" width={isMobile ? 126 : 210}
+                    tick={<NameAxisTick maxLength={isMobile ? 18 : 30} />} interval={0} />
+                  <Tooltip content={RepresentativeTooltip} />
                   <Legend />
-                  <Bar dataKey="fat" name="FY 26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
+                  <Bar dataKey="fy26" name="FY26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
                     onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })} />
-                  <Bar dataKey="meta" name="Meta de Venda" fill={COLOR_META} radius={[0, 3, 3, 0]} />
+                  <Bar dataKey="mf" name="MF" fill="#7c3aed" radius={[0, 3, 3, 0]} />
+                  <Bar dataKey="mv" name="MV" fill={COLOR_META} radius={[0, 3, 3, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
