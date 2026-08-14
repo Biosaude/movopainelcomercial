@@ -864,6 +864,20 @@ function Dashboard() {
                     <Customized component={QuarterComparisonOverlay} />
                   </ComposedChart>
                 </ResponsiveContainer>
+                <div className="hidden md:grid grid-cols-4 gap-3 px-[80px] mt-1">
+                  {byPeriodo.map((row) => (
+                    <div key={row.p} className="flex items-center justify-center gap-1 text-[10px]">
+                      {[
+                        ["FY25→FY26", row.fy25ToFy26], ["FY26→MF", row.fy26ToMf], ["MF→MV", row.mfToMv],
+                      ].map(([name, value]) => {
+                        const variation = value as number | null;
+                        const color = variation === null || variation === 0 ? COLOR_NEUTRO : variation > 0 ? COLOR_POS : COLOR_NEG;
+                        return <span key={name as string} title={name as string} className="rounded border bg-card px-1.5 py-0.5 font-semibold" style={{ color }}>{variation === null ? "—" : fmtSignedPct(variation)}</span>;
+                      })}
+                    </div>
+                  ))}
+                </div>
+                </>
               )}
             </CardContent>
           </Card>

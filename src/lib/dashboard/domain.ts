@@ -33,7 +33,11 @@ export const stripAccents = (s: string) =>
 
 export const normMarca = (s: string) =>
   stripAccents(String(s ?? "")).trim().toUpperCase().replace(/\s+/g, " ");
-export const normUF = (s: string) => normMarca(s);
+/** Normaliza siglas de UF; "SOU" é um identificador inválido observado para Amazonas na fonte comercial. */
+export const normUF = (s: string) => {
+  const uf = normMarca(s);
+  return uf === "SOU" ? "AM" : uf;
+};
 export const normTipo = (s: string) => normMarca(s);
 
 /** Código canônico do tópico: "IC- CARDIO INTERVENTIONAL" → "IC" */
