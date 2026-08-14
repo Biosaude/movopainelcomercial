@@ -274,23 +274,42 @@ type ComparisonLabelProps = {
   x?: number | string;
   y?: number | string;
   height?: number | string;
-  index?: number;
+  previousValue: number;
+  currentValue: number;
+  gap: number;
+  value: number | null;
 };
 
-function ComparisonLabel({ x, y, height, value }: ComparisonLabelProps & { value: number | null }) {
+function ComparisonLabel({ x, y, height, previousValue, currentValue, gap, value }: ComparisonLabelProps) {
   if (value === null || !Number.isFinite(value)) return null;
   const barX = Number(x ?? 0);
   const barY = Number(y ?? 0);
   const barHeight = Number(height ?? 0);
-  const centerX = barX - 18;
-  const centerY = barY + Math.min(Math.max(barHeight * 0.22, 18), 42);
+  const baseline = barY + barHeight;
+  const pixelsPerUnit = currentValue !== 0 ? barHeight / Math.abs(currentValue) : 0;
+  const previousTop = pixelsPerUnit > 0 ? baseline - Math.abs(previousValue) * pixelsPerUnit : barY;
+  const connectorY = Math.max(barY, previousTop) - 9;
+  const startX = barX - gap;
+  const endX = barX;
+  const centerX = (startX + endX) / 2;
   const color = value === 0 ? COLOR_NEUTRO : value > 0 ? COLOR_POS : COLOR_NEG;
 
   return (
-    <g aria-label={fmtSignedPct(value)}>
-      <line x1={centerX - 18} x2={centerX + 18} y1={centerY} y2={centerY} stroke={color} strokeOpacity={0.45} />
-      <rect x={centerX - 23} y={centerY - 9} width={46} height={18} rx={4} fill="var(--card)" stroke={color} strokeOpacity={0.35} />
-      <text x={centerX} y={centerY + 3} textAnchor="middle" fill={color} fontSize={9} fontWeight={600}>
+    <g className="hidden lg:block" aria-label={fmtSignedPct(value)}>
+      <line x1={startX} x2={endX} y1={connectorY} y2={connectorY} stroke={color} strokeOpacity={0.5} />
+      <circle cx={startX} cy={connectorY} r={1.5} fill={color} fillOpacity={0.65} />
+      <circle cx={endX} cy={connectorY} r={1.5} fill={color} fillOpacity={0.65} />
+      <text
+        x={centerX}
+        y={connectorY - 3}
+        textAnchor="middle"
+        fill={color}
+        stroke="var(--card)"
+        strokeWidth={3}
+        paintOrder="stroke"
+        fontSize={8}
+        fontWeight={600}
+      >
         {fmtSignedPct(value)}
       </text>
     </g>
@@ -784,17 +803,18 @@ function Dashboard() {
         {/* 3 · Evolução trimestral */}
         <div>
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Trimestre</CardTitle></CardHeader>
+            <CardHeader className="pb-1"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Trimestre</CardTitle></CardHeader>
             <CardContent>
               {filtered.length === 0 && filteredMetas.length === 0 ? (
                 <EmptyState message="Não há dados para os filtros selecionados." height={300} />
               ) : (
-                <ResponsiveContainer width="100%" height={340}>
+                <ResponsiveContainer width="100%" height={310}>
                   <BarChart
                     data={byPeriodo}
-                    barGap={isMobile ? 3 : 36}
-                    barCategoryGap={isMobile ? "12%" : "16%"}
-                    margin={{ top: 40, right: 8, left: 0, bottom: 0 }}
+                    barGap={isMobile ? 3 : 28}
+                    barCategoryGap={isMobile ? "18%" : "28%"}
+                    maxBarSize={42}
+                    margin={{ top: 34, right: 8, left: 0, bottom: -4 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
                     <XAxis dataKey="p" className="text-xs" />
@@ -809,19 +829,22 @@ function Dashboard() {
                       onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })}>
                       <LabelList dataKey="v2026" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
                       {!isMobile && <LabelList content={(props) => (
-                        <ComparisonLabel {...props} value={byPeriodo[props.index ?? -1]?.fy25ToFy26 ?? null} />
+                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.v2025 ?? 0}
+                          currentValue={byPeriodo[props.index ?? -1]?.v2026 ?? 0} value={byPeriodo[props.index ?? -1]?.fy25ToFy26 ?? null} />
                       )} />}
                     </Bar>
                     <Bar dataKey="metaFinanceira" name="MF" fill="#7c3aed" radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="metaFinanceira" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
                       {!isMobile && <LabelList content={(props) => (
-                        <ComparisonLabel {...props} value={byPeriodo[props.index ?? -1]?.fy26ToMf ?? null} />
+                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.v2026 ?? 0}
+                          currentValue={byPeriodo[props.index ?? -1]?.metaFinanceira ?? 0} value={byPeriodo[props.index ?? -1]?.fy26ToMf ?? null} />
                       )} />}
                     </Bar>
                     <Bar dataKey="meta" name="MV" fill={COLOR_META} radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="meta" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
                       {!isMobile && <LabelList content={(props) => (
-                        <ComparisonLabel {...props} value={byPeriodo[props.index ?? -1]?.mfToMv ?? null} />
+                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.metaFinanceira ?? 0}
+                          currentValue={byPeriodo[props.index ?? -1]?.meta ?? 0} value={byPeriodo[props.index ?? -1]?.mfToMv ?? null} />
                       )} />}
                     </Bar>
                   </BarChart>
