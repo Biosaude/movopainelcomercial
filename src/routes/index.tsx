@@ -230,6 +230,7 @@ function RankingCard({
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+          </div>
         )}
       </CardContent>
     </Card>
@@ -871,6 +872,10 @@ function Dashboard() {
                     </Bar>
                     <Bar dataKey="meta" name="MV" fill={COLOR_META} radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="meta" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                      {!isMobile && <LabelList content={(props) => (
+                        <ComparisonLabel {...props} gap={12} previousValue={periodosVisiveis[props.index ?? -1]?.metaFinanceira ?? 0}
+                          currentValue={periodosVisiveis[props.index ?? -1]?.meta ?? 0} value={periodosVisiveis[props.index ?? -1]?.mfToMv ?? null} />
+                      )} />}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
