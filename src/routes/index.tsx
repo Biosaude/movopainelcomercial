@@ -186,7 +186,7 @@ const tooltipStyle = { background: "var(--card)", border: "1px solid var(--borde
 type RankItem = { name: string; value: number };
 
 function RankingCard({
-  title, icon: Icon, items, color, empty, onSelect, expanded = false,
+  title, icon: Icon, items, color, empty, onSelect, expanded = false, viewportHeight,
 }: {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -195,12 +195,13 @@ function RankingCard({
   empty: string;
   onSelect?: (name: string) => void;
   expanded?: boolean;
+  viewportHeight?: number;
 }) {
   const isMobile = useIsMobile();
   const axisWidth = expanded ? (isMobile ? 126 : 180) : 92;
   const rowHeight = expanded ? 32 : 26;
   return (
-    <Card className="min-w-0">
+    <Card className="h-full min-w-0">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           <Icon className="h-4 w-4 text-primary shrink-0" />
@@ -211,6 +212,7 @@ function RankingCard({
         {items.length === 0 ? (
           <EmptyState message={empty} height={220} />
         ) : (
+          <div className="overflow-y-auto" style={viewportHeight ? { maxHeight: viewportHeight } : undefined}>
           <ResponsiveContainer width="100%" height={Math.max(220, items.length * rowHeight)}>
             <BarChart data={items} layout="vertical" margin={{ left: 4, right: expanded ? 54 : 34, top: 4, bottom: 4 }}>
               <XAxis type="number" hide />
@@ -228,6 +230,7 @@ function RankingCard({
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+          </div>
         )}
       </CardContent>
     </Card>
@@ -250,7 +253,7 @@ function NameAxisTick({ x = 0, y = 0, payload, maxLength }: {
 function ClientRankingCard({ items }: { items: RankItem[] }) {
   const max = items[0]?.value ?? 0;
   return (
-    <Card className="min-w-0">
+    <Card className="h-full min-w-0">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           <Building2 className="h-4 w-4 text-primary shrink-0" />
@@ -540,11 +543,16 @@ function Dashboard() {
   const topMedicos = useMemo(() => rank((d) => d.medico, 12), [filtered2026]);
 
   const repPerformance = useMemo(() => {
-    const byRepresentative = new Map<string, { name: string; fy26: number; mf: number; mv: number }>();
+    const byRepresentative = new Map<string, {
+      name: string; fy26: number; mf: number; mv: number; hasMf: boolean; hasMv: boolean;
+    }>();
     const ensure = (rawName: string) => {
+      if (!str(rawName) || normMarca(rawName) === "SEM REPRESENTANTE") return null;
       const key = normRep(rawName);
       if (!key) return null;
-      const current = byRepresentative.get(key) || { name: rawName || key, fy26: 0, mf: 0, mv: 0 };
+      const current = byRepresentative.get(key) || {
+        name: rawName, fy26: 0, mf: 0, mv: 0, hasMf: false, hasMv: false,
+      };
       if (rawName.length > current.name.length) current.name = rawName;
       byRepresentative.set(key, current);
       return current;
@@ -556,10 +564,16 @@ function Dashboard() {
     filteredMetas.filter((m) => periodoYear(m.periodo) === 2026).forEach((m) => {
       const representative = ensure(m.rep);
       if (!representative) return;
-      representative.mf += m.metaFinanceira ?? 0;
-      representative.mv += m.meta;
+      if (m.metaFinanceira !== undefined && Number.isFinite(m.metaFinanceira) && m.metaFinanceira > 0) {
+        representative.mf += m.metaFinanceira;
+        representative.hasMf = true;
+      }
+      if (Number.isFinite(m.meta) && m.meta > 0) {
+        representative.mv += m.meta;
+        representative.hasMv = true;
+      }
     });
-    return Array.from(byRepresentative.values()).sort((a, b) =>
+    return Array.from(byRepresentative.values()).filter((row) => row.hasMf && row.hasMv).sort((a, b) =>
       b.fy26 - a.fy26 || (b.mf || b.mv) - (a.mf || a.mv)
     );
   }, [filtered2026, filteredMetas]);
@@ -896,7 +910,7 @@ function Dashboard() {
         </div>
 
         {/* 4 · Distribuição geográfica */}
-        <div>
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] items-stretch gap-4">
           <Card className="h-full" data-map-reconciled={hospitalMapData.reconciled} data-map-outside-records={hospitalMapData.outsideRecords}>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento FY26 pela UF do Hospital</CardTitle>
@@ -919,35 +933,35 @@ function Dashboard() {
               </div>
             </CardContent>
           </Card>
+          <RankingCard title="Ranking de Marcas" icon={Package} items={topMarcas} color={COLOR_2026}
+            empty="Não há dados para os filtros selecionados." expanded
+            onSelect={(name) => openDrill(`Detalhe · ${name}`, { marca: name })} />
         </div>
 
-        {/* 5 · Rankings */}
+        {/* 5 · Rankings de clientes, médicos e assessores */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-          <RankingCard title="Ranking de Marcas" icon={Package} items={topMarcas} color={COLOR_2026}
-            empty="Não há dados para os filtros selecionados."
-            onSelect={(name) => openDrill(`Detalhe · ${name}`, { marca: name })} />
           <ClientRankingCard items={topClientes} />
           <RankingCard title="Ranking de Médicos" icon={Stethoscope} items={topMedicos} color="#f97316"
             empty="A base atual não possui a dimensão Médico." />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-3">
-          <RankingCard title="Ranking de Representantes" icon={Users} items={topReps} color="#f59e0b"
-            empty="Não há dados para os filtros selecionados." expanded
-            onSelect={(name) => openDrill(`Detalhe · ${name}`, { rep: name })} />
           <RankingCard title="Ranking de Assessores" icon={Award} items={topAssessores} color="#14b8a6"
             empty="A base atual não possui a dimensão Assessor." expanded />
         </div>
 
-        {/* Comparativo FY26 × MF × MV por representante */}
-        <Card>
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(300px,1fr)_minmax(0,2fr)] items-stretch gap-4">
+          <RankingCard title="Ranking de Representantes" icon={Users} items={topReps} color="#f59e0b"
+            empty="Não há dados para os filtros selecionados." expanded
+            viewportHeight={Math.max(280, repPerformance.length * 64)}
+            onSelect={(name) => openDrill(`Detalhe · ${name}`, { rep: name })} />
+
+          {/* Comparativo FY26 × MF × MV por representante */}
+          <Card className="h-full">
             <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY26 × MF × MV por Representante</CardTitle></CardHeader>
           <CardContent>
             {repPerformance.length === 0 ? (
               <EmptyState message="Não há dados para os filtros selecionados." />
             ) : (
-              <ResponsiveContainer width="100%" height={Math.max(280, repPerformance.length * 58)}>
-                <BarChart data={repPerformance} layout="vertical" barGap={2} barCategoryGap="18%" margin={{ left: 8, right: 48 }}>
+              <ResponsiveContainer width="100%" height={Math.max(280, repPerformance.length * 64)}>
+                <BarChart data={repPerformance} layout="vertical" barSize={10} barGap={3} barCategoryGap="24%" margin={{ left: 8, right: 80 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
                   <XAxis type="number" tickFormatter={fmtCompact} className="text-xs" />
                   <YAxis type="category" dataKey="name" width={isMobile ? 126 : 210}
@@ -955,17 +969,25 @@ function Dashboard() {
                   <Tooltip content={RepresentativeTooltip} />
                   <Legend />
                   <Bar dataKey="fy26" name="FY26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
-                    onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })} />
-                  <Bar dataKey="mf" name="MF" fill="#7c3aed" radius={[0, 3, 3, 0]} />
-                  <Bar dataKey="mv" name="MV" fill={COLOR_META} radius={[0, 3, 3, 0]} />
+                    onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })}>
+                    <LabelList dataKey="fy26" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={9} />
+                  </Bar>
+                  <Bar dataKey="mf" name="MF" fill="#7c3aed" radius={[0, 3, 3, 0]}>
+                    <LabelList dataKey="mf" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={9} />
+                  </Bar>
+                  <Bar dataKey="mv" name="MV" fill={COLOR_META} radius={[0, 3, 3, 0]}>
+                    <LabelList dataKey="mv" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={9} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             )}
           </CardContent>
-        </Card>
+          </Card>
+        </div>
 
-        {/* 6 · Faturamento por Tópico do Produto */}
-        <Card>
+        {/* 6 · Faturamento por Tópico do Produto e UF do Cliente */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 items-stretch gap-4">
+        <Card className="h-full">
           <CardHeader className="pb-2 flex flex-row items-center justify-between gap-3">
             <CardTitle className="text-base">Faturamento por Tópico do Produto</CardTitle>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -1001,7 +1023,7 @@ function Dashboard() {
 
         {/* 7 · UF do Cliente */}
         <div>
-          <Card>
+          <Card className="h-full">
             <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento por UF do Cliente</CardTitle></CardHeader>
             <CardContent>
               {byUFCliente.length === 0 ? (
@@ -1020,6 +1042,7 @@ function Dashboard() {
             </CardContent>
           </Card>
 
+        </div>
         </div>
 
         {/* 8 · Médicos por Tópico do Produto */}
