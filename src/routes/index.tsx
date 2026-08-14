@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend,
+  Bar, BarChart, CartesianGrid, Cell, LabelList, Legend,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
@@ -16,7 +16,8 @@ import { KpiCard } from "@/components/dashboard/KpiCard";
 import { BaseManagement, type LastUpdate } from "@/components/dashboard/BaseManagement";
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
 import { BrazilHospitalMap, isBrazilUF } from "@/components/dashboard/BrazilHospitalMap";
-import { buildDrillRows, type DrillScope } from "@/lib/dashboard/drilldown";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { type DrillScope } from "@/lib/dashboard/drilldown";
 import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, SEM_UF,
   type Meta, type Row,
@@ -269,9 +270,56 @@ type TooltipRenderProps = {
   payload?: Array<{ payload?: unknown }>;
 };
 
+type ComparisonLabelProps = {
+  x?: number | string;
+  y?: number | string;
+  height?: number | string;
+  previousValue: number;
+  currentValue: number;
+  gap: number;
+  value: number | null;
+};
+
+function ComparisonLabel({ x, y, height, previousValue, currentValue, gap, value }: ComparisonLabelProps) {
+  if (value === null || !Number.isFinite(value)) return null;
+  const barX = Number(x ?? 0);
+  const barY = Number(y ?? 0);
+  const barHeight = Number(height ?? 0);
+  const baseline = barY + barHeight;
+  const pixelsPerUnit = currentValue !== 0 ? barHeight / Math.abs(currentValue) : 0;
+  const previousTop = pixelsPerUnit > 0 ? baseline - Math.abs(previousValue) * pixelsPerUnit : barY;
+  const connectorY = Math.max(barY, previousTop) - 9;
+  const startX = barX - gap;
+  const endX = barX;
+  const centerX = (startX + endX) / 2;
+  const color = value === 0 ? COLOR_NEUTRO : value > 0 ? COLOR_POS : COLOR_NEG;
+
+  return (
+    <g className="hidden lg:block" aria-label={fmtSignedPct(value)}>
+      <line x1={startX} x2={endX} y1={connectorY} y2={connectorY} stroke={color} strokeOpacity={0.5} />
+      <circle cx={startX} cy={connectorY} r={1.5} fill={color} fillOpacity={0.65} />
+      <circle cx={endX} cy={connectorY} r={1.5} fill={color} fillOpacity={0.65} />
+      <text
+        x={centerX}
+        y={connectorY - 3}
+        textAnchor="middle"
+        fill={color}
+        stroke="var(--card)"
+        strokeWidth={3}
+        paintOrder="stroke"
+        fontSize={8}
+        fontWeight={600}
+      >
+        {fmtSignedPct(value)}
+      </text>
+    </g>
+  );
+}
+
 /* ---------------- Página ---------------- */
 
 function Dashboard() {
+  const isMobile = useIsMobile();
   const [data, setData] = useState<Row[]>(() => loadLS<Row[]>(LS_FAT, INITIAL_FAT));
   const [metasData, setMetasData] = useState<Meta[]>(() => loadLS<Meta[]>(LS_METAS, INITIAL_METAS));
   const [lastUpdate, setLastUpdateState] = useState<LastUpdate | null>(() => loadLastUpdate());
@@ -559,29 +607,6 @@ function Dashboard() {
   const byUFHospital = hospitalMapData.rows;
   const topUFHospital = byUFHospital.slice(0, 5);
 
-  /** Realizado FY26 × Meta de Venda por UF do Hospital. */
-  const ufHospitalPerformance = useMemo(() => {
-    const map = new Map<string, { name: string; fat: number; meta: number }>();
-    const ensure = (uf: string) => {
-      const cur = map.get(uf) || { name: uf, fat: 0, meta: 0 };
-      map.set(uf, cur);
-      return cur;
-    };
-    filtered2026.forEach((d) => {
-      const uf = str(d.ufHospital);
-      if (!uf) return;
-      ensure(normUF(uf)).fat += d.valor;
-    });
-    filteredMetas.forEach((m) => {
-      const uf = str(m.ufHospital);
-      if (!uf) return;
-      ensure(normUF(uf)).meta += m.meta;
-    });
-    return Array.from(map.values())
-      .map((v) => ({ ...v, ating: pctAting(v.fat, v.meta), gap: v.fat - v.meta }))
-      .sort((a, b) => (b.meta || b.fat) - (a.meta || a.fat));
-  }, [filtered2026, filteredMetas]);
-
   /* --------- Médicos por tópico --------- */
   const topicoAtivo = topicoSel && byTopico.some((t) => t.code === topicoSel) ? topicoSel : byTopico[0]?.code ?? null;
   const medicoRows = useMemo(() => {
@@ -608,9 +633,6 @@ function Dashboard() {
     return rows;
   }, [filtered2026, topicoAtivo, medicoQuery]);
   const temMedico = useMemo(() => data.some((d) => str(d.medico)), [data]);
-
-  /* --------- Tabela analítica --------- */
-  const tabelaRows = useMemo(() => buildDrillRows(filtered, filteredMetas, {}).slice(0, 300), [filtered, filteredMetas]);
 
   /* --------- Reconciliação --------- */
   const reconc = useMemo(() => {
@@ -781,14 +803,19 @@ function Dashboard() {
         {/* 3 · Evolução trimestral */}
         <div>
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Trimestre</CardTitle></CardHeader>
+            <CardHeader className="pb-1"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Trimestre</CardTitle></CardHeader>
             <CardContent>
               {filtered.length === 0 && filteredMetas.length === 0 ? (
                 <EmptyState message="Não há dados para os filtros selecionados." height={300} />
               ) : (
-                <>
-                <ResponsiveContainer width="100%" height={340}>
-                  <ComposedChart data={byPeriodo} barGap={2} barCategoryGap="18%" margin={{ top: 36, right: 8, left: 0, bottom: 0 }}>
+                <ResponsiveContainer width="100%" height={310}>
+                  <BarChart
+                    data={byPeriodo}
+                    barGap={isMobile ? 3 : 28}
+                    barCategoryGap={isMobile ? "18%" : "28%"}
+                    maxBarSize={42}
+                    margin={{ top: 34, right: 8, left: 0, bottom: -4 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
                     <XAxis dataKey="p" className="text-xs" />
                     <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
@@ -801,29 +828,27 @@ function Dashboard() {
                     <Bar dataKey="v2026" name="FY26" fill={COLOR_2026} radius={[4, 4, 0, 0]} cursor="pointer"
                       onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })}>
                       <LabelList dataKey="v2026" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                      {!isMobile && <LabelList content={(props) => (
+                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.v2025 ?? 0}
+                          currentValue={byPeriodo[props.index ?? -1]?.v2026 ?? 0} value={byPeriodo[props.index ?? -1]?.fy25ToFy26 ?? null} />
+                      )} />}
                     </Bar>
                     <Bar dataKey="metaFinanceira" name="MF" fill="#7c3aed" radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="metaFinanceira" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                      {!isMobile && <LabelList content={(props) => (
+                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.v2026 ?? 0}
+                          currentValue={byPeriodo[props.index ?? -1]?.metaFinanceira ?? 0} value={byPeriodo[props.index ?? -1]?.fy26ToMf ?? null} />
+                      )} />}
                     </Bar>
                     <Bar dataKey="meta" name="MV" fill={COLOR_META} radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="meta" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                      {!isMobile && <LabelList content={(props) => (
+                        <ComparisonLabel {...props} gap={28} previousValue={byPeriodo[props.index ?? -1]?.metaFinanceira ?? 0}
+                          currentValue={byPeriodo[props.index ?? -1]?.meta ?? 0} value={byPeriodo[props.index ?? -1]?.mfToMv ?? null} />
+                      )} />}
                     </Bar>
-                  </ComposedChart>
+                  </BarChart>
                 </ResponsiveContainer>
-                <div className="hidden md:grid grid-cols-4 gap-3 px-[80px] mt-1">
-                  {byPeriodo.map((row) => (
-                    <div key={row.p} className="flex items-center justify-center gap-1 text-[10px]">
-                      {[
-                        ["FY25→FY26", row.fy25ToFy26], ["FY26→MF", row.fy26ToMf], ["MF→MV", row.mfToMv],
-                      ].map(([name, value]) => {
-                        const variation = value as number | null;
-                        const color = variation === null || variation === 0 ? COLOR_NEUTRO : variation > 0 ? COLOR_POS : COLOR_NEG;
-                        return <span key={name as string} title={name as string} className="rounded border bg-card px-1.5 py-0.5 font-semibold" style={{ color }}>{variation === null ? "—" : fmtSignedPct(variation)}</span>;
-                      })}
-                    </div>
-                  ))}
-                </div>
-                </>
               )}
             </CardContent>
           </Card>
@@ -911,29 +936,6 @@ function Dashboard() {
                   <Legend />
                   <Bar dataKey="fat" name="FY 26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
                     onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })} />
-                  <Bar dataKey="meta" name="Meta de Venda" fill={COLOR_META} radius={[0, 3, 3, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Faturamento × Meta de Venda por UF do Hospital */}
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 × Meta de Venda por UF do Hospital</CardTitle></CardHeader>
-          <CardContent>
-            {ufHospitalPerformance.length === 0 ? (
-              <EmptyState message="Sem UF do Hospital na base atual. Envie a planilha com a coluna 'UF do Hospital' para habilitar esta análise." />
-            ) : (
-              <ResponsiveContainer width="100%" height={Math.max(280, ufHospitalPerformance.length * 34)}>
-                <BarChart data={ufHospitalPerformance} layout="vertical" margin={{ left: 8, right: 24 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
-                  <XAxis type="number" tickFormatter={fmtCompact} className="text-xs" />
-                  <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10 }} interval={0} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [fmtBRLFull(v), n]} />
-                  <Legend />
-                  <Bar dataKey="fat" name="FY 26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
-                    onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · UF do Hospital ${e.name}`)} />
                   <Bar dataKey="meta" name="Meta de Venda" fill={COLOR_META} radius={[0, 3, 3, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -1083,54 +1085,6 @@ function Dashboard() {
                   </table>
                 </div>
               </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* 9 · Tabela analítica detalhada */}
-        <Card>
-          <CardHeader className="pb-2 flex flex-row items-center justify-between gap-3">
-            <CardTitle className="text-base">Tabela Analítica Detalhada</CardTitle>
-            <span className="text-xs text-muted-foreground">{fmtInt(tabelaRows.length)} linhas exibidas</span>
-          </CardHeader>
-          <CardContent>
-            {tabelaRows.length === 0 ? (
-              <EmptyState message="Não há dados para os filtros selecionados." />
-            ) : (
-              <div className="max-h-[420px] overflow-auto rounded-md border">
-                <table className="w-full min-w-[1000px] text-xs">
-                  <thead className="sticky top-0 bg-muted/80 backdrop-blur">
-                    <tr className="text-left">
-                      {["Período", "GR", "Representante", "UF", "Marca", "Tópico", "Tipo"].map((h) => (
-                        <th key={h} className="px-3 py-2 font-semibold">{h}</th>
-                      ))}
-                      {["FY 25", "FY 26", "Meta 2026", "Cobertura", "Var. 25/26"].map((h) => (
-                        <th key={h} className="px-3 py-2 text-right font-semibold">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tabelaRows.map((r, i) => (
-                      <tr key={i} className="border-t hover:bg-muted/40">
-                        <td className="px-3 py-1.5">{r.periodo}</td>
-                        <td className="px-3 py-1.5">{r.gr}</td>
-                        <td className="px-3 py-1.5">{r.rep}</td>
-                        <td className="px-3 py-1.5">{r.uf}</td>
-                        <td className="px-3 py-1.5">{r.marca}</td>
-                        <td className="px-3 py-1.5 max-w-[200px] truncate" title={r.topico}>{r.topico}</td>
-                        <td className="px-3 py-1.5">{r.tipo}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">{fmtBRL(r.fat25)}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">{fmtBRL(r.fat26)}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">{r.meta > 0 ? fmtBRL(r.meta) : "Sem meta"}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">{r.ating === null ? "Sem meta" : fmtPct(r.ating)}</td>
-                        <td className={`px-3 py-1.5 text-right tabular-nums ${r.varPct === null ? "" : r.varPct >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                          {r.varPct === null ? "—" : fmtSignedPct(r.varPct)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             )}
           </CardContent>
         </Card>
