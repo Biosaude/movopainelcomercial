@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Bar, BarChart, CartesianGrid, Cell, ComposedChart, LabelList, Legend,
+  Bar, BarChart, CartesianGrid, Cell, LabelList, Legend,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
@@ -16,7 +16,8 @@ import { KpiCard } from "@/components/dashboard/KpiCard";
 import { BaseManagement, type LastUpdate } from "@/components/dashboard/BaseManagement";
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
 import { BrazilHospitalMap, isBrazilUF } from "@/components/dashboard/BrazilHospitalMap";
-import { buildDrillRows, type DrillScope } from "@/lib/dashboard/drilldown";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { type DrillScope } from "@/lib/dashboard/drilldown";
 import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, SEM_UF,
   type Meta, type Row,
@@ -185,7 +186,7 @@ const tooltipStyle = { background: "var(--card)", border: "1px solid var(--borde
 type RankItem = { name: string; value: number };
 
 function RankingCard({
-  title, icon: Icon, items, color, empty, onSelect,
+  title, icon: Icon, items, color, empty, onSelect, expanded = false, compact = false, chartHeight,
 }: {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -193,31 +194,37 @@ function RankingCard({
   color: string;
   empty: string;
   onSelect?: (name: string) => void;
+  expanded?: boolean;
+  compact?: boolean;
+  chartHeight?: number;
 }) {
+  const isMobile = useIsMobile();
+  const axisWidth = expanded ? (isMobile ? 126 : 180) : 92;
+  const rowHeight = compact ? 20 : expanded ? 32 : 26;
   return (
-    <Card className="min-w-0">
+    <Card className="h-full min-w-0">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           <Icon className="h-4 w-4 text-primary shrink-0" />
           <span className="truncate">{title}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-2">
+      <CardContent className={compact ? "px-2 py-1" : "px-2"}>
         {items.length === 0 ? (
           <EmptyState message={empty} height={220} />
         ) : (
-          <ResponsiveContainer width="100%" height={Math.max(220, items.length * 26)}>
-            <BarChart data={items} layout="vertical" margin={{ left: 4, right: 34, top: 4, bottom: 4 }}>
+          <ResponsiveContainer width="100%" height={chartHeight ?? Math.max(220, items.length * rowHeight)}>
+            <BarChart data={items} layout="vertical" margin={{ left: 4, right: expanded ? 54 : 34, top: compact ? 1 : 4, bottom: compact ? 1 : 4 }}>
               <XAxis type="number" hide />
               <YAxis
-                type="category" dataKey="name" width={92}
-                tick={{ fontSize: 9 }} interval={0}
+                type="category" dataKey="name" width={axisWidth}
+                tick={<NameAxisTick maxLength={expanded ? (isMobile ? 18 : 27) : 14} />} interval={0}
               />
               <Tooltip
                 contentStyle={tooltipStyle}
                 formatter={(v: number) => [fmtBRLFull(v), "Faturamento FY26"]}
               />
-              <Bar dataKey="value" fill={color} radius={[0, 3, 3, 0]} cursor={onSelect ? "pointer" : undefined}
+              <Bar dataKey="value" barSize={compact ? 8 : undefined} fill={color} radius={[0, 3, 3, 0]} cursor={onSelect ? "pointer" : undefined}
                 onClick={(e: { name?: string }) => e?.name && onSelect?.(e.name)}>
                 <LabelList dataKey="value" position="right" formatter={(v: number) => fmtCompact(v)} className="fill-muted-foreground" fontSize={9} />
               </Bar>
@@ -229,10 +236,23 @@ function RankingCard({
   );
 }
 
+function NameAxisTick({ x = 0, y = 0, payload, maxLength }: {
+  x?: number; y?: number; payload?: { value?: string }; maxLength: number;
+}) {
+  const name = String(payload?.value ?? "");
+  const visible = name.length > maxLength ? `${name.slice(0, maxLength - 3)}...` : name;
+  return (
+    <text x={x - 4} y={y} dy="0.32em" textAnchor="end" fontSize={9} fill="currentColor">
+      <title>{name}</title>
+      {visible}
+    </text>
+  );
+}
+
 function ClientRankingCard({ items }: { items: RankItem[] }) {
   const max = items[0]?.value ?? 0;
   return (
-    <Card className="min-w-0">
+    <Card className="h-full min-w-0">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           <Building2 className="h-4 w-4 text-primary shrink-0" />
@@ -269,9 +289,69 @@ type TooltipRenderProps = {
   payload?: Array<{ payload?: unknown }>;
 };
 
+function RepresentativeTooltip({ active, payload }: TooltipRenderProps) {
+  if (!active || !payload?.length) return null;
+  const row = (payload[0].payload ?? {}) as { name: string; fy26: number; mf: number; mv: number };
+  return (
+    <div className="space-y-1 rounded-md border bg-card p-3 text-xs shadow-md">
+      <p className="font-semibold">Representante: {row.name}</p>
+      <p><span className="text-muted-foreground">FY26: </span>{fmtBRLFull(row.fy26)}</p>
+      <p><span className="text-muted-foreground">MF: </span>{fmtBRLFull(row.mf)}</p>
+      <p><span className="text-muted-foreground">MV: </span>{fmtBRLFull(row.mv)}</p>
+    </div>
+  );
+}
+
+type ComparisonLabelProps = {
+  x?: number | string;
+  y?: number | string;
+  height?: number | string;
+  previousValue: number;
+  currentValue: number;
+  gap: number;
+  value: number | null;
+};
+
+function ComparisonLabel({ x, y, height, previousValue, currentValue, gap, value }: ComparisonLabelProps) {
+  if (value === null || !Number.isFinite(value)) return null;
+  const barX = Number(x ?? 0);
+  const barY = Number(y ?? 0);
+  const barHeight = Number(height ?? 0);
+  const baseline = barY + barHeight;
+  const pixelsPerUnit = currentValue !== 0 ? barHeight / Math.abs(currentValue) : 0;
+  const previousTop = pixelsPerUnit > 0 ? baseline - Math.abs(previousValue) * pixelsPerUnit : barY;
+  const connectorY = Math.max(barY, previousTop) - 9;
+  const startX = barX - gap;
+  const endX = barX;
+  const centerX = (startX + endX) / 2;
+  const color = value === 0 ? COLOR_NEUTRO : value > 0 ? COLOR_POS : COLOR_NEG;
+
+  return (
+    <g className="hidden lg:block" aria-label={fmtSignedPct(value)}>
+      <line x1={startX} x2={endX} y1={connectorY} y2={connectorY} stroke={color} strokeOpacity={0.5} />
+      <circle cx={startX} cy={connectorY} r={1.5} fill={color} fillOpacity={0.65} />
+      <circle cx={endX} cy={connectorY} r={1.5} fill={color} fillOpacity={0.65} />
+      <text
+        x={centerX}
+        y={connectorY - 3}
+        textAnchor="middle"
+        fill={color}
+        stroke="var(--card)"
+        strokeWidth={3}
+        paintOrder="stroke"
+        fontSize={8}
+        fontWeight={600}
+      >
+        {fmtSignedPct(value)}
+      </text>
+    </g>
+  );
+}
+
 /* ---------------- Página ---------------- */
 
 function Dashboard() {
+  const isMobile = useIsMobile();
   const [data, setData] = useState<Row[]>(() => loadLS<Row[]>(LS_FAT, INITIAL_FAT));
   const [metasData, setMetasData] = useState<Meta[]>(() => loadLS<Meta[]>(LS_METAS, INITIAL_METAS));
   const [lastUpdate, setLastUpdateState] = useState<LastUpdate | null>(() => loadLastUpdate());
@@ -373,17 +453,6 @@ function Dashboard() {
   const fat2026 = filtered2026.reduce((s, d) => s + d.valor, 0);
   const metaTotal = filteredMetas.reduce((s, m) => s + m.meta, 0);
 
-  const fatByJoinKey = useMemo(() => {
-    const m = new Map<string, { fat25: number; fat26: number }>();
-    filtered.forEach((d) => {
-      const k = joinKey(d);
-      const cur = m.get(k) || { fat25: 0, fat26: 0 };
-      if (periodoYear(d.periodo) === 2025) cur.fat25 += d.valor;
-      else if (periodoYear(d.periodo) === 2026) cur.fat26 += d.valor;
-      m.set(k, cur);
-    });
-    return m;
-  }, [filtered]);
   const diffAbs = fat2026 - fat2025;
   const diffPct = pctVar(fat2026, fat2025);
   const coberturaMV = pctAting(fat2026, metaTotal);
@@ -428,10 +497,12 @@ function Dashboard() {
     return Array.from(m.values()).map((row) => ({
       ...row,
       fy25ToFy26: row.has2025 && row.has2026 ? pctVar(row.v2026, row.v2025) : null,
-      fy26ToMf: row.has2026 && row.hasMetaFinanceira ? pctVar(row.metaFinanceira, row.v2026) : null,
-      mfToMv: row.hasMetaFinanceira && row.hasMeta ? pctVar(row.meta, row.metaFinanceira) : null,
+      fy26ToMf: row.has2026 && row.hasMetaFinanceira ? pctVar(row.v2026, row.metaFinanceira) : null,
     })).sort((a, b) => a.p.localeCompare(b.p));
   }, [filtered, filteredMetas, metasFinanceirasFiltradas]);
+  const periodosVisiveis = byPeriodo.filter((row) =>
+    row.p !== "Q4" || (row.has2026 && Number.isFinite(row.v2026) && row.v2026 > 0)
+  );
 
   const byGR = useMemo(() => {
     const m = new Map<string, number>();
@@ -439,15 +510,16 @@ function Dashboard() {
     return Array.from(m, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [filtered2026]);
 
-  const rank = (getter: (d: Row) => string | undefined, limit: number): RankItem[] => {
+  const rank = (getter: (d: Row) => string | undefined, limit?: number): RankItem[] => {
     const m = new Map<string, number>();
     filtered2026.forEach((d) => {
       const raw = str(getter(d));
       if (!raw) return;
       m.set(raw, (m.get(raw) || 0) + d.valor);
     });
-    return Array.from(m, ([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value).slice(0, limit);
+    const sorted = Array.from(m, ([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+    return limit === undefined ? sorted : sorted.slice(0, limit);
   };
 
   const topMarcas = useMemo(() => rank((d) => normMarca(d.marca), 10), [filtered2026]);
@@ -462,42 +534,48 @@ function Dashboard() {
       m.set(k, cur);
     });
     return Array.from(m.values()).map((v) => ({ name: v.label, value: v.value }))
-      .sort((a, b) => b.value - a.value).slice(0, 12);
+      .sort((a, b) => b.value - a.value);
   }, [filtered2026]);
-  const topAssessores = useMemo(() => rank((d) => d.assessor, 12), [filtered2026]);
+  const topAssessores = useMemo(() => rank((d) => d.assessor), [filtered2026]);
   const topClientes = useMemo(() => rank((d) => d.cliente, 10), [filtered2026]);
   const topMedicos = useMemo(() => rank((d) => d.medico, 12), [filtered2026]);
 
   const repPerformance = useMemo(() => {
-    const fatMap = new Map<string, number>();
-    const metaMap = new Map<string, { meta: number; label: string }>();
-    const repJoinKeys = new Map<string, Set<string>>();
-    filteredMetas.forEach((m) => {
-      const k = normRep(m.rep);
-      const cur = metaMap.get(k) || { meta: 0, label: m.rep };
-      cur.meta += m.meta;
-      cur.label = m.rep.length > cur.label.length ? m.rep : cur.label;
-      metaMap.set(k, cur);
-      const s = repJoinKeys.get(k) || new Set<string>();
-      s.add(joinKey(m));
-      repJoinKeys.set(k, s);
+    const byRepresentative = new Map<string, {
+      name: string; fy26: number; mf: number; mv: number; hasMf: boolean; hasMv: boolean;
+    }>();
+    const ensure = (rawName: string) => {
+      if (!str(rawName) || normMarca(rawName) === "SEM REPRESENTANTE") return null;
+      const key = normRep(rawName);
+      if (!key) return null;
+      const current = byRepresentative.get(key) || {
+        name: rawName, fy26: 0, mf: 0, mv: 0, hasMf: false, hasMv: false,
+      };
+      if (rawName.length > current.name.length) current.name = rawName;
+      byRepresentative.set(key, current);
+      return current;
+    };
+    filtered2026.forEach((row) => {
+      const representative = ensure(row.rep);
+      if (representative) representative.fy26 += row.valor;
     });
-    repJoinKeys.forEach((s, k) => {
-      let total = 0;
-      s.forEach((jk) => { total += fatByJoinKey.get(jk)?.fat26 || 0; });
-      fatMap.set(k, total);
+    filteredMetas.filter((m) => periodoYear(m.periodo) === 2026).forEach((m) => {
+      const representative = ensure(m.rep);
+      if (!representative) return;
+      if (m.metaFinanceira !== undefined && Number.isFinite(m.metaFinanceira) && m.metaFinanceira > 0) {
+        representative.mf += m.metaFinanceira;
+        representative.hasMf = true;
+      }
+      if (Number.isFinite(m.meta) && m.meta > 0) {
+        representative.mv += m.meta;
+        representative.hasMv = true;
+      }
     });
-    filtered2026.forEach((d) => {
-      const k = normRep(d.rep);
-      if (!metaMap.has(k)) fatMap.set(k, (fatMap.get(k) || 0) + d.valor);
-    });
-    const keys = new Set<string>([...fatMap.keys(), ...metaMap.keys()]);
-    return Array.from(keys).map((k) => {
-      const meta = metaMap.get(k)?.meta || 0;
-      const fat = fatMap.get(k) || 0;
-      return { name: metaMap.get(k)?.label || k, fat, meta, ating: pctAting(fat, meta), gap: fat - meta };
-    }).sort((a, b) => b.fat - a.fat).slice(0, 10);
-  }, [filtered2026, filteredMetas, fatByJoinKey]);
+    return Array.from(byRepresentative.values()).filter((row) => row.hasMf && row.hasMv).sort((a, b) =>
+      b.fy26 - a.fy26 || (b.mf || b.mv) - (a.mf || a.mv)
+    );
+  }, [filtered2026, filteredMetas]);
+  const representativeChartsHeight = Math.max(220, topReps.length * 16, repPerformance.length * 38);
 
   const byTopico = useMemo(() => {
     const m = new Map<string, { name: string; code: string; value: number; medicos: Set<string>; itens: number }>();
@@ -559,29 +637,6 @@ function Dashboard() {
   const byUFHospital = hospitalMapData.rows;
   const topUFHospital = byUFHospital.slice(0, 5);
 
-  /** Realizado FY26 × Meta de Venda por UF do Hospital. */
-  const ufHospitalPerformance = useMemo(() => {
-    const map = new Map<string, { name: string; fat: number; meta: number }>();
-    const ensure = (uf: string) => {
-      const cur = map.get(uf) || { name: uf, fat: 0, meta: 0 };
-      map.set(uf, cur);
-      return cur;
-    };
-    filtered2026.forEach((d) => {
-      const uf = str(d.ufHospital);
-      if (!uf) return;
-      ensure(normUF(uf)).fat += d.valor;
-    });
-    filteredMetas.forEach((m) => {
-      const uf = str(m.ufHospital);
-      if (!uf) return;
-      ensure(normUF(uf)).meta += m.meta;
-    });
-    return Array.from(map.values())
-      .map((v) => ({ ...v, ating: pctAting(v.fat, v.meta), gap: v.fat - v.meta }))
-      .sort((a, b) => (b.meta || b.fat) - (a.meta || a.fat));
-  }, [filtered2026, filteredMetas]);
-
   /* --------- Médicos por tópico --------- */
   const topicoAtivo = topicoSel && byTopico.some((t) => t.code === topicoSel) ? topicoSel : byTopico[0]?.code ?? null;
   const medicoRows = useMemo(() => {
@@ -608,9 +663,6 @@ function Dashboard() {
     return rows;
   }, [filtered2026, topicoAtivo, medicoQuery]);
   const temMedico = useMemo(() => data.some((d) => str(d.medico)), [data]);
-
-  /* --------- Tabela analítica --------- */
-  const tabelaRows = useMemo(() => buildDrillRows(filtered, filteredMetas, {}).slice(0, 300), [filtered, filteredMetas]);
 
   /* --------- Reconciliação --------- */
   const reconc = useMemo(() => {
@@ -644,7 +696,7 @@ function Dashboard() {
     if (!active || !payload?.length) return null;
     const d = (payload[0].payload ?? {}) as {
       v2025: number; v2026: number; meta: number; metaFinanceira: number;
-      fy25ToFy26: number | null; fy26ToMf: number | null; mfToMv: number | null;
+      fy25ToFy26: number | null; fy26ToMf: number | null;
     };
     const variation = (value: number | null) => value === null ? "—" : fmtSignedPct(value);
     return (
@@ -655,9 +707,8 @@ function Dashboard() {
         <p><span className="text-muted-foreground">MF: </span>{fmtBRLFull(d.metaFinanceira)}</p>
         <p><span className="text-muted-foreground">MV: </span>{fmtBRLFull(d.meta)}</p>
         <div className="my-1.5 border-t" />
-        <p><span className="text-muted-foreground">FY25 → FY26: </span>{variation(d.fy25ToFy26)}</p>
-        <p><span className="text-muted-foreground">FY26 → MF: </span>{variation(d.fy26ToMf)}</p>
-        <p><span className="text-muted-foreground">MF → MV: </span>{variation(d.mfToMv)}</p>
+        <p><span className="text-muted-foreground">Variação FY25 → FY26: </span>{variation(d.fy25ToFy26)}</p>
+        <p><span className="text-muted-foreground">Desvio FY26 × MF: </span>{variation(d.fy26ToMf)}</p>
       </div>
     );
   };
@@ -747,7 +798,7 @@ function Dashboard() {
             onClick={() => openDrill("Detalhe · FY 26")}
           />
           <KpiCard
-            title="MV FY 2026" value={fmtCompact(metaTotal)} tooltip={metaTotal > 0 ? fmtBRLFull(metaTotal) : "Sem meta cadastrada para esta combinação"}
+            title="MV 2026" value={fmtCompact(metaTotal)} tooltip={metaTotal > 0 ? fmtBRLFull(metaTotal) : "Sem meta cadastrada para esta combinação"}
             icon={Target} accent="warning"
             onClick={() => openDrill("Detalhe · Meta de Venda 2026")}
           />
@@ -778,17 +829,22 @@ function Dashboard() {
           />
         </div>
 
-        {/* 3 · Evolução trimestral */}
-        <div>
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Trimestre</CardTitle></CardHeader>
+        {/* 3 · Evolução por quarter e FY26 por GR */}
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] items-stretch gap-4">
+          <Card className="h-full">
+            <CardHeader className="pb-1"><CardTitle className="text-base">Evolução FY25 × FY26 × Metas por Quarter.</CardTitle></CardHeader>
             <CardContent>
               {filtered.length === 0 && filteredMetas.length === 0 ? (
                 <EmptyState message="Não há dados para os filtros selecionados." height={300} />
               ) : (
-                <>
-                <ResponsiveContainer width="100%" height={340}>
-                  <ComposedChart data={byPeriodo} barGap={2} barCategoryGap="18%" margin={{ top: 36, right: 8, left: 0, bottom: 0 }}>
+                <ResponsiveContainer width="100%" height={330}>
+                  <BarChart
+                    data={periodosVisiveis}
+                    barGap={isMobile ? 3 : 12}
+                    barCategoryGap={isMobile ? "16%" : "22%"}
+                    maxBarSize={isMobile ? 28 : 54}
+                    margin={{ top: 38, right: 8, left: 0, bottom: -4 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
                     <XAxis dataKey="p" className="text-xs" />
                     <YAxis tickFormatter={fmtCompact} className="text-xs" width={80} />
@@ -801,47 +857,37 @@ function Dashboard() {
                     <Bar dataKey="v2026" name="FY26" fill={COLOR_2026} radius={[4, 4, 0, 0]} cursor="pointer"
                       onClick={(e: { p?: string }) => e?.p && openDrill(`Detalhe · ${e.p}`, { periodo: e.p })}>
                       <LabelList dataKey="v2026" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                      {!isMobile && <LabelList content={(props) => (
+                        <ComparisonLabel {...props} gap={12} previousValue={periodosVisiveis[props.index ?? -1]?.v2025 ?? 0}
+                          currentValue={periodosVisiveis[props.index ?? -1]?.v2026 ?? 0} value={periodosVisiveis[props.index ?? -1]?.fy25ToFy26 ?? null} />
+                      )} />}
                     </Bar>
                     <Bar dataKey="metaFinanceira" name="MF" fill="#7c3aed" radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="metaFinanceira" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
+                      {!isMobile && <LabelList content={(props) => (
+                        <ComparisonLabel {...props} gap={12} previousValue={periodosVisiveis[props.index ?? -1]?.v2026 ?? 0}
+                          currentValue={periodosVisiveis[props.index ?? -1]?.metaFinanceira ?? 0} value={periodosVisiveis[props.index ?? -1]?.fy26ToMf ?? null} />
+                      )} />}
                     </Bar>
                     <Bar dataKey="meta" name="MV" fill={COLOR_META} radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="meta" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
                     </Bar>
-                  </ComposedChart>
+                  </BarChart>
                 </ResponsiveContainer>
-                <div className="hidden md:grid grid-cols-4 gap-3 px-[80px] mt-1">
-                  {byPeriodo.map((row) => (
-                    <div key={row.p} className="flex items-center justify-center gap-1 text-[10px]">
-                      {[
-                        ["FY25→FY26", row.fy25ToFy26], ["FY26→MF", row.fy26ToMf], ["MF→MV", row.mfToMv],
-                      ].map(([name, value]) => {
-                        const variation = value as number | null;
-                        const color = variation === null || variation === 0 ? COLOR_NEUTRO : variation > 0 ? COLOR_POS : COLOR_NEG;
-                        return <span key={name as string} title={name as string} className="rounded border bg-card px-1.5 py-0.5 font-semibold" style={{ color }}>{variation === null ? "—" : fmtSignedPct(variation)}</span>;
-                      })}
-                    </div>
-                  ))}
-                </div>
-                </>
               )}
             </CardContent>
           </Card>
 
-        </div>
-
-        {/* 4 · FY 26 por GR e distribuição geográfica */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch gap-4">
           <Card className="h-full">
-            <CardHeader className="pb-2"><CardTitle className="text-base">FY 26 por GR</CardTitle></CardHeader>
+            <CardHeader className="pb-1"><CardTitle className="text-base">FY 26 por GR</CardTitle></CardHeader>
             <CardContent>
               {byGR.length === 0 ? (
                 <EmptyState message="Não há dados para os filtros selecionados." />
               ) : (
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={330}>
                   <PieChart>
                     <Pie
-                      data={byGR} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={95}
+                      data={byGR} dataKey="value" nameKey="name" cx="50%" cy="46%" outerRadius={108}
                       label={({ percent }: { percent?: number }) => `${(((percent ?? 0) * 100)).toFixed(0)}%`}
                       onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { gr: e.name })}
                       cursor="pointer"
@@ -855,7 +901,10 @@ function Dashboard() {
               )}
             </CardContent>
           </Card>
+        </div>
 
+        {/* 4 · Distribuição geográfica */}
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] items-stretch gap-4">
           <Card className="h-full" data-map-reconciled={hospitalMapData.reconciled} data-map-outside-records={hospitalMapData.outsideRecords}>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento FY26 pela UF do Hospital</CardTitle>
@@ -878,71 +927,60 @@ function Dashboard() {
               </div>
             </CardContent>
           </Card>
+          <RankingCard title="Ranking de Marcas" icon={Package} items={topMarcas} color={COLOR_2026}
+            empty="Não há dados para os filtros selecionados." expanded
+            onSelect={(name) => openDrill(`Detalhe · ${name}`, { marca: name })} />
         </div>
 
-        {/* 5 · Rankings */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
-          <RankingCard title="Ranking de Marcas" icon={Package} items={topMarcas} color={COLOR_2026}
-            empty="Não há dados para os filtros selecionados."
-            onSelect={(name) => openDrill(`Detalhe · ${name}`, { marca: name })} />
-          <RankingCard title="Ranking de Representantes" icon={Users} items={topReps} color="#f59e0b"
-            empty="Não há dados para os filtros selecionados."
-            onSelect={(name) => openDrill(`Detalhe · ${name}`, { rep: name })} />
-          <RankingCard title="Ranking de Assessores" icon={Award} items={topAssessores} color="#14b8a6"
-            empty="A base atual não possui a dimensão Assessor." />
+        {/* 5 · Rankings de clientes, médicos e assessores */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           <ClientRankingCard items={topClientes} />
           <RankingCard title="Ranking de Médicos" icon={Stethoscope} items={topMedicos} color="#f97316"
             empty="A base atual não possui a dimensão Médico." />
+          <RankingCard title="Ranking de Assessores" icon={Award} items={topAssessores} color="#14b8a6"
+            empty="A base atual não possui a dimensão Assessor." expanded />
         </div>
 
-        {/* Faturamento × Meta por Representante (mantido) */}
-        <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 × Meta de Venda por Representante</CardTitle></CardHeader>
-          <CardContent>
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(300px,1fr)_minmax(0,2fr)] items-stretch gap-4">
+          <RankingCard title="Ranking de Representantes" icon={Users} items={topReps} color="#f59e0b"
+            empty="Não há dados para os filtros selecionados." expanded compact chartHeight={representativeChartsHeight}
+            onSelect={(name) => openDrill(`Detalhe · ${name}`, { rep: name })} />
+
+          {/* Comparativo FY26 × MF × MV por representante */}
+          <Card className="h-full">
+            <CardHeader className="pb-1"><CardTitle className="text-base">Faturamento FY26 × MF × MV por Representante</CardTitle></CardHeader>
+          <CardContent className="py-1">
             {repPerformance.length === 0 ? (
               <EmptyState message="Não há dados para os filtros selecionados." />
             ) : (
-              <ResponsiveContainer width="100%" height={Math.max(280, repPerformance.length * 34)}>
-                <BarChart data={repPerformance} layout="vertical" margin={{ left: 8, right: 24 }}>
+              <ResponsiveContainer width="100%" height={representativeChartsHeight}>
+                <BarChart data={repPerformance} layout="vertical" barSize={6} barGap={1} barCategoryGap="20%" margin={{ top: 1, left: 8, right: 80, bottom: 1 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
                   <XAxis type="number" tickFormatter={fmtCompact} className="text-xs" />
-                  <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10 }} interval={0} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [fmtBRLFull(v), n]} />
+                  <YAxis type="category" dataKey="name" width={isMobile ? 126 : 210}
+                    tick={<NameAxisTick maxLength={isMobile ? 18 : 30} />} interval={0} />
+                  <Tooltip content={RepresentativeTooltip} />
                   <Legend />
-                  <Bar dataKey="fat" name="FY 26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
-                    onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })} />
-                  <Bar dataKey="meta" name="Meta de Venda" fill={COLOR_META} radius={[0, 3, 3, 0]} />
+                  <Bar dataKey="fy26" name="FY26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
+                    onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })}>
+                    <LabelList dataKey="fy26" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={8} />
+                  </Bar>
+                  <Bar dataKey="mf" name="MF" fill="#7c3aed" radius={[0, 3, 3, 0]}>
+                    <LabelList dataKey="mf" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={8} />
+                  </Bar>
+                  <Bar dataKey="mv" name="MV" fill={COLOR_META} radius={[0, 3, 3, 0]}>
+                    <LabelList dataKey="mv" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={8} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             )}
           </CardContent>
-        </Card>
+          </Card>
+        </div>
 
-        {/* Faturamento × Meta de Venda por UF do Hospital */}
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Faturamento FY 26 × Meta de Venda por UF do Hospital</CardTitle></CardHeader>
-          <CardContent>
-            {ufHospitalPerformance.length === 0 ? (
-              <EmptyState message="Sem UF do Hospital na base atual. Envie a planilha com a coluna 'UF do Hospital' para habilitar esta análise." />
-            ) : (
-              <ResponsiveContainer width="100%" height={Math.max(280, ufHospitalPerformance.length * 34)}>
-                <BarChart data={ufHospitalPerformance} layout="vertical" margin={{ left: 8, right: 24 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
-                  <XAxis type="number" tickFormatter={fmtCompact} className="text-xs" />
-                  <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10 }} interval={0} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [fmtBRLFull(v), n]} />
-                  <Legend />
-                  <Bar dataKey="fat" name="FY 26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
-                    onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · UF do Hospital ${e.name}`)} />
-                  <Bar dataKey="meta" name="Meta de Venda" fill={COLOR_META} radius={[0, 3, 3, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* 6 · Faturamento por Tópico do Produto */}
-        <Card>
+        {/* 6 · Faturamento por Tópico do Produto e UF do Cliente */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 items-stretch gap-4">
+        <Card className="h-full">
           <CardHeader className="pb-2 flex flex-row items-center justify-between gap-3">
             <CardTitle className="text-base">Faturamento por Tópico do Produto</CardTitle>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -978,7 +1016,7 @@ function Dashboard() {
 
         {/* 7 · UF do Cliente */}
         <div>
-          <Card>
+          <Card className="h-full">
             <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />Faturamento por UF do Cliente</CardTitle></CardHeader>
             <CardContent>
               {byUFCliente.length === 0 ? (
@@ -997,6 +1035,7 @@ function Dashboard() {
             </CardContent>
           </Card>
 
+        </div>
         </div>
 
         {/* 8 · Médicos por Tópico do Produto */}
@@ -1083,54 +1122,6 @@ function Dashboard() {
                   </table>
                 </div>
               </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* 9 · Tabela analítica detalhada */}
-        <Card>
-          <CardHeader className="pb-2 flex flex-row items-center justify-between gap-3">
-            <CardTitle className="text-base">Tabela Analítica Detalhada</CardTitle>
-            <span className="text-xs text-muted-foreground">{fmtInt(tabelaRows.length)} linhas exibidas</span>
-          </CardHeader>
-          <CardContent>
-            {tabelaRows.length === 0 ? (
-              <EmptyState message="Não há dados para os filtros selecionados." />
-            ) : (
-              <div className="max-h-[420px] overflow-auto rounded-md border">
-                <table className="w-full min-w-[1000px] text-xs">
-                  <thead className="sticky top-0 bg-muted/80 backdrop-blur">
-                    <tr className="text-left">
-                      {["Período", "GR", "Representante", "UF", "Marca", "Tópico", "Tipo"].map((h) => (
-                        <th key={h} className="px-3 py-2 font-semibold">{h}</th>
-                      ))}
-                      {["FY 25", "FY 26", "Meta 2026", "Cobertura", "Var. 25/26"].map((h) => (
-                        <th key={h} className="px-3 py-2 text-right font-semibold">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tabelaRows.map((r, i) => (
-                      <tr key={i} className="border-t hover:bg-muted/40">
-                        <td className="px-3 py-1.5">{r.periodo}</td>
-                        <td className="px-3 py-1.5">{r.gr}</td>
-                        <td className="px-3 py-1.5">{r.rep}</td>
-                        <td className="px-3 py-1.5">{r.uf}</td>
-                        <td className="px-3 py-1.5">{r.marca}</td>
-                        <td className="px-3 py-1.5 max-w-[200px] truncate" title={r.topico}>{r.topico}</td>
-                        <td className="px-3 py-1.5">{r.tipo}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">{fmtBRL(r.fat25)}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">{fmtBRL(r.fat26)}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">{r.meta > 0 ? fmtBRL(r.meta) : "Sem meta"}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">{r.ating === null ? "Sem meta" : fmtPct(r.ating)}</td>
-                        <td className={`px-3 py-1.5 text-right tabular-nums ${r.varPct === null ? "" : r.varPct >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                          {r.varPct === null ? "—" : fmtSignedPct(r.varPct)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             )}
           </CardContent>
         </Card>

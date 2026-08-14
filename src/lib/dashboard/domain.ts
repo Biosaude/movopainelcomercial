@@ -48,10 +48,11 @@ export const topicoCode = (s: string) => {
   return (m ? m[1] : t.replace(/\s+/g, "")).trim();
 };
 
-/** Chave canônica do representante: "ALDAIR FREIRE" e "ALDAIR F." → "ALDAIR F" */
+/** Chave canônica: abrevia o sobrenome e tolera letras consecutivas duplicadas entre as fontes. */
 export const normRep = (s: string) => {
   const t = stripAccents(String(s ?? ""))
-    .toUpperCase().replace(/[.,]/g, " ").trim().replace(/\s+/g, " ");
+    .toUpperCase().replace(/[.,]/g, " ").trim().replace(/\s+/g, " ")
+    .replace(/([A-Z])\1+/g, "$1");
   if (!t) return "";
   if (t.includes("-")) return t;
   const parts = t.split(" ").filter(Boolean);
