@@ -498,8 +498,7 @@ function Dashboard() {
     return Array.from(m.values()).map((row) => ({
       ...row,
       fy25ToFy26: row.has2025 && row.has2026 ? pctVar(row.v2026, row.v2025) : null,
-      fy26ToMf: row.has2026 && row.hasMetaFinanceira ? pctVar(row.metaFinanceira, row.v2026) : null,
-      mfToMv: row.hasMetaFinanceira && row.hasMeta ? pctVar(row.meta, row.metaFinanceira) : null,
+      fy26ToMf: row.has2026 && row.hasMetaFinanceira ? pctVar(row.v2026, row.metaFinanceira) : null,
     })).sort((a, b) => a.p.localeCompare(b.p));
   }, [filtered, filteredMetas, metasFinanceirasFiltradas]);
   const periodosVisiveis = byPeriodo.filter((row) =>
@@ -697,7 +696,7 @@ function Dashboard() {
     if (!active || !payload?.length) return null;
     const d = (payload[0].payload ?? {}) as {
       v2025: number; v2026: number; meta: number; metaFinanceira: number;
-      fy25ToFy26: number | null; fy26ToMf: number | null; mfToMv: number | null;
+      fy25ToFy26: number | null; fy26ToMf: number | null;
     };
     const variation = (value: number | null) => value === null ? "—" : fmtSignedPct(value);
     return (
@@ -708,9 +707,8 @@ function Dashboard() {
         <p><span className="text-muted-foreground">MF: </span>{fmtBRLFull(d.metaFinanceira)}</p>
         <p><span className="text-muted-foreground">MV: </span>{fmtBRLFull(d.meta)}</p>
         <div className="my-1.5 border-t" />
-        <p><span className="text-muted-foreground">FY25 → FY26: </span>{variation(d.fy25ToFy26)}</p>
-        <p><span className="text-muted-foreground">FY26 → MF: </span>{variation(d.fy26ToMf)}</p>
-        <p><span className="text-muted-foreground">MF → MV: </span>{variation(d.mfToMv)}</p>
+        <p><span className="text-muted-foreground">Variação FY25 → FY26: </span>{variation(d.fy25ToFy26)}</p>
+        <p><span className="text-muted-foreground">Desvio FY26 × MF: </span>{variation(d.fy26ToMf)}</p>
       </div>
     );
   };
@@ -873,10 +871,6 @@ function Dashboard() {
                     </Bar>
                     <Bar dataKey="meta" name="MV" fill={COLOR_META} radius={[4, 4, 0, 0]}>
                       <LabelList dataKey="meta" position="top" formatter={(v: number) => v ? fmtCompact(v) : ""} fontSize={9} />
-                      {!isMobile && <LabelList content={(props) => (
-                        <ComparisonLabel {...props} gap={12} previousValue={periodosVisiveis[props.index ?? -1]?.metaFinanceira ?? 0}
-                          currentValue={periodosVisiveis[props.index ?? -1]?.meta ?? 0} value={periodosVisiveis[props.index ?? -1]?.mfToMv ?? null} />
-                      )} />}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
