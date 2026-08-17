@@ -48,16 +48,25 @@ export const topicoCode = (s: string) => {
   return (m ? m[1] : t.replace(/\s+/g, "")).trim();
 };
 
-/** Chave canônica do representante: "ALDAIR FREIRE" e "ALDAIR F." → "ALDAIR F" */
-export const normRep = (s: string) => {
+/**
+ * Chave canônica do representante. Além de caixa, acentos, pontuação e espaços,
+ * reduz letras consecutivas repetidas para reconciliar variações ortográficas da
+ * mesma abreviação sem recorrer a correspondência parcial.
+ * Ex.: "ALDAIR FREIRE" e "ALDAIR F." → "ALDAIR F".
+ */
+export const normalizeRepresentative = (s: string) => {
   const t = stripAccents(String(s ?? ""))
-    .toUpperCase().replace(/[.,]/g, " ").trim().replace(/\s+/g, " ");
+    .toUpperCase().replace(/[.,]/g, " ").trim().replace(/\s+/g, " ")
+    .replace(/([A-Z])\1+/g, "$1");
   if (!t) return "";
   if (t.includes("-")) return t;
   const parts = t.split(" ").filter(Boolean);
   if (parts.length === 1) return parts[0];
   return `${parts[0]} ${parts[parts.length - 1][0]}`;
 };
+
+/** Alias mantido para os consumidores existentes da chave canônica. */
+export const normRep = normalizeRepresentative;
 
 /** "BIOSAUDE" ↔ "BIOSAUDE MATRIZ" */
 export const normGR = (s: string) => {
