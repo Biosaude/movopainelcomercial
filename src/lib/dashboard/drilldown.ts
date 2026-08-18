@@ -8,6 +8,8 @@ export type DrillScope = {
   tipo?: string; rep?: string; periodo?: string;
 };
 
+export type DrillMetric = "MV" | "MF" | "COBERTURA_MF";
+
 export type DrillRow = {
   periodo: string; gr: string; rep: string; uf: string;
   marca: string; topico: string; tipo: string;
@@ -22,7 +24,12 @@ type Bucket = Omit<DrillRow, "ating" | "varPct" | "gap">;
  * agrupados pela MESMA chave canônica (período · GR · rep · UF · marca · tópico
  * · tipo), de modo que a meta nunca é somada mais de uma vez.
  */
-export function buildDrillRows(fat: Row[], metas: Meta[], scope: DrillScope): DrillRow[] {
+export function buildDrillRows(
+  fat: Row[],
+  metas: Meta[],
+  scope: DrillScope,
+  metric: DrillMetric = "MV",
+): DrillRow[] {
   const grK = scope.gr ? normGR(scope.gr) : null;
   const ufK = scope.uf ? normUF(scope.uf) : null;
   const marcaK = scope.marca ? normMarca(scope.marca) : null;
@@ -58,13 +65,13 @@ export function buildDrillRows(fat: Row[], metas: Meta[], scope: DrillScope): Dr
     else if (periodoYear(d.periodo) === 2026) b.fat26 += d.valor;
   });
 
-  metas.filter(match).forEach((m) => {
+  metas.filter((m) => match(m) && (metric === "MV" || periodoYear(m.periodo) === 2026)).forEach((m) => {
     const b = ensure(metaKey(m), {
       periodo: periodoQ(m.periodo), gr: m.gr, rep: m.rep, uf: m.uf || "—",
       marca: m.marca, topico: m.topico, tipo: m.tipo?.trim() || "—",
       fat25: 0, fat26: 0, meta: 0,
     });
-    b.meta += m.meta;
+    b.meta += metric === "MV" ? m.meta : (m.metaFinanceira ?? 0);
   });
 
   return Array.from(buckets.values())

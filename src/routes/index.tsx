@@ -17,7 +17,7 @@ import { BaseManagement, type LastUpdate } from "@/components/dashboard/BaseMana
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
 import { BrazilHospitalMap, isBrazilUF } from "@/components/dashboard/BrazilHospitalMap";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { type DrillScope } from "@/lib/dashboard/drilldown";
+import { type DrillMetric, type DrillScope } from "@/lib/dashboard/drilldown";
 import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, SEM_UF,
   type Meta, type Row,
@@ -164,7 +164,7 @@ function matchesMeta(m: Meta, f: Filters, skip?: FilterKey) {
 }
 
 const FILTER_LABELS: Record<FilterKey, string> = {
-  anos: "Ano", trimestres: "Trimestre", meses: "Mês", grs: "GR", ufs: "UF",
+  anos: "Ano", trimestres: "Quarter", meses: "Mês", grs: "GR", ufs: "UF",
   ufsCliente: "UF do Cliente", ufsHospital: "UF do Hospital", marcas: "Marca",
   topicos: "Tópico do Produto", tipos: "Tipo do Produto", clientes: "Cliente",
   medicos: "Médico", reps: "Representante", assessores: "Assessor",
@@ -357,7 +357,7 @@ function Dashboard() {
   const [metasData, setMetasData] = useState<Meta[]>(() => loadLS<Meta[]>(LS_METAS, INITIAL_METAS));
   const [lastUpdate, setLastUpdateState] = useState<LastUpdate | null>(() => loadLastUpdate());
   const [f, setF] = useState<Filters>(EMPTY_FILTERS);
-  const [drill, setDrill] = useState<{ title: string; scope: DrillScope } | null>(null);
+  const [drill, setDrill] = useState<{ title: string; scope: DrillScope; metric: DrillMetric } | null>(null);
   const [showAllTopicos, setShowAllTopicos] = useState(false);
   const [topicoSel, setTopicoSel] = useState<string | null>(null);
   const [medicoQuery, setMedicoQuery] = useState("");
@@ -690,7 +690,8 @@ function Dashboard() {
     clearFilters();
   };
 
-  const openDrill = (title: string, scope: DrillScope = {}) => setDrill({ title, scope });
+  const openDrill = (title: string, scope: DrillScope = {}, metric: DrillMetric = "MV") =>
+    setDrill({ title, scope, metric });
 
   const evolutionTooltip = ({ active, payload, label: lbl }: TooltipRenderProps) => {
     if (!active || !payload?.length) return null;
@@ -759,7 +760,7 @@ function Dashboard() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3">
               <MultiSelectFilter label="Ano" selected={f.anos} options={anoOptions} onChange={set("anos")} />
-              <MultiSelectFilter label="Trimestre" selected={f.trimestres} options={trimestreOptions} onChange={set("trimestres")} />
+              <MultiSelectFilter label="Quarter" selected={f.trimestres} options={trimestreOptions} onChange={set("trimestres")} />
               <MultiSelectFilter label="Mês" selected={f.meses} options={mesOptions} onChange={set("meses")} />
               <MultiSelectFilter label="GR" selected={f.grs} options={grOptions} onChange={set("grs")} />
               <MultiSelectFilter label="UF" selected={f.ufs} options={ufOptions} onChange={set("ufs")} />
@@ -798,27 +799,29 @@ function Dashboard() {
             onClick={() => openDrill("Detalhe · FY 26")}
           />
           <KpiCard
-            title="MV 2026" value={fmtCompact(metaTotal)} tooltip={metaTotal > 0 ? fmtBRLFull(metaTotal) : "Sem meta cadastrada para esta combinação"}
-            icon={Target} accent="warning"
-            onClick={() => openDrill("Detalhe · Meta de Venda 2026")}
-          />
-          <KpiCard
             title="MF 2026"
             value={metaFinanceira2026 > 0 ? fmtCompact(metaFinanceira2026) : "Sem meta"}
             tooltip={metaFinanceira2026 > 0 ? fmtBRLFull(metaFinanceira2026) : "Sem meta financeira cadastrada para 2026"}
             icon={DollarSign}
             accent="info"
+            onClick={() => openDrill("Detalhe · Meta Financeira 2026", {}, "MF")}
+          />
+          <KpiCard
+            title="MV 2026" value={fmtCompact(metaTotal)} tooltip={metaTotal > 0 ? fmtBRLFull(metaTotal) : "Sem meta cadastrada para esta combinação"}
+            icon={Target} accent="warning"
+            onClick={() => openDrill("Detalhe · Meta de Venda 2026")}
+          />
+          <KpiCard
+            title="Cobertura MF" value={coberturaMF === null ? "Sem meta" : fmtPct(coberturaMF, 2)}
+            icon={Flag} accent={coberturaMF === null ? "info" : coberturaMF >= 100 ? "success" : coberturaMF >= 70 ? "warning" : "danger"}
+            tooltip={coberturaMF === null ? "Sem MF cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaFinanceira2026)}`}
+            onClick={() => openDrill("Detalhe · Cobertura MF 2026", {}, "COBERTURA_MF")}
           />
           <KpiCard
             title="Cobertura MV" value={coberturaMV === null ? "Sem meta" : fmtPct(coberturaMV, 2)}
             icon={Flag} accent={coberturaMV === null ? "info" : coberturaMV >= 100 ? "success" : coberturaMV >= 70 ? "warning" : "danger"}
             tooltip={coberturaMV === null ? "Sem meta cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaTotal)}`}
             onClick={() => openDrill("Detalhe · Cobertura da Meta")}
-          />
-          <KpiCard
-            title="Cobertura MF" value={coberturaMF === null ? "Sem meta" : fmtPct(coberturaMF, 2)}
-            icon={Flag} accent={coberturaMF === null ? "info" : coberturaMF >= 100 ? "success" : coberturaMF >= 70 ? "warning" : "danger"}
-            tooltip={coberturaMF === null ? "Sem MF cadastrada para esta combinação" : `${fmtBRLFull(fat2026)} de ${fmtBRLFull(metaFinanceira2026)}`}
           />
           <KpiCard
             title="Diferença 25 / 26" value={`${diffAbs >= 0 ? "+" : "-"}${fmtCompact(Math.abs(diffAbs))}`}
