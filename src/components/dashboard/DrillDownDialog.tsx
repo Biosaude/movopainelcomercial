@@ -3,17 +3,20 @@ import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { type Meta, type Row, fmtBRLFull, fmtPct, fmtSignedPct, pctAting, pctVar } from "@/lib/dashboard/domain";
-import { type DrillScope, buildDrillRows } from "@/lib/dashboard/drilldown";
+import { type DrillMetric, type DrillScope, buildDrillRows } from "@/lib/dashboard/drilldown";
 
 export function DrillDownDialog({
   drill, fat, metas, onClose,
 }: {
-  drill: { title: string; scope: DrillScope } | null;
+  drill: { title: string; scope: DrillScope; metric: DrillMetric } | null;
   fat: Row[];
   metas: Meta[];
   onClose: () => void;
 }) {
-  const rows = useMemo(() => (drill ? buildDrillRows(fat, metas, drill.scope) : []), [drill, fat, metas]);
+  const rows = useMemo(
+    () => (drill ? buildDrillRows(fat, metas, drill.scope, drill.metric) : []),
+    [drill, fat, metas],
+  );
   const totals = useMemo(
     () => rows.reduce(
       (s, r) => ({ fat25: s.fat25 + r.fat25, fat26: s.fat26 + r.fat26, meta: s.meta + r.meta }),
@@ -24,6 +27,10 @@ export function DrillDownDialog({
   const totalAting = pctAting(totals.fat26, totals.meta);
   const totalVar = pctVar(totals.fat26, totals.fat25);
   const scopeChips = drill ? Object.entries(drill.scope).filter(([, v]) => v) : [];
+  const isFinancial = drill?.metric === "MF" || drill?.metric === "COBERTURA_MF";
+  const metaLabel = isFinancial ? "Meta Financeira 2026" : "Meta de Venda 2026";
+  const coverageLabel = drill?.metric === "COBERTURA_MF" ? "Cobertura MF %" : "Atingimento";
+  const gapLabel = isFinancial ? "Gap MF" : "Gap Meta";
 
   const atingCls = (v: number | null) =>
     v === null ? "text-muted-foreground" : v >= 100 ? "text-emerald-600" : v >= 70 ? "text-amber-600" : "text-red-600";
@@ -59,9 +66,9 @@ export function DrillDownDialog({
                 <th className="py-2 pr-3 font-semibold">Tipo</th>
                 <th className="py-2 pr-3 font-semibold text-right">Fat. 2025</th>
                 <th className="py-2 pr-3 font-semibold text-right">Fat. 2026</th>
-                <th className="py-2 pr-3 font-semibold text-right">Meta 2026</th>
-                <th className="py-2 pr-3 font-semibold text-right">Atingimento</th>
-                <th className="py-2 pr-3 font-semibold text-right">Gap Meta</th>
+                <th className="py-2 pr-3 font-semibold text-right">{metaLabel}</th>
+                <th className="py-2 pr-3 font-semibold text-right">{coverageLabel}</th>
+                <th className="py-2 pr-3 font-semibold text-right">{gapLabel}</th>
                 <th className="py-2 pr-3 font-semibold text-right">Var. 25/26</th>
               </tr>
             </thead>
