@@ -18,6 +18,73 @@ export type Meta = {
 export const ALL = "Todos";
 export const SEM_UF = "Não informado";
 
+export const MONTHS_PT = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+] as const;
+
+/** Converte datas de calendário sem passar por UTC, inclusive seriais nativos do Excel. */
+export function parseExcelDate(raw: unknown): Date | null {
+  if (raw instanceof Date) {
+    if (!Number.isFinite(raw.getTime())) return null;
+    return new Date(raw.getFullYear(), raw.getMonth(), raw.getDate());
+  }
+
+  const serial = typeof raw === "number"
+    ? raw
+    : /^\d+(?:\.\d+)?$/.test(String(raw ?? "").trim())
+      ? Number(String(raw).trim())
+      : null;
+  if (serial !== null && Number.isFinite(serial) && serial > 0) {
+    const parsed = XLSX.SSF.parse_date_code(serial);
+    if (!parsed || !parsed.y || parsed.m < 1 || parsed.m > 12 || parsed.d < 1 || parsed.d > 31) return null;
+    const date = new Date(parsed.y, parsed.m - 1, parsed.d);
+    return date.getFullYear() === parsed.y && date.getMonth() === parsed.m - 1 && date.getDate() === parsed.d
+      ? date : null;
+  }
+
+  const value = String(raw ?? "").trim();
+  if (!value) return null;
+  const br = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  const iso = value.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s].*)?$/);
+  const year = br ? Number(br[3].length === 2 ? `20${br[3]}` : br[3]) : iso ? Number(iso[1]) : 0;
+  const month = br ? Number(br[2]) : iso ? Number(iso[2]) : 0;
+  const day = br ? Number(br[1]) : iso ? Number(iso[3]) : 0;
+  if (!year || month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day ? date : null;
+}
+
+export const formatCalendarDate = (date: Date): string =>
+  [String(date.getDate()).padStart(2, "0"), String(date.getMonth() + 1).padStart(2, "0"), date.getFullYear()].join("/");
+
+/** Aceita número, abreviação ou nome do mês e devolve uma única grafia pt-BR. */
+export function normalizeMonth(raw: unknown): string | undefined {
+  const value = stripAccents(String(raw ?? "")).trim().toLowerCase().replace(/[.]/g, "");
+  if (!value) return undefined;
+  if (/^(?:0?[1-9]|1[0-2])$/.test(value)) return MONTHS_PT[Number(value) - 1];
+  const index = [
+    ["jan", "janeiro"], ["fev", "fevereiro"], ["mar", "marco"], ["abr", "abril"],
+    ["mai", "maio"], ["jun", "junho"], ["jul", "julho"], ["ago", "agosto"],
+    ["set", "setembro"], ["out", "outubro"], ["nov", "novembro"], ["dez", "dezembro"],
+  ].findIndex((aliases) => aliases.includes(value));
+  return index >= 0 ? MONTHS_PT[index] : undefined;
+}
+
+/** Normaliza M/Data e faz de N/Mês a primeira fonte, com fallback para a data. */
+export function normalizeRowDate(row: Row): Row {
+  const date = parseExcelDate(row.data);
+  return {
+    ...row,
+    data: date ? formatCalendarDate(date) : undefined,
+    mes: normalizeMonth(row.mes) ?? (date ? MONTHS_PT[date.getMonth()] : undefined),
+  };
+}
+
+export const sortMonths = (months: string[]): string[] =>
+  Array.from(new Set(months.map(normalizeMonth).filter((m): m is string => Boolean(m))))
+    .sort((a, b) => MONTHS_PT.indexOf(a as typeof MONTHS_PT[number]) - MONTHS_PT.indexOf(b as typeof MONTHS_PT[number]));
+
 /** "Q1 2026" → "Q1" */
 export const periodoQ = (p: string) =>
   (String(p ?? "").match(/Q[1-4]/i)?.[0] ?? String(p ?? "")).toUpperCase();
@@ -312,7 +379,7 @@ export function parseWorkbook(file: ArrayBuffer): ParseResult {
             if (!v) return undefined;
             return upper ? v.toUpperCase() : v;
           };
-          faturamento.push({
+          faturamento.push(normalizeRowDate({
             gr,
             rep: String(row[fatMap.rep!] ?? "").trim(),
             uf: String(fatMap.uf !== undefined ? row[fatMap.uf] ?? "" : "").trim().toUpperCase(),
@@ -329,7 +396,7 @@ export function parseWorkbook(file: ArrayBuffer): ParseResult {
             assessor: opt(fatMap.assessor as number | undefined),
             ufCliente: opt(fatMap.ufCliente as number | undefined, true),
             ufHospital: opt(fatMap.ufHospital as number | undefined, true),
-          });
+          }));
         }
       } else if (isMeta) {
         for (let r = 1; r < grid.length; r++) {
