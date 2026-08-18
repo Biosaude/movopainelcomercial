@@ -22,7 +22,7 @@ import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, SEM_UF,
   type Meta, type Row,
   fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
-  joinKey, normGR, normMarca, normRep, normTipo, normUF, stripAccents,
+  joinKey, normGR, normMarca, normRep, normTipo, normUF, normalizeRowDate, sortMonths, stripAccents,
   pctAting, pctVar, periodoQ, periodoYear, topicoCode, unique,
 } from "@/lib/dashboard/domain";
 
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/")({
 
 const str = (v: unknown) => String(v ?? "").trim();
 
-const INITIAL_FAT: Row[] = (rawFaturamento as Array<Record<string, unknown>>).map((r) => ({
+const INITIAL_FAT: Row[] = (rawFaturamento as Array<Record<string, unknown>>).map((r) => normalizeRowDate({
   gr: str(r.gr),
   rep: str(r.rep),
   marca: str(r.marca),
@@ -353,7 +353,7 @@ function ComparisonLabel({ x, y, height, previousValue, currentValue, gap, value
 
 function Dashboard() {
   const isMobile = useIsMobile();
-  const [data, setData] = useState<Row[]>(() => loadLS<Row[]>(LS_FAT, INITIAL_FAT));
+  const [data, setData] = useState<Row[]>(() => loadLS<Row[]>(LS_FAT, INITIAL_FAT).map(normalizeRowDate));
   const [metasData, setMetasData] = useState<Meta[]>(() => loadLS<Meta[]>(LS_METAS, INITIAL_METAS));
   const [lastUpdate, setLastUpdateState] = useState<LastUpdate | null>(() => loadLastUpdate());
   const [f, setF] = useState<Filters>(EMPTY_FILTERS);
@@ -394,7 +394,7 @@ function Dashboard() {
 
   const anoOptions = useMemo(() => optionsFor("anos", (r) => anoLabel(r.periodo)).filter((a) => a !== NI), [data, f]);
   const trimestreOptions = useMemo(() => optionsFor("trimestres", (r) => periodoQ(r.periodo)), [data, f]);
-  const mesOptions = useMemo(() => optionsFor("meses", (r) => label(r.mes)).filter((m) => m !== NI), [data, f]);
+  const mesOptions = useMemo(() => sortMonths(optionsFor("meses", (r) => label(r.mes)).filter((m) => m !== NI)), [data, f]);
   const grOptions = useMemo(() => {
     const fromMetas = metasData.filter((m) => matchesMeta(m, f, "grs")).map((m) => normGR(m.gr));
     return unique([...optionsFor("grs", (r) => normGR(r.gr)), ...fromMetas]);
