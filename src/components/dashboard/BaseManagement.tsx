@@ -10,11 +10,12 @@ import {
   fmtInt, parseWorkbook,
 } from "@/lib/dashboard/domain";
 
-export type LastUpdate = { when: Date; fileName: string; count: number; metaCount: number };
+export type LastUpdate = { version?: string; when: Date; fileName: string; count: number; metaCount: number };
 
 type UploadStatus =
   | { kind: "idle" }
   | { kind: "ready"; fileName: string; result: ParseResult }
+  | { kind: "publishing"; fileName: string; result: ParseResult }
   | { kind: "error"; message: string; result?: ParseResult }
   | { kind: "success"; fileName: string; count: number; metaCount: number };
 
@@ -23,7 +24,7 @@ export function BaseManagement({
 }: {
   current: Row[];
   currentMetas: Meta[];
-  onApply: (faturamento: Row[], metas: Meta[], fileName: string) => void;
+  onApply: (faturamento: Row[], metas: Meta[], fileName: string) => Promise<LastUpdate>;
   lastUpdate: LastUpdate | null;
   setLastUpdate: (v: LastUpdate | null) => void;
 }) {
@@ -65,13 +66,23 @@ export function BaseManagement({
     }
   };
 
-  const applyUpdate = () => {
+  const applyUpdate = async () => {
     if (status.kind !== "ready") return;
     const { faturamento, metas } = status.result;
-    onApply(faturamento, metas, status.fileName);
-    setLastUpdate({ when: new Date(), fileName: status.fileName, count: faturamento.length, metaCount: metas.length });
-    setStatus({ kind: "success", fileName: status.fileName, count: faturamento.length, metaCount: metas.length });
-    if (fileInput.current) fileInput.current.value = "";
+    const fileName = status.fileName;
+    setStatus({ kind: "publishing", fileName, result: status.result });
+    try {
+      const update = await onApply(faturamento, metas, fileName);
+      setLastUpdate(update);
+      setStatus({ kind: "success", fileName, count: faturamento.length, metaCount: metas.length });
+      if (fileInput.current) fileInput.current.value = "";
+    } catch (e) {
+      setStatus({
+        kind: "error",
+        message: `${(e as Error).message} A última versão publicada continua disponível.`,
+        result: status.result,
+      });
+    }
   };
 
   const ready = status.kind === "ready" ? status.result : null;
@@ -110,13 +121,14 @@ export function BaseManagement({
           />
 
           <Button onClick={applyUpdate} disabled={status.kind !== "ready"} className="justify-start h-auto py-3">
-            <RefreshCw className="h-4 w-4 mr-2 shrink-0" />
+            <RefreshCw className={`h-4 w-4 mr-2 shrink-0 ${status.kind === "publishing" ? "animate-spin" : ""}`} />
             <div className="text-left">
               <div className="text-sm font-medium">Atualizar Dashboard</div>
               <div className="text-[11px] opacity-80 font-normal">
                 {ready
                   ? `${fmtInt(ready.faturamento.length)} fat · ${fmtInt(ready.metas.length)} metas`
-                  : status.kind === "success" ? "Base atualizada" : "Base ativa em uso"}
+                  : status.kind === "publishing" ? "Publicando base..."
+                    : status.kind === "success" ? "Base atualizada" : "Base ativa em uso"}
               </div>
             </div>
           </Button>

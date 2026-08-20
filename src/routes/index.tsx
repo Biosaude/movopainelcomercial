@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar, BarChart, CartesianGrid, Cell, LabelList, Legend,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -18,6 +18,7 @@ import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
 import { BrazilHospitalMap, isBrazilUF } from "@/components/dashboard/BrazilHospitalMap";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { type DrillScope } from "@/lib/dashboard/drilldown";
+import { getPublishedDashboardBase, publishDashboardBase } from "@/lib/api/dashboard-base.functions";
 import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, SEM_UF,
   type Meta, type Row,
@@ -91,7 +92,7 @@ function loadLastUpdate(): LastUpdate | null {
   try {
     const raw = window.localStorage.getItem(LS_LAST_UPDATE);
     if (!raw) return null;
-    const p = JSON.parse(raw) as { when: string; fileName: string; count: number; metaCount: number };
+    const p = JSON.parse(raw) as { version?: string; when: string; fileName: string; count: number; metaCount: number };
     return { ...p, when: new Date(p.when) };
   } catch { return null; }
 }
@@ -361,6 +362,26 @@ function Dashboard() {
   const [showAllTopicos, setShowAllTopicos] = useState(false);
   const [topicoSel, setTopicoSel] = useState<string | null>(null);
   const [medicoQuery, setMedicoQuery] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    getPublishedDashboardBase()
+      .then((published) => {
+        if (!active || !published) return;
+        const rows = (published.faturamento as Row[]).map(normalizeRowDate);
+        const metas = published.metas as Meta[];
+        const update = { ...published.lastUpdate, when: new Date(published.lastUpdate.when) };
+        setData(rows);
+        setMetasData(metas);
+        setLastUpdate(update);
+        try {
+          window.localStorage.setItem(LS_FAT, JSON.stringify(rows));
+          window.localStorage.setItem(LS_METAS, JSON.stringify(metas));
+        } catch { /* cache indisponível; a fonte oficial continua sendo o Supabase */ }
+      })
+      .catch((error) => console.warn("Usando cache/base embarcada; fonte compartilhada indisponível:", error));
+    return () => { active = false; };
+  }, []);
 
   const setLastUpdate = (v: LastUpdate | null) => {
     setLastUpdateState(v);
@@ -678,7 +699,8 @@ function Dashboard() {
   }, [byGR, byTipo, byTopico, fat2026]);
 
   /* --------- Base --------- */
-  const handleApply = (rows: Row[], newMetas: Meta[]) => {
+  const handleApply = async (rows: Row[], newMetas: Meta[], fileName: string): Promise<LastUpdate> => {
+    const published = await publishDashboardBase({ data: { faturamento: rows, metas: newMetas, fileName } });
     setData(rows);
     setMetasData(newMetas);
     try {
@@ -688,6 +710,7 @@ function Dashboard() {
       console.warn("Não foi possível persistir a base no navegador:", e);
     }
     clearFilters();
+    return { ...published, when: new Date(published.when) };
   };
 
   const openDrill = (title: string, scope: DrillScope = {}) => setDrill({ title, scope });

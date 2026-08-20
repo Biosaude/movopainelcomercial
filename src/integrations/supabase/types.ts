@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      dashboard_base_versions: {
+        Row: {
+          faturamento: Json
+          faturamento_count: number
+          file_name: string
+          id: string
+          is_current: boolean
+          metas: Json
+          metas_count: number
+          published_at: string
+        }
+        Insert: {
+          faturamento: Json
+          faturamento_count: number
+          file_name: string
+          id?: string
+          is_current?: boolean
+          metas: Json
+          metas_count: number
+          published_at?: string
+        }
+        Update: {
+          faturamento?: Json
+          faturamento_count?: number
+          file_name?: string
+          id?: string
+          is_current?: boolean
+          metas?: Json
+          metas_count?: number
+          published_at?: string
+        }
+        Relationships: []
+      }
       faturamento_comercial: {
         Row: {
           created_at: string
@@ -131,7 +164,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      publish_dashboard_base: {
+        Args: { p_faturamento: Json; p_file_name: string; p_metas: Json }
+        Returns: Database["public"]["Tables"]["dashboard_base_versions"]["Row"][]
+      }
     }
     Enums: {
       [_ in never]: never
