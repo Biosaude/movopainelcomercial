@@ -1,9 +1,25 @@
 import { describe, expect, test } from "bun:test";
-import { monthLabel, normalizeMetaMonth, normalizeMonth, normalizeRowDate, sortMonths, type Row } from "../src/lib/dashboard/domain";
+import { aggregateHospitalRevenue, HOSPITAL_RANKING_UFS, monthLabel, normalizeMetaMonth, normalizeMonth, normalizeRowDate, sortMonths, type Row } from "../src/lib/dashboard/domain";
 
 const row = (overrides: Partial<Row>): Row => ({
   gr: "GR", rep: "REP", marca: "MARCA", uf: "CE", topico: "TOPICO",
   tipo: "TIPO", periodo: "Q3 2026", valor: 1, ...overrides,
+});
+
+describe("ranking de faturamento por UF do Hospital", () => {
+  test("agrega somente as 12 UFs, ordena dinamicamente e mantém zeros", () => {
+    const result = aggregateHospitalRevenue([
+      row({ ufHospital: "PA", valor: 10 }),
+      row({ ufHospital: "AP", valor: 30 }),
+      row({ ufHospital: "PA", valor: 25 }),
+      row({ ufHospital: "SP", valor: 1_000 }),
+    ]);
+
+    expect(result).toHaveLength(HOSPITAL_RANKING_UFS.length);
+    expect(result.slice(0, 2)).toEqual([{ name: "PA", value: 35 }, { name: "AP", value: 30 }]);
+    expect(result.find(({ name }) => name === "PB")?.value).toBe(0);
+    expect(result.some(({ name }) => name === "SP")).toBe(false);
+  });
 });
 
 describe("normalização mensal", () => {

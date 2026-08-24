@@ -15,13 +15,13 @@ import { MultiSelectFilter } from "@/components/dashboard/MultiSelectFilter";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { BaseManagement, type LastUpdate } from "@/components/dashboard/BaseManagement";
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
-import { BrazilHospitalMap, isBrazilUF } from "@/components/dashboard/BrazilHospitalMap";
+import { BrazilHospitalMap } from "@/components/dashboard/BrazilHospitalMap";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { type DrillScope } from "@/lib/dashboard/drilldown";
 import {
-  ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, SEM_UF,
+  ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, HOSPITAL_RANKING_UFS, SEM_UF,
   type Meta, type Row,
-  fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
+  aggregateHospitalRevenue, fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
   joinKey, monthLabel, normGR, normMarca, normRep, normTipo, normUF, normalizeMetaMonth, normalizeMonth, normalizeRowDate, sortMonths, stripAccents,
   pctAting, pctVar, periodoQ, periodoYear, topicoCode, unique,
 } from "@/lib/dashboard/domain";
@@ -166,7 +166,7 @@ function matchesMeta(m: Meta, f: Filters, skip?: FilterKey) {
 }
 
 const FILTER_LABELS: Record<FilterKey, string> = {
-  anos: "Ano", trimestres: "Trimestre", meses: "Mês", grs: "GR", ufs: "UF",
+  anos: "Ano", trimestres: "QUARTER", meses: "Mês", grs: "GR", ufs: "UF",
   ufsCliente: "UF do Cliente", ufsHospital: "UF do Hospital", marcas: "Marca",
   topicos: "Tópico do Produto", tipos: "Tipo do Produto", clientes: "Cliente",
   medicos: "Médico", reps: "Representante", assessores: "Assessor",
@@ -615,19 +615,17 @@ function Dashboard() {
   };
   const byUFCliente = useMemo(() => byUFGeneric((d) => d.ufCliente), [filtered2026]);
   const hospitalMapData = useMemo(() => {
-    const values = new Map<string, number>();
+    const rows = aggregateHospitalRevenue(filtered2026);
+    const allowedUfs = new Set<string>(HOSPITAL_RANKING_UFS);
     let outsideValue = 0;
     let outsideRecords = 0;
     filtered2026.forEach((row) => {
       const uf = normUF(str(row.ufHospital));
-      if (!isBrazilUF(uf)) {
+      if (!allowedUfs.has(uf)) {
         outsideValue += row.valor;
         outsideRecords += 1;
-        return;
       }
-      values.set(uf, (values.get(uf) ?? 0) + row.valor);
     });
-    const rows = Array.from(values, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
     const representedValue = rows.reduce((total, item) => total + item.value, 0);
     return {
       rows,
@@ -637,7 +635,7 @@ function Dashboard() {
     };
   }, [filtered2026, fat2026]);
   const byUFHospital = hospitalMapData.rows;
-  const topUFHospital = byUFHospital.slice(0, 5);
+  const hospitalRankingTotal = byUFHospital.reduce((total, item) => total + item.value, 0);
 
   /* --------- Médicos por tópico --------- */
   const topicoAtivo = topicoSel && byTopico.some((t) => t.code === topicoSel) ? topicoSel : byTopico[0]?.code ?? null;
@@ -763,7 +761,7 @@ function Dashboard() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3">
               <MultiSelectFilter label="Ano" selected={f.anos} options={anoOptions} onChange={set("anos")} />
-              <MultiSelectFilter label="Trimestre" selected={f.trimestres} options={trimestreOptions} onChange={set("trimestres")} />
+              <MultiSelectFilter label="QUARTER" selected={f.trimestres} options={trimestreOptions} onChange={set("trimestres")} />
               <MultiSelectFilter label="Mês" selected={f.meses} options={mesOptions} onChange={set("meses")} />
               <MultiSelectFilter label="GR" selected={f.grs} options={grOptions} onChange={set("grs")} />
               <MultiSelectFilter label="UF" selected={f.ufs} options={ufOptions} onChange={set("ufs")} />
@@ -915,15 +913,19 @@ function Dashboard() {
               <p className="text-xs text-muted-foreground">Distribuição geográfica do faturamento por estado</p>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px] items-center gap-4">
+              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_260px] items-center gap-4">
                 <BrazilHospitalMap data={byUFHospital} />
                 <div className="min-w-0">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Top 5 UFs</p>
-                  <ol className="space-y-2">
-                    {topUFHospital.map((item, index) => (
-                      <li key={item.name} className="grid grid-cols-[20px_28px_1fr] items-center gap-1 text-xs">
-                        <span className="text-muted-foreground">{index + 1}.</span><b>{item.name}</b>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ranking – 12 UFs</p>
+                  <div className="mb-1 grid grid-cols-[24px_28px_minmax(80px,1fr)_44px] gap-1 border-b pb-1 text-[9px] font-semibold uppercase text-muted-foreground">
+                    <span>Pos.</span><span>UF</span><span className="text-right">Faturamento FY26</span><span className="text-right">% total</span>
+                  </div>
+                  <ol className="space-y-0.5">
+                    {byUFHospital.map((item, index) => (
+                      <li key={item.name} className="grid grid-cols-[24px_28px_minmax(80px,1fr)_44px] items-center gap-1 py-0.5 text-[11px]">
+                        <span className="text-muted-foreground tabular-nums">{index + 1}.</span><b>{item.name}</b>
                         <span className="text-right tabular-nums">{fmtCompact(item.value)}</span>
+                        <span className="text-right tabular-nums text-muted-foreground">{fmtPct(hospitalRankingTotal > 0 ? item.value / hospitalRankingTotal * 100 : 0)}</span>
                       </li>
                     ))}
                   </ol>
