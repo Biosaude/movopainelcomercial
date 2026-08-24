@@ -22,6 +22,7 @@ export const MONTHS_PT = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ] as const;
+export type MonthKey = "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10" | "11" | "12";
 
 /** Converte datas de calendário sem passar por UTC, inclusive seriais nativos do Excel. */
 export function parseExcelDate(raw: unknown): Date | null {
@@ -58,18 +59,28 @@ export function parseExcelDate(raw: unknown): Date | null {
 export const formatCalendarDate = (date: Date): string =>
   [String(date.getDate()).padStart(2, "0"), String(date.getMonth() + 1).padStart(2, "0"), date.getFullYear()].join("/");
 
-/** Aceita número, abreviação ou nome do mês e devolve uma única grafia pt-BR. */
-export function normalizeMonth(raw: unknown): string | undefined {
+/** Aceita mês numérico/textual ou data e devolve a chave canônica MM. */
+export function normalizeMonth(raw: unknown): MonthKey | undefined {
+  if (raw instanceof Date) {
+    return Number.isFinite(raw.getTime()) ? String(raw.getMonth() + 1).padStart(2, "0") as MonthKey : undefined;
+  }
   const value = stripAccents(String(raw ?? "")).trim().toLowerCase().replace(/[.]/g, "");
   if (!value) return undefined;
-  if (/^(?:0?[1-9]|1[0-2])$/.test(value)) return MONTHS_PT[Number(value) - 1];
+  if (/^(?:0?[1-9]|1[0-2])$/.test(value)) return String(Number(value)).padStart(2, "0") as MonthKey;
   const index = [
     ["jan", "janeiro"], ["fev", "fevereiro"], ["mar", "marco"], ["abr", "abril"],
     ["mai", "maio"], ["jun", "junho"], ["jul", "julho"], ["ago", "agosto"],
     ["set", "setembro"], ["out", "outubro"], ["nov", "novembro"], ["dez", "dezembro"],
   ].findIndex((aliases) => aliases.includes(value));
-  return index >= 0 ? MONTHS_PT[index] : undefined;
+  if (index >= 0) return String(index + 1).padStart(2, "0") as MonthKey;
+  const date = parseExcelDate(raw);
+  return date ? String(date.getMonth() + 1).padStart(2, "0") as MonthKey : undefined;
 }
+
+export const monthLabel = (raw: unknown): string | undefined => {
+  const key = normalizeMonth(raw);
+  return key ? MONTHS_PT[Number(key) - 1] : undefined;
+};
 
 /** Normaliza M/Data e faz de N/Mês a primeira fonte, com fallback para a data. */
 export function normalizeRowDate(row: Row): Row {
@@ -77,13 +88,19 @@ export function normalizeRowDate(row: Row): Row {
   return {
     ...row,
     data: date ? formatCalendarDate(date) : undefined,
-    mes: normalizeMonth(row.mes) ?? (date ? MONTHS_PT[date.getMonth()] : undefined),
+    mes: normalizeMonth(row.mes) ?? normalizeMonth(date),
   };
 }
 
+/** Metas podem ter granularidade mensal; quando têm, usam a mesma chave MM do faturamento. */
+export function normalizeMetaMonth(meta: Meta): Meta {
+  return { ...meta, mes: normalizeMonth(meta.mes) };
+}
+
 export const sortMonths = (months: string[]): string[] =>
-  Array.from(new Set(months.map(normalizeMonth).filter((m): m is string => Boolean(m))))
-    .sort((a, b) => MONTHS_PT.indexOf(a as typeof MONTHS_PT[number]) - MONTHS_PT.indexOf(b as typeof MONTHS_PT[number]));
+  Array.from(new Set(months.map(normalizeMonth).filter((m): m is MonthKey => Boolean(m))))
+    .sort((a, b) => Number(a) - Number(b))
+    .map((m) => monthLabel(m)!);
 
 /** "Q1 2026" → "Q1" */
 export const periodoQ = (p: string) =>
@@ -421,7 +438,7 @@ export function parseWorkbook(file: ArrayBuffer): ParseResult {
             gr: String(row[metaMap.gr!] ?? "").trim(),
             rep,
             uf: String(metaMap.uf !== undefined ? row[metaMap.uf] ?? "" : "").trim().toUpperCase(),
-            mes: optMeta(metaMap.mes as number | undefined),
+            mes: normalizeMonth(optMeta(metaMap.mes as number | undefined)),
             cliente: optMeta(metaMap.cliente as number | undefined),
             medico: optMeta(metaMap.medico as number | undefined),
             assessor: optMeta(metaMap.assessor as number | undefined),
