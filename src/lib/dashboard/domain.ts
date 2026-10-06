@@ -122,6 +122,10 @@ export const normUF = (s: string) => {
   const uf = normMarca(s);
   return uf === "SOU" ? "AM" : uf;
 };
+
+/** Aplica a multisseleção da UF principal sem deixar linhas sem UF vazarem para o recorte. */
+export const matchesUF = (selected: string[], value: unknown) =>
+  selected.length === 0 || selected.map(normUF).includes(normUF(String(value ?? "")));
 export const normTipo = (s: string) => normMarca(s);
 
 export const HOSPITAL_RANKING_UFS = [

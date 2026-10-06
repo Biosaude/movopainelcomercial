@@ -21,8 +21,8 @@ import { type DrillScope } from "@/lib/dashboard/drilldown";
 import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, HOSPITAL_RANKING_UFS, SEM_UF,
   type Meta, type Row,
-  aggregateHospitalRevenue, fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
-  joinKey, monthLabel, normGR, normMarca, normRep, normTipo, normUF, normalizeMetaMonth, normalizeMonth, normalizeRowDate, sortMonths, stripAccents,
+  fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
+  joinKey, matchesUF, monthLabel, normGR, normMarca, normRep, normTipo, normUF, normalizeMetaMonth, normalizeMonth, normalizeRowDate, sortMonths, stripAccents,
   pctAting, pctVar, periodoQ, periodoYear, topicoCode, unique,
 } from "@/lib/dashboard/domain";
 
@@ -131,7 +131,7 @@ function matchesFat(r: Row, f: Filters, skip?: FilterKey) {
     has("trimestres", f.trimestres, periodoQ(r.periodo)) &&
     (skip === "meses" || f.meses.length === 0 || selectedMonthKeys(f.meses).includes(normalizeMonth(r.mes)!)) &&
     has("grs", f.grs, normGR(r.gr)) &&
-    (skip === "ufs" || f.ufs.length === 0 || !str(r.uf) || f.ufs.includes(ufLabel(r.uf))) &&
+    (skip === "ufs" || matchesUF(f.ufs, r.uf)) &&
     has("ufsCliente", f.ufsCliente, ufLabel(r.ufCliente)) &&
     has("ufsHospital", f.ufsHospital, ufLabel(r.ufHospital)) &&
     has("marcas", f.marcas.map(normMarca), normMarca(r.marca)) &&
@@ -152,7 +152,7 @@ function matchesMeta(m: Meta, f: Filters, skip?: FilterKey) {
     has("trimestres", f.trimestres, periodoQ(m.periodo)) &&
     (skip === "meses" || f.meses.length === 0 || selectedMonthKeys(f.meses).includes(normalizeMonth(m.mes)!)) &&
     has("grs", f.grs, normGR(m.gr)) &&
-    has("ufs", f.ufs, ufLabel(m.uf)) &&
+    (skip === "ufs" || matchesUF(f.ufs, m.uf)) &&
     (skip === "ufsCliente" || f.ufsCliente.length === 0 || !str(m.ufCliente) || f.ufsCliente.includes(ufLabel(m.ufCliente))) &&
     (skip === "ufsHospital" || f.ufsHospital.length === 0 || !str(m.ufHospital) || f.ufsHospital.includes(ufLabel(m.ufHospital))) &&
     has("marcas", f.marcas.map(normMarca), normMarca(m.marca)) &&
