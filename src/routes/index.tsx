@@ -21,7 +21,7 @@ import { type DrillScope } from "@/lib/dashboard/drilldown";
 import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, HOSPITAL_RANKING_UFS, SEM_UF,
   type Meta, type Row,
-  aggregateHospitalRevenue, fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
+  aggregateHospitalRevenue, aggregateMetas, monthlyMetas, fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
   joinKey, monthLabel, normGR, normMarca, normRep, normTipo, normUF, normalizeMetaMonth, normalizeMonth, normalizeRowDate, sortMonths, stripAccents,
   pctAting, pctVar, periodoQ, periodoYear, topicoCode, unique,
 } from "@/lib/dashboard/domain";
@@ -131,7 +131,7 @@ function matchesFat(r: Row, f: Filters, skip?: FilterKey) {
     has("trimestres", f.trimestres, periodoQ(r.periodo)) &&
     (skip === "meses" || f.meses.length === 0 || selectedMonthKeys(f.meses).includes(normalizeMonth(r.mes)!)) &&
     has("grs", f.grs, normGR(r.gr)) &&
-    (skip === "ufs" || f.ufs.length === 0 || !str(r.uf) || f.ufs.includes(ufLabel(r.uf))) &&
+    has("ufs", f.ufs, ufLabel(r.uf)) &&
     has("ufsCliente", f.ufsCliente, ufLabel(r.ufCliente)) &&
     has("ufsHospital", f.ufsHospital, ufLabel(r.ufHospital)) &&
     has("marcas", f.marcas.map(normMarca), normMarca(r.marca)) &&
@@ -378,7 +378,9 @@ function Dashboard() {
   const filtered = useMemo(() => data.filter((d) => matchesFat(d, f)), [data, f]);
 
   const filteredMetas = useMemo(() => {
-    const base = metasData.filter((m) => matchesMeta(m, f));
+    const aggregated = aggregateMetas(metasData);
+    const monthly = f.meses.length > 0 ? monthlyMetas(aggregated) : aggregated;
+    const base = monthly.filter((m) => periodoYear(m.periodo) === 2026 && matchesMeta(m, f));
     const metasComUfHospital = metasData.some((m) => str(m.ufHospital));
     const fatOnlyKeys = metasComUfHospital ? FAT_ONLY.filter((k) => k !== "ufsHospital") : FAT_ONLY;
     const fatOnlyActive = fatOnlyKeys.some((k) => f[k].length > 0);
@@ -391,32 +393,64 @@ function Dashboard() {
   const fat2025Rows = useMemo(() => filtered.filter((d) => periodoYear(d.periodo) === 2025), [filtered]);
 
   /* --------- Opções (dependentes dos demais filtros) --------- */
+  const metasOptionsData = useMemo(() => monthlyMetas(aggregateMetas(metasData)), [metasData]);
   const optionsFor = (key: FilterKey, getter: (r: Row) => string) =>
     unique(data.filter((d) => matchesFat(d, f, key)).map(getter));
 
-  const anoOptions = useMemo(() => optionsFor("anos", (r) => anoLabel(r.periodo)).filter((a) => a !== NI), [data, f]);
-  const trimestreOptions = useMemo(() => optionsFor("trimestres", (r) => periodoQ(r.periodo)), [data, f]);
-  const mesOptions = useMemo(() => sortMonths(optionsFor("meses", (r) => monthLabel(r.mes) ?? NI).filter((m) => m !== NI)), [data, f]);
+  const anoOptions = useMemo(() => {
+    const fromMetas = metasOptionsData
+      .filter((m) => matchesMeta(m, f, "anos"))
+      .map((m) => anoLabel(m.periodo));
+    return unique([...optionsFor("anos", (r) => anoLabel(r.periodo)), ...fromMetas]).filter(
+      (a) => a !== NI,
+    );
+  }, [data, metasOptionsData, f]);
+  const trimestreOptions = useMemo(() => {
+    const fromMetas = metasOptionsData
+      .filter((m) => matchesMeta(m, f, "trimestres"))
+      .map((m) => periodoQ(m.periodo));
+    return unique([...optionsFor("trimestres", (r) => periodoQ(r.periodo)), ...fromMetas]);
+  }, [data, metasOptionsData, f]);
+  const mesOptions = useMemo(() => {
+    const fromMetas = metasOptionsData
+      .filter((m) => matchesMeta(m, f, "meses"))
+      .map((m) => monthLabel(m.mes) ?? NI);
+    return sortMonths(
+      [...optionsFor("meses", (r) => monthLabel(r.mes) ?? NI), ...fromMetas].filter((m) => m !== NI),
+    );
+  }, [data, metasOptionsData, f]);
   const grOptions = useMemo(() => {
-    const fromMetas = metasData.filter((m) => matchesMeta(m, f, "grs")).map((m) => normGR(m.gr));
+    const fromMetas = metasOptionsData
+      .filter((m) => matchesMeta(m, f, "grs"))
+      .map((m) => normGR(m.gr));
     return unique([...optionsFor("grs", (r) => normGR(r.gr)), ...fromMetas]);
-  }, [data, metasData, f]);
+  }, [data, metasOptionsData, f]);
   const ufOptions = useMemo(() => {
     const fromFat = optionsFor("ufs", (r) => ufLabel(r.uf));
-    const fromMetas = metasData
+    const fromMetas = metasOptionsData
       .filter((m) => matchesMeta(m, f, "ufs") && str(m.uf))
       .map((m) => ufLabel(m.uf));
     return unique([...fromFat, ...fromMetas]).filter((u) => u !== SEM_UF);
-  }, [data, metasData, f]);
+  }, [data, metasOptionsData, f]);
   const ufClienteOptions = useMemo(() => optionsFor("ufsCliente", (r) => ufLabel(r.ufCliente)).filter((u) => u !== SEM_UF), [data, f]);
   const ufHospitalOptions = useMemo(() => {
-    const fromMetas = metasData
+    const fromMetas = metasOptionsData
       .filter((m) => matchesMeta(m, f, "ufsHospital") && str(m.ufHospital))
       .map((m) => ufLabel(m.ufHospital));
     return unique([...optionsFor("ufsHospital", (r) => ufLabel(r.ufHospital)), ...fromMetas]).filter((u) => u !== SEM_UF);
-  }, [data, metasData, f]);
-  const marcaOptions = useMemo(() => optionsFor("marcas", (r) => normMarca(r.marca)), [data, f]);
-  const tipoOptions = useMemo(() => optionsFor("tipos", (r) => label(r.tipo)), [data, f]);
+  }, [data, metasOptionsData, f]);
+  const marcaOptions = useMemo(() => {
+    const fromMetas = metasOptionsData
+      .filter((m) => matchesMeta(m, f, "marcas"))
+      .map((m) => normMarca(m.marca));
+    return unique([...optionsFor("marcas", (r) => normMarca(r.marca)), ...fromMetas]);
+  }, [data, metasOptionsData, f]);
+  const tipoOptions = useMemo(() => {
+    const fromMetas = metasOptionsData
+      .filter((m) => matchesMeta(m, f, "tipos"))
+      .map((m) => label(m.tipo));
+    return unique([...optionsFor("tipos", (r) => label(r.tipo)), ...fromMetas]);
+  }, [data, metasOptionsData, f]);
   const clienteOptions = useMemo(() => optionsFor("clientes", (r) => label(r.cliente)).filter((c) => c !== NI), [data, f]);
   const medicoOptions = useMemo(() => optionsFor("medicos", (r) => label(r.medico)).filter((c) => c !== NI), [data, f]);
   const assessorOptions = useMemo(() => optionsFor("assessores", (r) => label(r.assessor)).filter((c) => c !== NI), [data, f]);
@@ -429,9 +463,9 @@ function Dashboard() {
       if (!cur || raw.length > cur.length) byCode.set(code, raw.trim());
     };
     data.forEach((d) => { if (matchesFat(d, f, "topicos")) consider(d.topico); });
-    metasData.forEach((m) => { if (matchesMeta(m, f, "topicos")) consider(m.topico); });
+    metasOptionsData.forEach((m) => { if (matchesMeta(m, f, "topicos")) consider(m.topico); });
     return Array.from(byCode.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [data, metasData, f]);
+  }, [data, metasOptionsData, f]);
   const repOptions = useMemo(() => {
     const byKey = new Map<string, string>();
     const consider = (raw: string) => {
@@ -442,9 +476,9 @@ function Dashboard() {
       if (!cur || r.length > cur.length) byKey.set(k, r);
     };
     data.forEach((d) => { if (matchesFat(d, f, "reps")) consider(d.rep); });
-    metasData.forEach((m) => { if (matchesMeta(m, f, "reps")) consider(m.rep); });
+    metasOptionsData.forEach((m) => { if (matchesMeta(m, f, "reps")) consider(m.rep); });
     return Array.from(byKey.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [data, metasData, f]);
+  }, [data, metasOptionsData, f]);
 
   const activeFilters = useMemo(
     () => (Object.entries(f) as [FilterKey, string[]][]).filter(([, v]) => v.length > 0),
@@ -504,7 +538,7 @@ function Dashboard() {
     })).sort((a, b) => a.p.localeCompare(b.p));
   }, [filtered, filteredMetas, metasFinanceirasFiltradas]);
   const periodosVisiveis = byPeriodo.filter((row) =>
-    row.p !== "Q4" || (row.has2026 && Number.isFinite(row.v2026) && row.v2026 > 0)
+    row.p !== "Q4" || row.has2025 || row.has2026 || row.hasMeta || row.hasMetaFinanceira
   );
 
   const byGR = useMemo(() => {
