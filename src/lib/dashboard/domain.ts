@@ -128,6 +128,21 @@ export const matchesUF = (selected: string[], value: unknown) =>
   selected.length === 0 || selected.map(normUF).includes(normUF(String(value ?? "")));
 export const normTipo = (s: string) => normMarca(s);
 
+export const HOSPITAL_RANKING_UFS = [
+  "PA", "AP", "MA", "TO", "PI", "AM", "RR", "RO", "AC", "CE", "RN", "PB",
+] as const;
+
+/** Agrega o FY26 já filtrado pelas UFs comerciais, preservando também as UFs sem venda. */
+export const aggregateHospitalRevenue = (rows: Row[]) => {
+  const values = new Map<string, number>(HOSPITAL_RANKING_UFS.map((uf) => [uf, 0]));
+  rows.forEach((row) => {
+    const uf = normUF(row.ufHospital ?? "");
+    if (values.has(uf)) values.set(uf, (values.get(uf) ?? 0) + row.valor);
+  });
+  return HOSPITAL_RANKING_UFS.map((name) => ({ name, value: values.get(name) ?? 0 }))
+    .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name, "pt-BR"));
+};
+
 /** Código canônico do tópico: "IC- CARDIO INTERVENTIONAL" → "IC" */
 export const topicoCode = (s: string) => {
   const t = stripAccents(String(s ?? "")).trim().toUpperCase().replace(/\s+/g, " ");

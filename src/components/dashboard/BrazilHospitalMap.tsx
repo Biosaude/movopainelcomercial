@@ -107,7 +107,7 @@ export function BrazilHospitalMap({ data }: { data: Array<{ name: string; value:
 
   return (
     <div className="min-w-0">
-      {data.length === 0 && (
+      {!data.some((item) => item.value > 0) && (
         <p className="mb-2 text-center text-sm text-muted-foreground">Não há dados de UF do Hospital para o recorte selecionado.</p>
       )}
       <svg viewBox="0 0 500 450" role="img" aria-label="Mapa do faturamento FY26 por UF do Hospital" className="h-auto max-h-[430px] w-full">
