@@ -82,11 +82,12 @@ export const monthLabel = (raw: unknown): string | undefined => {
   return key ? MONTHS_PT[Number(key) - 1] : undefined;
 };
 
-/** Normaliza M/Data e faz de N/Mês a primeira fonte, com fallback para a data. */
+/** Normaliza M/Data e N/Mês; a UF principal segue a UF do Hospital. */
 export function normalizeRowDate(row: Row): Row {
   const date = parseExcelDate(row.data);
   return {
     ...row,
+    uf: normUF(row.ufHospital ?? ""),
     data: date ? formatCalendarDate(date) : undefined,
     mes: normalizeMonth(row.mes) ?? normalizeMonth(date),
   };
@@ -196,8 +197,14 @@ export const joinKey = (r: { periodo: string; gr: string; rep: string; uf: strin
 
 export function aggregateMetas(rows: Meta[]): Meta[] {
   const map = new Map<string, Meta>();
+  const seen = new Set<string>();
   rows.forEach((m) => {
-    const key = metaKey(m);
+    const key = `${periodoYear(m.periodo)}|||${metaKey(m)}`;
+    // Exclude repeated copies of the same target, preserving additive distinct
+    // values and the existing UF/quarter/month/commercial dimensions.
+    const duplicateKey = JSON.stringify([key, m.meta, m.metaFinanceira ?? null]);
+    if (seen.has(duplicateKey)) return;
+    seen.add(duplicateKey);
     const cur = map.get(key);
     if (cur) {
       cur.meta += m.meta;
@@ -205,6 +212,23 @@ export function aggregateMetas(rows: Meta[]): Meta[] {
     } else map.set(key, { ...m });
   });
   return Array.from(map.values());
+}
+
+/** Rateio autorizado: cada mês recebe 1/3 do Quarter, sem substituir metas mensais explícitas. */
+export function monthlyMetas(rows: Meta[]): Meta[] {
+  const key = (meta: Meta) => `${periodoYear(meta.periodo)}|||${metaKey(meta)}`;
+  const explicit = new Set(rows.filter((meta) => normalizeMonth(meta.mes)).map(key));
+  return rows.flatMap((meta) => {
+    if (normalizeMonth(meta.mes)) return [meta];
+    const quarter = periodoQ(meta.periodo);
+    if (!/^Q[1-4]$/.test(quarter)) return [];
+    return Array.from({ length: 3 }, (_, index) => ({
+      ...meta,
+      mes: String((Number(quarter[1]) - 1) * 3 + index + 1).padStart(2, "0"),
+      meta: meta.meta / 3,
+      metaFinanceira: meta.metaFinanceira === undefined ? undefined : meta.metaFinanceira / 3,
+    })).filter((month) => !explicit.has(key(month)));
+  });
 }
 
 /* ---------------- Formatação pt-BR ---------------- */
