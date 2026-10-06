@@ -22,7 +22,7 @@ import {
   ALL, CHART_COLORS, COLOR_2025, COLOR_2026, COLOR_META, COLOR_NEG, COLOR_NEUTRO, COLOR_POS, SEM_UF,
   type Meta, type Row,
   fmtBRL, fmtBRLFull, fmtCompact, fmtInt, fmtPct, fmtSignedPct,
-  joinKey, normGR, normMarca, normRep, normTipo, normUF, normalizeRowDate, sortMonths, stripAccents,
+  joinKey, matchesUF, monthLabel, normGR, normMarca, normRep, normTipo, normUF, normalizeMetaMonth, normalizeMonth, normalizeRowDate, sortMonths, stripAccents,
   pctAting, pctVar, periodoQ, periodoYear, topicoCode, unique,
 } from "@/lib/dashboard/domain";
 
@@ -60,7 +60,7 @@ const INITIAL_FAT: Row[] = (rawFaturamento as Array<Record<string, unknown>>).ma
   ufCliente: str(r.ufCliente) || undefined,
   ufHospital: str(r.ufHospital) || undefined,
 }));
-const INITIAL_METAS: Meta[] = (rawMetas as Array<Record<string, unknown>>).map((m) => ({
+const INITIAL_METAS: Meta[] = (rawMetas as Array<Record<string, unknown>>).map((m) => normalizeMetaMonth({
   gr: str(m.gr), rep: str(m.rep), marca: str(m.marca), uf: str(m.uf),
   topico: str(m.topico), tipo: str(m.tipo), periodo: str(m.periodo), meta: Number(m.meta) || 0,
   ufHospital: str(m.ufHospital) || undefined,
@@ -119,7 +119,9 @@ const anoLabel = (periodo: string) => {
 };
 
 /** Dimensões que só existem na base de faturamento (metas não têm essa granularidade). */
-const FAT_ONLY: FilterKey[] = ["meses", "ufsCliente", "ufsHospital", "clientes", "medicos", "assessores"];
+const FAT_ONLY: FilterKey[] = ["ufsCliente", "ufsHospital", "clientes", "medicos", "assessores"];
+
+const selectedMonthKeys = (months: string[]) => months.map(normalizeMonth).filter((month): month is NonNullable<ReturnType<typeof normalizeMonth>> => Boolean(month));
 
 function matchesFat(r: Row, f: Filters, skip?: FilterKey) {
   const has = (key: FilterKey, values: string[], value: string) =>
@@ -127,9 +129,9 @@ function matchesFat(r: Row, f: Filters, skip?: FilterKey) {
   return (
     has("anos", f.anos, anoLabel(r.periodo)) &&
     has("trimestres", f.trimestres, periodoQ(r.periodo)) &&
-    has("meses", f.meses, label(r.mes)) &&
+    (skip === "meses" || f.meses.length === 0 || selectedMonthKeys(f.meses).includes(normalizeMonth(r.mes)!)) &&
     has("grs", f.grs, normGR(r.gr)) &&
-    (skip === "ufs" || f.ufs.length === 0 || !str(r.uf) || f.ufs.includes(ufLabel(r.uf))) &&
+    (skip === "ufs" || matchesUF(f.ufs, r.uf)) &&
     has("ufsCliente", f.ufsCliente, ufLabel(r.ufCliente)) &&
     has("ufsHospital", f.ufsHospital, ufLabel(r.ufHospital)) &&
     has("marcas", f.marcas.map(normMarca), normMarca(r.marca)) &&
@@ -148,9 +150,9 @@ function matchesMeta(m: Meta, f: Filters, skip?: FilterKey) {
   return (
     has("anos", f.anos, anoLabel(m.periodo)) &&
     has("trimestres", f.trimestres, periodoQ(m.periodo)) &&
-    (skip === "meses" || f.meses.length === 0 || !str(m.mes) || f.meses.includes(label(m.mes))) &&
+    (skip === "meses" || f.meses.length === 0 || selectedMonthKeys(f.meses).includes(normalizeMonth(m.mes)!)) &&
     has("grs", f.grs, normGR(m.gr)) &&
-    has("ufs", f.ufs, ufLabel(m.uf)) &&
+    (skip === "ufs" || matchesUF(f.ufs, m.uf)) &&
     (skip === "ufsCliente" || f.ufsCliente.length === 0 || !str(m.ufCliente) || f.ufsCliente.includes(ufLabel(m.ufCliente))) &&
     (skip === "ufsHospital" || f.ufsHospital.length === 0 || !str(m.ufHospital) || f.ufsHospital.includes(ufLabel(m.ufHospital))) &&
     has("marcas", f.marcas.map(normMarca), normMarca(m.marca)) &&
@@ -354,7 +356,7 @@ function ComparisonLabel({ x, y, height, previousValue, currentValue, gap, value
 function Dashboard() {
   const isMobile = useIsMobile();
   const [data, setData] = useState<Row[]>(() => loadLS<Row[]>(LS_FAT, INITIAL_FAT).map(normalizeRowDate));
-  const [metasData, setMetasData] = useState<Meta[]>(() => loadLS<Meta[]>(LS_METAS, INITIAL_METAS));
+  const [metasData, setMetasData] = useState<Meta[]>(() => loadLS<Meta[]>(LS_METAS, INITIAL_METAS).map(normalizeMetaMonth));
   const [lastUpdate, setLastUpdateState] = useState<LastUpdate | null>(() => loadLastUpdate());
   const [f, setF] = useState<Filters>(EMPTY_FILTERS);
   const [drill, setDrill] = useState<{ title: string; scope: DrillScope } | null>(null);
@@ -394,7 +396,7 @@ function Dashboard() {
 
   const anoOptions = useMemo(() => optionsFor("anos", (r) => anoLabel(r.periodo)).filter((a) => a !== NI), [data, f]);
   const trimestreOptions = useMemo(() => optionsFor("trimestres", (r) => periodoQ(r.periodo)), [data, f]);
-  const mesOptions = useMemo(() => sortMonths(optionsFor("meses", (r) => label(r.mes)).filter((m) => m !== NI)), [data, f]);
+  const mesOptions = useMemo(() => sortMonths(optionsFor("meses", (r) => monthLabel(r.mes) ?? NI).filter((m) => m !== NI)), [data, f]);
   const grOptions = useMemo(() => {
     const fromMetas = metasData.filter((m) => matchesMeta(m, f, "grs")).map((m) => normGR(m.gr));
     return unique([...optionsFor("grs", (r) => normGR(r.gr)), ...fromMetas]);
@@ -679,11 +681,13 @@ function Dashboard() {
 
   /* --------- Base --------- */
   const handleApply = (rows: Row[], newMetas: Meta[]) => {
-    setData(rows);
-    setMetasData(newMetas);
+    const normalizedRows = rows.map(normalizeRowDate);
+    const normalizedMetas = newMetas.map(normalizeMetaMonth);
+    setData(normalizedRows);
+    setMetasData(normalizedMetas);
     try {
-      window.localStorage.setItem(LS_FAT, JSON.stringify(rows));
-      window.localStorage.setItem(LS_METAS, JSON.stringify(newMetas));
+      window.localStorage.setItem(LS_FAT, JSON.stringify(normalizedRows));
+      window.localStorage.setItem(LS_METAS, JSON.stringify(normalizedMetas));
     } catch (e) {
       console.warn("Não foi possível persistir a base no navegador:", e);
     }
