@@ -369,7 +369,10 @@ const toNumber = (v: unknown): number | null => {
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
   const s = String(v ?? "").trim();
   if (!s) return null;
+  // Reject nonnumeric cells instead of turning their stripped empty text into 0.
+  if (/[^\d\s.,-]/.test(s.replace(/^R\$\s*/, ""))) return null;
   const cleaned = s.replace(/[R$\s.]/g, "").replace(",", ".").replace(/[^\d.-]/g, "");
+  if (!/^-?\d+(?:\.\d+)?$/.test(cleaned)) return null;
   const n = Number(cleaned);
   return Number.isFinite(n) ? n : null;
 };
