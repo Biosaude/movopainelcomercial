@@ -1,6 +1,29 @@
 import { createServerFn } from "@tanstack/react-start";
 import { legacyPublicationSchema } from "../dashboard/shared";
 
+// Local workbook management also requires current, remotely verified permission.
+// No workbook data is uploaded or persisted by this authorization endpoint.
+export const authorizeDashboardManagement = createServerFn({ method: "POST" }).handler(async () => {
+  const { getRequest, setResponseHeader } = await import("@tanstack/react-start/server");
+  const api = await import("../dashboard/shared.server");
+  setResponseHeader("Cache-Control", "private, no-store");
+  try {
+    const config = api.dashboardConfig();
+    if (!config) throw new api.DashboardError("configuration", "Supabase não configurado.");
+    const token = api.bearerToken(getRequest().headers.get("authorization"));
+    await api.verifyAdministrator(api.requestClient(config, token), token);
+    return { ok: true as const };
+  } catch (error) {
+    return {
+      ok: false as const,
+      message:
+        error instanceof api.DashboardError
+          ? error.message
+          : "Não foi possível verificar a permissão administrativa.",
+    };
+  }
+});
+
 // Public reads intentionally do not use the old global Supabase auth attacher.
 export const getDashboardState = createServerFn({ method: "GET" }).handler(async () => {
   const { getRequest, setResponseHeader } = await import("@tanstack/react-start/server");

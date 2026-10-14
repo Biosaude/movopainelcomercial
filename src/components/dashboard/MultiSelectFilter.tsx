@@ -47,7 +47,13 @@ export function MultiSelectFilter({
             <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[280px] p-0" align="start">
+        <PopoverContent className="w-[280px] p-0" align="start" onCloseAutoFocus={(event) => {
+          // Exit animation can finish after another filter is already open.
+          // Keep that filter's focus instead of dismissing it from the old menu.
+          const active = document.activeElement;
+          if (active?.closest('[role="dialog"][data-state="open"]') ||
+            active?.matches('[aria-haspopup="dialog"][aria-expanded="true"]')) event.preventDefault();
+        }}>
           <div className="flex items-center justify-between px-3 py-2 border-b">
             <button onClick={() => onChange([])} className="text-xs font-medium text-primary hover:underline">
               Selecionar {ALL}
@@ -76,9 +82,10 @@ export function MultiSelectFilter({
                 key={opt}
                 type="button"
                 onClick={() => toggle(opt)}
+                aria-pressed={selected.includes(opt)}
                 className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-muted cursor-pointer text-sm text-left"
               >
-                <Checkbox checked={selected.includes(opt)} className="pointer-events-none" />
+                <Checkbox asChild checked={selected.includes(opt)} className="pointer-events-none"><span /></Checkbox>
                 <span className="truncate" title={opt}>{opt}</span>
               </button>
             ))}

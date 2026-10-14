@@ -172,6 +172,15 @@ try {
   const text = await visitor.locator("body").innerText();
   assert.ok(text.includes("13.759 registros") && text.includes("633 registros"));
   assert.ok(text.includes("fictional-full-13759-633.xlsx"));
+  // Large rankings keep every bar; only animation is omitted above 200 items.
+  const representatives = visitor
+    .getByText("Ranking de Representantes", { exact: true })
+    .locator("../../..");
+  await representatives
+    .locator(".recharts-bar-rectangle")
+    .nth(13758)
+    .waitFor({ state: "attached" });
+  assert.equal(await representatives.locator(".recharts-bar-rectangle").count(), 13759);
   const metrics = await (await fetch(`${fixture}/__test/metrics`)).json();
   assert.ok(metrics.pageReads > 2, "Large snapshots must use paged transport");
   assert.ok(metrics.maxBatchRequestBytes < 1_100_000);

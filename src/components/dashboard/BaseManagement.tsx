@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import {
   AlertCircle, CheckCircle2, Database, Download, RefreshCw, Upload,
@@ -40,6 +40,26 @@ export function BaseManagement({
   const [password, setPassword] = useState("");
   const [published, setPublished] = useState(false);
 
+  const canManage = Boolean(shared.session && shared.isAdmin && !shared.blocked);
+  const access = useRef({ canManage, epoch: 0 });
+  if (access.current.canManage !== canManage) {
+    access.current = { canManage, epoch: access.current.epoch + 1 };
+  }
+  useEffect(() => {
+    // Keep the request ID across a transient snapshot failure so publication
+    // retries remain idempotent. A different actor starts with no local file.
+    setStatus({ kind: "idle" });
+    setPublished(false);
+    if (fileInput.current) fileInput.current.value = "";
+  }, [shared.session?.user.id]);
+  const requireManagement = async () => {
+    const epoch = access.current.epoch;
+    if (!access.current.canManage || shared.loading) throw new Error("Entre com uma conta administrativa.");
+    await shared.authorizeManagement();
+    if (!access.current.canManage || epoch !== access.current.epoch) throw new Error("A sessão administrativa mudou. Tente novamente.");
+    return epoch;
+  };
+
   const downloadTemplate = () => {
     const fatRows = current;
     const metaRows = currentMetas;
@@ -59,17 +79,28 @@ export function BaseManagement({
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Base");
-    XLSX.writeFile(wb, "modelo_base_dashboard_biosaude.xlsx");
+    XLSX.writeFile(wb, "modelo_base_dashboard_biosaude.xlsx", { compression: true });
+  };
+
+  const downloadAuthorizedTemplate = async () => {
+    if (!canManage || busy || shared.loading) return;
+    setBusy(true); setActionError("");
+    try { await requireManagement(); downloadTemplate(); }
+    catch (error) { setActionError((error as Error).message); }
+    finally { setBusy(false); }
   };
 
   const handleFiles = async (files: File[]) => {
+    if (!canManage || busy || shared.loading) return;
     setBusy(true);
     setActionError("");
     setPublished(false);
     try {
+      const epoch = await requireManagement();
       if (files.length > 2) throw new Error("Selecione uma base combinada ou uma planilha de faturamento e uma de metas.");
       if (files.some((file) => file.size > 10_000_000)) throw new Error("Cada arquivo deve ter no máximo 10 MB.");
       const results = await Promise.all(files.map(async (file) => parseWorkbook(await file.arrayBuffer())));
+      if (!access.current.canManage || access.current.epoch !== epoch) return;
       if (results.filter((r) => r.faturamento.length > 0).length > 1 || results.filter((r) => r.metas.length > 0).length > 1) {
         throw new Error("Use somente uma fonte de faturamento e uma fonte de metas para evitar duplicações.");
       }
@@ -92,7 +123,7 @@ export function BaseManagement({
   };
 
   const publishUpdate = async () => {
-    if (status.kind !== "ready" || !shared.isAdmin || busy || shared.loading) return;
+    if (status.kind !== "ready" || !canManage || busy || shared.loading) return;
     const { faturamento, metas, linhasInvalidas } = status.result;
     setActionError("");
     if (linhasInvalidas > 0) { setActionError("Corrija as linhas inválidas antes de publicar permanentemente. A prévia temporária continua disponível."); return; }
@@ -110,14 +141,19 @@ export function BaseManagement({
     } finally { setBusy(false); }
   };
 
-  const applyUpdate = () => {
-    if (status.kind !== "ready") return;
-    const { faturamento, metas } = status.result;
-    onApply(faturamento, metas, status.fileName);
-    setPublished(false);
-    setLastUpdate({ when: new Date(), fileName: status.fileName, count: faturamento.length, metaCount: metas.length });
-    setStatus({ ...status, applied: true });
-    if (fileInput.current) fileInput.current.value = "";
+  const applyUpdate = async () => {
+    if (status.kind !== "ready" || !canManage || busy || shared.loading) return;
+    setBusy(true); setActionError("");
+    try {
+      await requireManagement();
+      const { faturamento, metas } = status.result;
+      onApply(faturamento, metas, status.fileName);
+      setPublished(false);
+      setLastUpdate({ when: new Date(), fileName: status.fileName, count: faturamento.length, metaCount: metas.length });
+      setStatus({ ...status, applied: true });
+      if (fileInput.current) fileInput.current.value = "";
+    } catch (error) { setActionError((error as Error).message); }
+    finally { setBusy(false); }
   };
 
   const ready = status.kind === "ready" ? status.result : null;
@@ -155,7 +191,7 @@ export function BaseManagement({
         </div>
         {actionError && <p role="alert" className="text-sm text-red-700">{actionError}</p>}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <Button variant="outline" onClick={downloadTemplate} className="justify-start h-auto py-3">
+          <Button variant="outline" disabled={!canManage || busy || shared.loading} onClick={() => { void downloadAuthorizedTemplate(); }} className="justify-start h-auto py-3">
             <Download className="h-4 w-4 mr-2 shrink-0" />
             <div className="text-left">
               <div className="text-sm font-medium">Baixar Modelo da Base</div>
@@ -163,7 +199,7 @@ export function BaseManagement({
             </div>
           </Button>
 
-          <Button variant="outline" disabled={busy || shared.loading || shared.blocked} onClick={() => fileInput.current?.click()} className="justify-start h-auto py-3">
+          <Button variant="outline" disabled={!canManage || busy || shared.loading || shared.blocked} onClick={() => fileInput.current?.click()} className="justify-start h-auto py-3">
             <Upload className="h-4 w-4 mr-2 shrink-0" />
             <div className="text-left">
               <div className="text-sm font-medium">Selecionar Nova Base</div>
@@ -173,13 +209,14 @@ export function BaseManagement({
           <input
             ref={fileInput}
             type="file"
+            disabled={!canManage || busy || shared.loading}
             multiple
             accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             className="hidden"
             onChange={(e) => { const files = Array.from(e.target.files ?? []); if (files.length) void handleFiles(files); }}
           />
 
-          <Button onClick={applyUpdate} disabled={status.kind !== "ready" || busy || shared.loading || shared.blocked} className="justify-start h-auto py-3">
+          <Button onClick={() => { void applyUpdate(); }} disabled={!canManage || status.kind !== "ready" || busy || shared.loading || shared.blocked} className="justify-start h-auto py-3">
             <RefreshCw className="h-4 w-4 mr-2 shrink-0" />
             <div className="text-left">
               <div className="text-sm font-medium">Atualizar Dashboard temporariamente</div>
@@ -192,12 +229,12 @@ export function BaseManagement({
           </Button>
         </div>
 
-        {shared.isAdmin && <Button onClick={() => { void publishUpdate(); }} disabled={status.kind !== "ready" || busy || shared.loading}>
+        <Button onClick={() => { void publishUpdate(); }} disabled={!canManage || status.kind !== "ready" || busy || shared.loading}>
           <Database className="h-4 w-4 mr-2" />{busy ? "Publicando..." : "Publicar base permanentemente"}
-        </Button>}
+        </Button>
         <p className="text-xs text-muted-foreground">A prévia temporária vale apenas neste navegador até recarregar. A publicação permanente exige administrador e substitui faturamento e metas juntos para todos os visitantes.</p>
 
-        {ready && status.kind === "ready" && (
+        {canManage && ready && status.kind === "ready" && (
           <div className="rounded-md border border-sky-500/30 bg-sky-500/5 p-3 text-sm space-y-2">
             <p className="font-medium text-sky-700 flex items-center gap-2">
               <Upload className="h-4 w-4" /> Planilha validada: {status.fileName}

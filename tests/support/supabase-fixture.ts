@@ -81,6 +81,8 @@ const metrics = {
 let failChunkIndex: number | null = null;
 let failReadAfterPublish = false;
 let pendingReadFailures = 0;
+let failPageOffset: number | null = null;
+let denyManagement = false;
 Bun.serve({
   hostname: "127.0.0.1",
   port: 54329,
@@ -91,6 +93,14 @@ Bun.serve({
     const user = users[token as keyof typeof users];
     try {
       if (url.pathname === "/__test/metrics") return response(metrics);
+      if (url.pathname === "/__test/fail-page" && request.method === "POST") {
+        failPageOffset = (await request.json()).offset;
+        return response({ armed: true });
+      }
+      if (url.pathname === "/__test/deny-management" && request.method === "POST") {
+        denyManagement = (await request.json()).deny;
+        return response({ denyManagement });
+      }
       if (url.pathname === "/__test/fail-chunk" && request.method === "POST") {
         const body = await request.json();
         failChunkIndex = body.index;
@@ -141,6 +151,10 @@ Bun.serve({
       if (url.pathname === "/rest/v1/rpc/dashboard_read_page") {
         const body = await request.json();
         metrics.pageReads++;
+        if (body.p_offset === failPageOffset) {
+          failPageOffset = null;
+          return response({ code: "fixture_read_failure", message: "Simulated lost page" }, 503);
+        }
         const page = await sql(
           `SELECT public.dashboard_read_page(${quote(body.p_import_id)}::uuid,${quote(body.p_kind)},${quote(String(body.p_offset))}::integer)`,
           user?.id,
@@ -152,7 +166,11 @@ Bun.serve({
         return response(page);
       }
       if (url.pathname === "/rest/v1/rpc/dashboard_is_admin")
-        return response(await sql("SELECT to_jsonb(public.dashboard_is_admin())", user?.id));
+        return response(
+          denyManagement
+            ? false
+            : await sql("SELECT to_jsonb(public.dashboard_is_admin())", user?.id),
+        );
       if (url.pathname === "/rest/v1/dashboard_imports")
         return response(
           await sql(

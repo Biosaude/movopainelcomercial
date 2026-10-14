@@ -4,7 +4,8 @@
   "git": {
     "deploymentEnabled": {
       "codex/supabase-base-compartilhada": false,
-      "codex/publicacao-base-em-lotes": false
+      "codex/publicacao-base-em-lotes": false,
+      "codex/auditoria-filtros-publicos": false
     }
   }
 }

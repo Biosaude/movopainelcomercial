@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient, type Session, type SupabaseClient } from "@supabase/supabase-js";
-import { getDashboardState } from "@/lib/api/dashboard.functions";
+import { authorizeDashboardManagement, getDashboardState } from "@/lib/api/dashboard.functions";
 import {
   beginSharedUpload,
   appendSharedUpload,
@@ -128,6 +128,9 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
       setSession(next);
       tokenRef.current = nextToken;
       if (!changed) return;
+      // Do not retain the previous actor's management permission during refresh.
+      setIsAdmin(false);
+      setHistory([]);
       // Do not await Auth calls inside the SDK auth listener.
       queueMicrotask(() => {
         if (active) void reload();
@@ -182,6 +185,17 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
         "A importação já está registrada no histórico, mas outra base está ativa. Confira a última atualização. Se desejar publicar uma nova versão deste arquivo, selecione-o novamente.",
       );
   };
+  const authorizeManagement = async () => {
+    if (!tokenRef.current) throw new Error("Entre com uma conta administrativa.");
+    const result = await authorizeDashboardManagement({
+      headers: { Authorization: `Bearer ${tokenRef.current}` },
+    });
+    if (!result.ok) {
+      setIsAdmin(false);
+      setHistory([]);
+      throw new Error(result.message);
+    }
+  };
   return {
     session,
     isAdmin,
@@ -195,6 +209,7 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
     signIn,
     signOut,
     publish,
+    authorizeManagement,
   };
 }
 export type SharedDashboard = ReturnType<typeof useSharedDashboard>;
