@@ -42,3 +42,4 @@ for attempt in {1..45}; do
 done
 if [ "$ready" != true ]; then cat "$test_logs/fixture.log" "$test_logs/app.log"; exit 1; fi
 node tests/e2e.mjs
+node tests/shared-dashboard-regressions.mjs

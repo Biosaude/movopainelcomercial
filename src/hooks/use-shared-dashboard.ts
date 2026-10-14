@@ -7,8 +7,8 @@ import type { Row, Meta } from "@/lib/dashboard/domain";
 export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboardState>>) {
   const [client, setClient] = useState<SupabaseClient | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [history, setHistory] = useState<ImportRecord[]>([]);
+  const [isAdmin, setIsAdmin] = useState(initial.ok && initial.isAdmin);
+  const [history, setHistory] = useState<ImportRecord[]>(initial.ok ? initial.history : []);
   const [dataset, setDataset] = useState<{
     faturamento: Row[];
     metas: Meta[];
@@ -32,7 +32,9 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
   const generation = useRef(0);
   const clientRef = useRef<SupabaseClient | null>(null);
   const tokenRef = useRef<string | undefined>(undefined);
-  const versionRef = useRef<string | null>(null);
+  const versionRef = useRef<string | null>(
+    initial.ok ? (initial.snapshot?.import.id ?? null) : null,
+  );
 
   const reload = useCallback(async () => {
     const current = ++generation.current;
@@ -66,7 +68,7 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
           metas: base.metas,
           import: result.snapshot?.import ?? null,
         });
-      return true;
+      return { version: result.snapshot?.import.id ?? null };
     } catch {
       if (current === generation.current)
         setMessage(
@@ -82,20 +84,34 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
     generation.current++;
   }, []);
   useEffect(() => {
-    void reload();
+    // The route loader already supplied the snapshot. Hydration only needs
+    // the Auth SDK; a restored session will trigger an authenticated read.
+    if (initial.config && !clientRef.current) {
+      const sdk = createClient(initial.config.url, initial.config.publishableKey);
+      clientRef.current = sdk;
+      setClient(sdk);
+    }
     return invalidatePending;
-  }, [reload, invalidatePending]);
+  }, [initial.config, invalidatePending]);
   useEffect(() => {
     if (!client) return;
+    let active = true;
     const { data } = client.auth.onAuthStateChange((_event, next) => {
+      if (!active) return;
+      const nextToken = next?.access_token;
+      const changed = tokenRef.current !== nextToken;
       setSession(next);
-      tokenRef.current = next?.access_token;
+      tokenRef.current = nextToken;
+      if (!changed) return;
       // Do not await Auth calls inside the SDK auth listener.
       queueMicrotask(() => {
-        void reload();
+        if (active) void reload();
       });
     });
-    return () => data.subscription.unsubscribe();
+    return () => {
+      active = false;
+      data.subscription.unsubscribe();
+    };
   }, [client, reload]);
 
   const signIn = async (email: string, password: string) => {
@@ -117,9 +133,14 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
       headers: tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {},
     });
     if (!result.ok) throw new Error(result.message);
-    if (!(await reload()))
+    const refreshed = await reload();
+    if (!refreshed)
       throw new Error(
         "Publicação confirmada, mas a leitura falhou. Recarregue para consultar a base publicada; repetir a mesma importação não cria duplicatas.",
+      );
+    if (refreshed.version !== result.id)
+      throw new Error(
+        "A importação já está registrada no histórico, mas outra base está ativa. Confira a última atualização. Se desejar publicar uma nova versão deste arquivo, selecione-o novamente.",
       );
   };
   return {

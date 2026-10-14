@@ -70,6 +70,9 @@ const cors = {
 };
 const response = (payload: unknown, status = 200) =>
   new Response(JSON.stringify(payload), { status, headers: cors });
+const metrics = { snapshotReads: 0, publications: 0 };
+let failReadAfterPublish = false;
+let pendingReadFailures = 0;
 Bun.serve({
   hostname: "127.0.0.1",
   port: 54329,
@@ -79,6 +82,11 @@ Bun.serve({
     const token = request.headers.get("authorization")?.replace("Bearer ", "");
     const user = users[token as keyof typeof users];
     try {
+      if (url.pathname === "/__test/metrics") return response(metrics);
+      if (url.pathname === "/__test/fail-read-after-publish" && request.method === "POST") {
+        failReadAfterPublish = true;
+        return response({ armed: true });
+      }
       if (url.pathname === "/auth/v1/token") {
         const body = await request.json();
         const key =
@@ -102,8 +110,17 @@ Bun.serve({
       if (url.pathname === "/auth/v1/logout") return response({});
       if (token && token !== "test-public-key" && !user)
         return response({ message: "Invalid JWT" }, 401);
-      if (url.pathname === "/rest/v1/rpc/dashboard_read_snapshot")
+      if (url.pathname === "/rest/v1/rpc/dashboard_read_snapshot") {
+        metrics.snapshotReads++;
+        if (pendingReadFailures > 0) {
+          pendingReadFailures--;
+          return response(
+            { code: "fixture_read_failure", message: "Simulated lost snapshot response" },
+            503,
+          );
+        }
         return response(await sql("SELECT public.dashboard_read_snapshot()", user?.id));
+      }
       if (url.pathname === "/rest/v1/rpc/dashboard_is_admin")
         return response(await sql("SELECT to_jsonb(public.dashboard_is_admin())", user?.id));
       if (url.pathname === "/rest/v1/dashboard_imports")
@@ -115,12 +132,16 @@ Bun.serve({
         );
       if (url.pathname === "/rest/v1/rpc/dashboard_publish") {
         const body = await request.json();
-        return response(
-          await sql(
-            `SELECT to_jsonb(public.dashboard_publish(${quote(body.p_request_id)}::uuid, ${body.p_expected_version ? quote(body.p_expected_version) + "::uuid" : "NULL"}, ${quote(body.p_file_name)}, ${quote(JSON.stringify(body.p_faturamento))}::jsonb, ${quote(JSON.stringify(body.p_metas))}::jsonb))`,
-            user?.id,
-          ),
+        metrics.publications++;
+        const id = await sql(
+          `SELECT to_jsonb(public.dashboard_publish(${quote(body.p_request_id)}::uuid, ${body.p_expected_version ? quote(body.p_expected_version) + "::uuid" : "NULL"}, ${quote(body.p_file_name)}, ${quote(JSON.stringify(body.p_faturamento))}::jsonb, ${quote(JSON.stringify(body.p_metas))}::jsonb))`,
+          user?.id,
         );
+        if (failReadAfterPublish) {
+          pendingReadFailures++;
+          failReadAfterPublish = false;
+        }
+        return response(id);
       }
       return response({ message: "Fixture route unavailable" }, 404);
     } catch (error) {
