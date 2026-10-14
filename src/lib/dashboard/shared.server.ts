@@ -1,11 +1,12 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   normalizePublication,
-  publicationSchema,
+  legacyPublicationSchema,
   type ImportRecord,
   type Publication,
   type SharedSnapshot,
 } from "./shared";
+import { SMALL_SNAPSHOT_BYTES, type ReadManifest } from "./batches";
 
 export type PublicConfig = { url: string; publishableKey: string };
 export class DashboardError extends Error {
@@ -60,13 +61,38 @@ export async function verifySession(client: SupabaseClient, token?: string, requ
 }
 export async function readDashboard(client: SupabaseClient, token?: string) {
   await verifySession(client, token);
-  const { data, error } = await client.rpc("dashboard_read_snapshot");
+  const { data, error } = await client.rpc("dashboard_read_manifest");
   if (error)
     throw new DashboardError(
       "unavailable",
       "Não foi possível consultar a base compartilhada. Verifique a conexão e a migração do Supabase.",
     );
-  const state = data as { access: boolean; isAdmin: boolean; snapshot: SharedSnapshot | null };
+  const metadata = data as { access: boolean; isAdmin: boolean; manifest: ReadManifest | null };
+  let state: {
+    access: boolean;
+    isAdmin: boolean;
+    snapshot: SharedSnapshot | null;
+    manifest: ReadManifest | null;
+  } = { ...metadata, snapshot: null };
+  if (metadata.access && (!metadata.manifest || metadata.manifest.bytes <= SMALL_SNAPSHOT_BYTES)) {
+    const response = await client.rpc("dashboard_read_snapshot");
+    if (response.error)
+      throw new DashboardError("unavailable", "Não foi possível consultar a base compartilhada.");
+    const loaded = response.data as {
+      access: boolean;
+      isAdmin: boolean;
+      snapshot: SharedSnapshot | null;
+    };
+    // A concurrent publication may have replaced the small version with a large
+    // one. Never send that full payload through the Vercel server function.
+    const bytes = loaded.snapshot
+      ? new TextEncoder().encode(JSON.stringify(loaded.snapshot)).byteLength
+      : 0;
+    state =
+      bytes > SMALL_SNAPSHOT_BYTES && loaded.snapshot
+        ? { ...loaded, snapshot: null, manifest: { import: loaded.snapshot.import, bytes } }
+        : { ...loaded, manifest: null };
+  }
   if (!state?.access)
     throw new DashboardError(
       "forbidden",
@@ -97,7 +123,7 @@ export async function publishDashboard(
   const permission = await client.rpc("dashboard_is_admin");
   if (permission.error || permission.data !== true)
     throw new DashboardError("forbidden", "Sua conta não possui permissão administrativa.");
-  const value = normalizePublication(publicationSchema.parse(payload));
+  const value = normalizePublication(legacyPublicationSchema.parse(payload));
   const { data, error } = await client.rpc("dashboard_publish", {
     p_request_id: value.requestId,
     p_expected_version: value.expectedVersion,

@@ -70,7 +70,15 @@ const cors = {
 };
 const response = (payload: unknown, status = 200) =>
   new Response(JSON.stringify(payload), { status, headers: cors });
-const metrics = { snapshotReads: 0, publications: 0 };
+const metrics = {
+  snapshotReads: 0,
+  manifestReads: 0,
+  pageReads: 0,
+  publications: 0,
+  maxBatchRequestBytes: 0,
+  maxPageResponseBytes: 0,
+};
+let failChunkIndex: number | null = null;
 let failReadAfterPublish = false;
 let pendingReadFailures = 0;
 Bun.serve({
@@ -83,6 +91,11 @@ Bun.serve({
     const user = users[token as keyof typeof users];
     try {
       if (url.pathname === "/__test/metrics") return response(metrics);
+      if (url.pathname === "/__test/fail-chunk" && request.method === "POST") {
+        const body = await request.json();
+        failChunkIndex = body.index;
+        return response({ armed: true });
+      }
       if (url.pathname === "/__test/fail-read-after-publish" && request.method === "POST") {
         failReadAfterPublish = true;
         return response({ armed: true });
@@ -121,6 +134,23 @@ Bun.serve({
         }
         return response(await sql("SELECT public.dashboard_read_snapshot()", user?.id));
       }
+      if (url.pathname === "/rest/v1/rpc/dashboard_read_manifest") {
+        metrics.manifestReads++;
+        return response(await sql("SELECT public.dashboard_read_manifest()", user?.id));
+      }
+      if (url.pathname === "/rest/v1/rpc/dashboard_read_page") {
+        const body = await request.json();
+        metrics.pageReads++;
+        const page = await sql(
+          `SELECT public.dashboard_read_page(${quote(body.p_import_id)}::uuid,${quote(body.p_kind)},${quote(String(body.p_offset))}::integer)`,
+          user?.id,
+        );
+        metrics.maxPageResponseBytes = Math.max(
+          metrics.maxPageResponseBytes,
+          new TextEncoder().encode(JSON.stringify(page)).byteLength,
+        );
+        return response(page);
+      }
       if (url.pathname === "/rest/v1/rpc/dashboard_is_admin")
         return response(await sql("SELECT to_jsonb(public.dashboard_is_admin())", user?.id));
       if (url.pathname === "/rest/v1/dashboard_imports")
@@ -135,6 +165,48 @@ Bun.serve({
         metrics.publications++;
         const id = await sql(
           `SELECT to_jsonb(public.dashboard_publish(${quote(body.p_request_id)}::uuid, ${body.p_expected_version ? quote(body.p_expected_version) + "::uuid" : "NULL"}, ${quote(body.p_file_name)}, ${quote(JSON.stringify(body.p_faturamento))}::jsonb, ${quote(JSON.stringify(body.p_metas))}::jsonb))`,
+          user?.id,
+        );
+        if (failReadAfterPublish) {
+          pendingReadFailures++;
+          failReadAfterPublish = false;
+        }
+        return response(id);
+      }
+      if (url.pathname === "/rest/v1/rpc/dashboard_upload_begin") {
+        const body = await request.json();
+        return response(
+          await sql(
+            `SELECT to_jsonb(public.dashboard_upload_begin(${quote(body.p_request_id)}::uuid,${body.p_expected_version ? quote(body.p_expected_version) + "::uuid" : "NULL"},${quote(body.p_file_name)},${quote(String(body.p_revenue_count))}::integer,${quote(String(body.p_target_count))}::integer,${quote(JSON.stringify(body.p_plan))}::jsonb))`,
+            user?.id,
+          ),
+        );
+      }
+      if (url.pathname === "/rest/v1/rpc/dashboard_upload_chunk") {
+        const body = await request.json();
+        metrics.maxBatchRequestBytes = Math.max(
+          metrics.maxBatchRequestBytes,
+          new TextEncoder().encode(JSON.stringify(body)).byteLength,
+        );
+        if (body.p_chunk_index === failChunkIndex) {
+          failChunkIndex = null;
+          return response(
+            { code: "fixture_chunk_failure", message: "Simulated intermediate failure" },
+            503,
+          );
+        }
+        return response(
+          await sql(
+            `SELECT to_jsonb(public.dashboard_upload_chunk(${quote(body.p_request_id)}::uuid,${quote(String(body.p_chunk_index))}::integer,${quote(body.p_payload)}))`,
+            user?.id,
+          ),
+        );
+      }
+      if (url.pathname === "/rest/v1/rpc/dashboard_upload_commit") {
+        const body = await request.json();
+        metrics.publications++;
+        const id = await sql(
+          `SELECT to_jsonb(public.dashboard_upload_commit(${quote(body.p_request_id)}::uuid))`,
           user?.id,
         );
         if (failReadAfterPublish) {
