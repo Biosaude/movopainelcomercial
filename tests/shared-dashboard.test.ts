@@ -14,6 +14,7 @@ import {
   combineParsedFiles,
   normalizePublication,
   publicationSchema,
+  legacyPublicationSchema,
   type Publication,
 } from "../src/lib/dashboard/shared";
 import { bearerToken, publishDashboard, readDashboard } from "../src/lib/dashboard/shared.server";
@@ -163,7 +164,7 @@ describe("publication validation", () => {
       publicationSchema.safeParse({ ...publication, faturamento: Array(25001).fill(row) }).success,
     ).toBe(false);
     expect(
-      publicationSchema.safeParse({
+      legacyPublicationSchema.safeParse({
         ...publication,
         faturamento: Array(4000).fill({ ...row, cliente: "X".repeat(1000) }),
       }).success,
@@ -205,6 +206,12 @@ function sdk(
           } else
             payload = { id: "00000000-0000-4000-8000-000000000001", email: "admin@example.test" };
         } else if (path.endsWith("dashboard_is_admin")) payload = options.admin ?? false;
+        else if (path.endsWith("dashboard_read_manifest"))
+          payload = {
+            access: options.publicAccess ?? true,
+            isAdmin: false,
+            manifest: { import: { id: publication.requestId }, bytes: 1000 },
+          };
         else if (path.endsWith("dashboard_read_snapshot"))
           payload = {
             access: options.publicAccess ?? true,
@@ -241,7 +248,10 @@ describe("backend session and authorization via real Supabase SDK", () => {
     const state = await readDashboard(client);
     expect(state.snapshot?.faturamento).toEqual([row]);
     expect(state.snapshot?.metas).toEqual([target]);
-    expect(requests).toEqual(["/rest/v1/rpc/dashboard_read_snapshot"]);
+    expect(requests).toEqual([
+      "/rest/v1/rpc/dashboard_read_manifest",
+      "/rest/v1/rpc/dashboard_read_snapshot",
+    ]);
   });
   test("public access revocation is respected", async () => {
     await expect(readDashboard(sdk({ publicAccess: false }).client)).rejects.toThrow(

@@ -44,15 +44,16 @@ export const publicationSchema = z
     faturamento: z.array(revenueSchema).min(1).max(25000),
     metas: z.array(targetSchema).max(25000),
   })
-  .strict()
-  .superRefine((value, context) => {
-    if (new TextEncoder().encode(JSON.stringify(value)).byteLength > MAX_PUBLICATION_BYTES) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Base muito grande para publicação (limite de 3 MB).",
-      });
-    }
-  });
+  .strict();
+// Only the retained legacy single-request endpoint has a total-body limit.
+export const legacyPublicationSchema = publicationSchema.superRefine((value, context) => {
+  if (new TextEncoder().encode(JSON.stringify(value)).byteLength > MAX_PUBLICATION_BYTES) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Base muito grande para publicação (limite de 3 MB).",
+    });
+  }
+});
 export type Publication = z.infer<typeof publicationSchema>;
 export type ImportRecord = {
   id: string;

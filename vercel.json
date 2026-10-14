@@ -3,7 +3,8 @@
   "buildCommand": "npx --yes bun@1.4.3 run build:vercel",
   "git": {
     "deploymentEnabled": {
-      "codex/supabase-base-compartilhada": false
+      "codex/supabase-base-compartilhada": false,
+      "codex/publicacao-base-em-lotes": false
     }
   }
 }

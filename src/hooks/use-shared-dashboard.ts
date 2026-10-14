@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient, type Session, type SupabaseClient } from "@supabase/supabase-js";
-import { getDashboardState, publishSharedDashboard } from "@/lib/api/dashboard.functions";
+import { getDashboardState } from "@/lib/api/dashboard.functions";
+import {
+  beginSharedUpload,
+  appendSharedUpload,
+  commitSharedUpload,
+  readSharedPage,
+} from "@/lib/api/dashboard-upload.functions";
+import { assembleSnapshot, transferUpload } from "@/lib/dashboard/batches";
 import { publicationSchema, type ImportRecord, type Publication } from "@/lib/dashboard/shared";
 import type { Row, Meta } from "@/lib/dashboard/domain";
 
@@ -24,7 +31,7 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
         }
       : null;
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(initial.ok && Boolean(initial.manifest));
   const [blocked, setBlocked] = useState(
     !initial.ok && ["forbidden", "unauthorized"].includes(initial.code),
   );
@@ -36,13 +43,15 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
     initial.ok ? (initial.snapshot?.import.id ?? null) : null,
   );
 
-  const reload = useCallback(async () => {
+  const reload = useCallback(async (provided?: Awaited<ReturnType<typeof getDashboardState>>) => {
     const current = ++generation.current;
     setLoading(true);
     try {
-      const result = await getDashboardState({
-        headers: tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {},
-      });
+      const result =
+        provided ??
+        (await getDashboardState({
+          headers: tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {},
+        }));
       if (current !== generation.current) return false;
       if (result.config && !clientRef.current) {
         const sdk = createClient(result.config.url, result.config.publishableKey);
@@ -60,15 +69,30 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
       setIsAdmin(result.isAdmin);
       setHistory(result.history);
       setMessage(result.message);
-      const base = result.snapshot ?? result.embedded;
-      versionRef.current = result.snapshot?.import.id ?? null;
+      const snapshot = result.manifest
+        ? await assembleSnapshot(
+            result.manifest,
+            async (data) => {
+              const response = await readSharedPage({
+                data,
+                headers: tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {},
+              });
+              if (!response.ok) throw new Error(response.message);
+              return response.data;
+            },
+            () => current === generation.current,
+          )
+        : result.snapshot;
+      if (current !== generation.current) return false;
+      const base = snapshot ?? result.embedded;
+      versionRef.current = snapshot?.import.id ?? null;
       if (base)
         setDataset({
           faturamento: base.faturamento,
           metas: base.metas,
-          import: result.snapshot?.import ?? null,
+          import: snapshot?.import ?? null,
         });
-      return { version: result.snapshot?.import.id ?? null };
+      return { version: snapshot?.import.id ?? null };
     } catch {
       if (current === generation.current)
         setMessage(
@@ -91,8 +115,9 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
       clientRef.current = sdk;
       setClient(sdk);
     }
+    if (initial.ok && initial.manifest) void reload(initial);
     return invalidatePending;
-  }, [initial.config, invalidatePending]);
+  }, [initial, invalidatePending, reload]);
   useEffect(() => {
     if (!client) return;
     let active = true;
@@ -128,17 +153,31 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
   };
   const publish = async (payload: Omit<Publication, "expectedVersion">) => {
     const value = publicationSchema.parse({ ...payload, expectedVersion: versionRef.current });
-    const result = await publishSharedDashboard({
-      data: value,
-      headers: tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {},
+    const headers = (): Record<string, string> =>
+      tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {};
+    const id = await transferUpload(value, {
+      begin: async (data) => {
+        const result = await beginSharedUpload({ data, headers: headers() });
+        if (!result.ok) throw new Error(result.message);
+        return result.data;
+      },
+      chunk: async (data) => {
+        const result = await appendSharedUpload({ data, headers: headers() });
+        if (!result.ok) throw new Error(result.message);
+        return result.data;
+      },
+      commit: async (data) => {
+        const result = await commitSharedUpload({ data, headers: headers() });
+        if (!result.ok) throw new Error(result.message);
+        return result.data;
+      },
     });
-    if (!result.ok) throw new Error(result.message);
     const refreshed = await reload();
     if (!refreshed)
       throw new Error(
         "Publicação confirmada, mas a leitura falhou. Recarregue para consultar a base publicada; repetir a mesma importação não cria duplicatas.",
       );
-    if (refreshed.version !== result.id)
+    if (refreshed.version !== id)
       throw new Error(
         "A importação já está registrada no histórico, mas outra base está ativa. Confira a última atualização. Se desejar publicar uma nova versão deste arquivo, selecione-o novamente.",
       );

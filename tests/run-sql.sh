@@ -16,7 +16,7 @@ for attempt in {1..30}; do
   sleep 1
 done
 if [ "$ready" != true ]; then docker_local logs "$test_container"; exit 1; fi
-for file in tests/sql/bootstrap.sql supabase/migrations/20261014130000_dashboard_shared_versions.sql tests/sql/shared-dashboard.sql; do
+for file in tests/sql/bootstrap.sql supabase/migrations/20261014130000_dashboard_shared_versions.sql supabase/migrations/20261014160000_dashboard_batch_uploads.sql tests/sql/shared-dashboard.sql; do
   docker_local exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < "$file"
 done
 docker_local exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/sql/concurrent-first.sql > "$test_logs/first.log" 2>&1 &
@@ -33,3 +33,5 @@ fi
 rg -q '40001' "$test_logs/second.log"
 wait "$first_pid"
 docker_local exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/sql/reload.sql
+
+bun tests/sql/batch-publication.ts "$test_container"

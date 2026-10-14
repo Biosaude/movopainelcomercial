@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { publicationSchema } from "../dashboard/shared";
+import { legacyPublicationSchema } from "../dashboard/shared";
 
 // Public reads intentionally do not use the old global Supabase auth attacher.
 export const getDashboardState = createServerFn({ method: "GET" }).handler(async () => {
@@ -24,6 +24,7 @@ export const getDashboardState = createServerFn({ method: "GET" }).handler(async
         access: true,
         isAdmin: false,
         snapshot: null,
+        manifest: null,
         history: [],
         embedded: { faturamento: base.INITIAL_FAT, metas: base.INITIAL_METAS },
         message:
@@ -32,13 +33,17 @@ export const getDashboardState = createServerFn({ method: "GET" }).handler(async
     }
     const token = api.bearerToken(getRequest().headers.get("authorization"));
     const state = await api.readDashboard(api.requestClient(config, token), token);
-    const base = state.snapshot ? null : await import("../dashboard/embedded.server");
+    const base =
+      state.snapshot || state.manifest ? null : await import("../dashboard/embedded.server");
     return {
       ok: true as const,
       config,
       ...state,
       embedded: base ? { faturamento: base.INITIAL_FAT, metas: base.INITIAL_METAS } : null,
-      message: state.snapshot ? "" : "Ainda não há uma base publicada. Exibindo a base embarcada.",
+      message:
+        state.snapshot || state.manifest
+          ? ""
+          : "Ainda não há uma base publicada. Exibindo a base embarcada.",
     };
   } catch (error) {
     return {
@@ -54,7 +59,7 @@ export const getDashboardState = createServerFn({ method: "GET" }).handler(async
 });
 
 export const publishSharedDashboard = createServerFn({ method: "POST" })
-  .validator(publicationSchema)
+  .validator(legacyPublicationSchema)
   .handler(async ({ data }) => {
     const { getRequest, setResponseHeader } = await import("@tanstack/react-start/server");
     const api = await import("../dashboard/shared.server");

@@ -20,7 +20,7 @@ Se não houver versão publicada e a leitura estiver autorizada, a base embarcad
 
 ## Migração e segurança
 
-Revisar e aplicar **somente** `supabase/migrations/20261014130000_dashboard_shared_versions.sql` ao projeto correto. Ela cria:
+A estrutura original está em `supabase/migrations/20261014130000_dashboard_shared_versions.sql` e permanece inalterada. Em projeto onde ela já foi executada, aplicar apenas o SQL adicional `supabase/migrations/20261014160000_dashboard_batch_uploads.sql` antes de usar a publicação em lotes. Veja [diagnóstico e implantação em lotes](publicacao-em-lotes.md). A estrutura original contém:
 
 | Tabela                  | Finalidade                                          |
 | ----------------------- | --------------------------------------------------- |
@@ -104,12 +104,12 @@ Resultados nesta implementação: 38 testes automatizados passaram; TypeScript p
 
 As regressões P2 de `tests/shared-dashboard-regressions.mjs` também fazem parte de `bun run test:e2e`: verificam uma única leitura na hidratação anônima, recarga explícita, login, sessão restaurada e logout; simulam uma publicação confirmada cuja leitura falha e a repetição do mesmo UUID. Uma repetição ainda ativa confirma sucesso sem nova importação. Se outra publicação estiver ativa, o painel informa que a importação anterior permanece no histórico, exibe a base realmente ativa e não altera o ponteiro nem duplica registros. A correção compara o ID retornado pela RPC com o snapshot atualizado, sem modificar a migração executada.
 
-Publicações aceitam até 25.000 linhas de faturamento, 25.000 metas e aproximadamente 3 MB de JSON, abaixo do limite de requisição de função do Vercel. Cada Excel deve ter no máximo 10 MB. O banco também impõe limites sobre sua representação JSONB. Bases maiores exigem upload em lotes/staging, fora deste PR. A leitura retorna uma versão inteira numa RPC, sem truncamento por paginação; acompanhar latência e tamanho da base. Versões históricas acumulam armazenamento; a equipe deve definir a retenção.
+A publicação em lotes aceita as contagens originais de até 25.000 linhas de faturamento e 25.000 metas, sem limitar a base completa a 3 MB. Cada lote contém até 500 registros e 500 KB de JSON; a ativação é uma transação única após a verificação de todos os lotes. Cada Excel continua limitado a 10 MB. Versões grandes são lidas em páginas de até 500 registros e aproximadamente 400 KB, ancoradas no mesmo ID e aplicadas no painel apenas após leitura completa. O endpoint/RPC monolítico original conserva seu limite para compatibilidade, mas não é usado pelo fluxo novo. Versões históricas e preparações acumulam armazenamento; não há exclusão automática. Consultar os testes e limites de operação em [publicação em lotes](publicacao-em-lotes.md).
 
 Nenhum dado real foi gravado, apagado ou substituído nos testes. Sem chave pública e migração aplicada, não é possível afirmar que o Supabase remoto está pronto. O lint geral já tinha 799 erros de formatação e 26 avisos; não foi realizada uma reformatação geral do dashboard.
 
 ## Publicação e aceite
 
-Após revisar o PR, aplicar a migração nova ao projeto correto, provisionar o administrador e preencher as variáveis no Vercel. Só então autorizar o deployment. Não houve merge nem publicação automática.
+Após revisar o PR, aplicar o SQL adicional de lotes ao projeto que já possui a estrutura original, confirmar o administrador existente e manter as variáveis no Vercel. Em projeto novo, aplicar primeiro a estrutura original e depois o SQL adicional. Só então autorizar o deployment. Não houve merge nem publicação automática.
 
 Validar primeiro em Preview: abrir sem login e conferir data/arquivo, indicadores e base ativa; confirmar o bloqueio para usuário sem permissão; publicar dados fictícios com administrador **em projeto de teste**. Conferir FY25/FY26, quarters, meses, multi-UF, UF Hospital/Cliente, filtros combinados, rankings, drill-down, Excel exportado e reconciliação. Recarregar e abrir outro navegador deve apresentar a mesma versão. Falhas e publicações concorrentes devem preservar uma versão consistente. Em produção, não testar substituições com dados fictícios sem autorização específica.
