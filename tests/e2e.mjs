@@ -71,10 +71,7 @@ const login = async (email) => {
 try {
   await page.goto(base, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Dashboard Comercial · Biosaude" }).waitFor();
-  assert.equal(
-    await page.getByRole("button", { name: "Publicar base permanentemente" }).count(),
-    0,
-  );
+  assert.ok(await page.getByRole("button", { name: "Publicar base permanentemente" }).isDisabled());
   await page.evaluate(() =>
     localStorage.setItem("biosaude.fat.representante.v2", JSON.stringify([{ valor: 999999999 }])),
   );
@@ -83,25 +80,22 @@ try {
     !(await page.locator("body").innerText()).includes("999.999.999"),
     "Old browser cache must not override shared snapshot",
   );
-  await page.locator('input[type="file"]').setInputFiles(workbook(777));
-  await page.getByText("Planilha validada:", { exact: false }).waitFor();
-  await page.getByRole("button", { name: "Atualizar Dashboard temporariamente" }).click();
-  await page.getByText("Prévia temporária neste navegador.", { exact: false }).waitFor();
-  await page.reload({ waitUntil: "networkidle" });
-  assert.equal(
-    await page.getByText("Prévia temporária neste navegador.", { exact: false }).count(),
-    0,
-  );
+  for (const name of [
+    "Baixar Modelo da Base",
+    "Selecionar Nova Base",
+    "Atualizar Dashboard temporariamente",
+    "Publicar base permanentemente",
+  ]) {
+    assert.ok(await page.getByRole("button", { name }).isDisabled());
+  }
+  assert.ok(await page.locator('input[type="file"]').isDisabled());
   await page.getByLabel("E-mail administrativo").fill("admin@example.test");
   await page.getByLabel("Senha administrativa").fill("wrong-fixture-password");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await page.getByRole("alert").filter({ hasText: "Não foi possível entrar" }).waitFor();
   await login("visitor@example.test");
   await page.getByText("Sem permissão administrativa", { exact: false }).waitFor();
-  assert.equal(
-    await page.getByRole("button", { name: "Publicar base permanentemente" }).count(),
-    0,
-  );
+  assert.ok(await page.getByRole("button", { name: "Publicar base permanentemente" }).isDisabled());
   await page.getByRole("button", { name: "Sair", exact: true }).click();
   await page.getByRole("button", { name: "Entrar", exact: true }).waitFor();
   await login("admin@example.test");
@@ -150,7 +144,7 @@ try {
   );
   assert.deepEqual(errors, [], "No browser runtime errors");
   console.log(
-    "Browser assertions passed: public read, stale localStorage ignored, temporary preview reset, login, non-admin denial, admin publish, reload persistence, new visitor, desktop/mobile.",
+    "Browser assertions passed: public read, stale localStorage ignored, public management disabled, login, non-admin denial, admin publish, reload persistence, new visitor, desktop/mobile.",
   );
 } finally {
   await browser.close();

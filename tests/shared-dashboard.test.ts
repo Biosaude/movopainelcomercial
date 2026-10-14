@@ -17,7 +17,12 @@ import {
   legacyPublicationSchema,
   type Publication,
 } from "../src/lib/dashboard/shared";
-import { bearerToken, publishDashboard, readDashboard } from "../src/lib/dashboard/shared.server";
+import {
+  bearerToken,
+  publishDashboard,
+  readDashboard,
+  verifyAdministrator,
+} from "../src/lib/dashboard/shared.server";
 
 const row = {
   gr: "TEST",
@@ -242,6 +247,27 @@ function sdk(
   });
   return { client, requests };
 }
+
+describe("management authorization is checked by the server", () => {
+  test("rejects missing, invalid and non-administrator sessions", async () => {
+    const missing = sdk();
+    await expect(verifyAdministrator(missing.client)).rejects.toThrow("Entre com uma conta");
+    expect(missing.requests).toEqual([]);
+    const invalid = sdk({ validToken: false, admin: true });
+    await expect(verifyAdministrator(invalid.client, "invalid")).rejects.toThrow("Sessão inválida");
+    expect(invalid.requests).toEqual(["/auth/v1/user"]);
+    const visitor = sdk();
+    await expect(verifyAdministrator(visitor.client, "visitor")).rejects.toThrow(
+      "permissão administrativa",
+    );
+    expect(visitor.requests).toEqual(["/auth/v1/user", "/rest/v1/rpc/dashboard_is_admin"]);
+  });
+  test("validates the administrator remotely without reading or writing a dataset", async () => {
+    const admin = sdk({ admin: true });
+    await verifyAdministrator(admin.client, "admin");
+    expect(admin.requests).toEqual(["/auth/v1/user", "/rest/v1/rpc/dashboard_is_admin"]);
+  });
+});
 describe("backend session and authorization via real Supabase SDK", () => {
   test("public read requires no session and returns matching revenue/targets", async () => {
     const { client, requests } = sdk();

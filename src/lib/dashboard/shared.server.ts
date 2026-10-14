@@ -59,6 +59,13 @@ export async function verifySession(client: SupabaseClient, token?: string, requ
     throw new DashboardError("unauthorized", "Sessão inválida. Entre novamente.");
   return data.user;
 }
+/** Revalidate management access server-side, including revoked administrator roles. */
+export async function verifyAdministrator(client: SupabaseClient, token?: string) {
+  await verifySession(client, token, true);
+  const permission = await client.rpc("dashboard_is_admin");
+  if (permission.error || permission.data !== true)
+    throw new DashboardError("forbidden", "Sua conta não possui permissão administrativa.");
+}
 export async function readDashboard(client: SupabaseClient, token?: string) {
   await verifySession(client, token);
   const { data, error } = await client.rpc("dashboard_read_manifest");

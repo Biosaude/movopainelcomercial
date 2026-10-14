@@ -24,7 +24,9 @@ done
 docker_local run -d --name "$test_container" --network none -e POSTGRES_HOST_AUTH_METHOD=trust postgres:17-alpine >/dev/null
 ready=false
 for attempt in {1..30}; do
-  if docker_local exec "$test_container" pg_isready -U postgres >/dev/null 2>&1; then ready=true; break; fi
+  # The image starts a temporary Unix-socket server during initialization.
+  # Wait for the final TCP listener, which survives entrypoint initialization.
+  if docker_local exec "$test_container" pg_isready -U postgres -h 127.0.0.1 >/dev/null 2>&1; then ready=true; break; fi
   sleep 1
 done
 if [ "$ready" != true ]; then docker_local logs "$test_container"; exit 1; fi
@@ -44,3 +46,5 @@ if [ "$ready" != true ]; then cat "$test_logs/fixture.log" "$test_logs/app.log";
 node tests/e2e.mjs
 node tests/shared-dashboard-regressions.mjs
 node tests/large-publication.e2e.mjs
+
+node tests/dashboard-audit.e2e.mjs

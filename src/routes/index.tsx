@@ -174,6 +174,7 @@ function RankingCard({
                 formatter={(v: number) => [fmtBRLFull(v), "Faturamento FY26"]}
               />
               <Bar dataKey="value" fill={color} radius={[0, 3, 3, 0]} cursor={onSelect ? "pointer" : undefined}
+                isAnimationActive={items.length <= 200}
                 onClick={(e: { name?: string }) => e?.name && onSelect?.(e.name)}>
                 <LabelList dataKey="value" position="right" formatter={(v: number) => fmtCompact(v)} className="fill-muted-foreground" fontSize={9} />
               </Bar>
@@ -329,6 +330,18 @@ function Dashboard() {
     setMedicoQuery("");
     setDrill(null);
   }, [shared.dataset]);
+  useEffect(() => {
+    if (!temporary || shared.isAdmin || !shared.dataset) return;
+    setData(shared.dataset.faturamento.map(normalizeRowDate));
+    setMetasData(shared.dataset.metas.map(normalizeMetaMonth));
+    const info = shared.dataset.import;
+    setLastUpdateState(info ? { when: new Date(info.published_at), fileName: info.file_name, count: info.revenue_count, metaCount: info.target_count } : null);
+    setTemporary(false);
+    setF(EMPTY_FILTERS);
+    setDrill(null);
+    setTopicoSel(null);
+    setMedicoQuery("");
+  }, [shared.isAdmin, shared.dataset, temporary]);
   const set = (key: FilterKey) => (v: string[]) => setF((prev) => ({ ...prev, [key]: v }));
   const clearFilters = () => { setF(EMPTY_FILTERS); setTopicoSel(null); setMedicoQuery(""); };
 
@@ -671,6 +684,7 @@ function Dashboard() {
 
   /* --------- Base --------- */
   const handleApply = (rows: Row[], newMetas: Meta[]) => {
+    if (!shared.session || !shared.isAdmin || shared.loading) return;
     const normalizedRows = rows.map(normalizeRowDate);
     const normalizedMetas = newMetas.map(normalizeMetaMonth);
     setData(normalizedRows);
@@ -750,11 +764,11 @@ function Dashboard() {
                 <FilterIcon className="h-4 w-4 text-primary" />
                 Filtros
                 {activeFilters.length > 0 ? (
-                  <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                  <span key="active-filters" className="text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                     {activeFilters.length} ativo{activeFilters.length > 1 ? "s" : ""}
                   </span>
                 ) : (
-                  <span className="text-xs font-normal text-muted-foreground">Exibindo {ALL.toLowerCase()} os registros</span>
+                  <span key="all-records" className="text-xs font-normal text-muted-foreground">Exibindo {ALL.toLowerCase()} os registros</span>
                 )}
               </div>
               <button onClick={clearFilters} className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -971,13 +985,14 @@ function Dashboard() {
                   <Tooltip content={RepresentativeTooltip} />
                   <Legend />
                   <Bar dataKey="fy26" name="FY26" fill={COLOR_2026} radius={[0, 3, 3, 0]} cursor="pointer"
+                    isAnimationActive={repPerformance.length <= 200}
                     onClick={(e: { name?: string }) => e?.name && openDrill(`Detalhe · ${e.name}`, { rep: e.name })}>
                     <LabelList dataKey="fy26" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={9} />
                   </Bar>
-                  <Bar dataKey="mf" name="MF" fill="#7c3aed" radius={[0, 3, 3, 0]}>
+                  <Bar dataKey="mf" name="MF" fill="#7c3aed" radius={[0, 3, 3, 0]} isAnimationActive={repPerformance.length <= 200}>
                     <LabelList dataKey="mf" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={9} />
                   </Bar>
-                  <Bar dataKey="mv" name="MV" fill={COLOR_META} radius={[0, 3, 3, 0]}>
+                  <Bar dataKey="mv" name="MV" fill={COLOR_META} radius={[0, 3, 3, 0]} isAnimationActive={repPerformance.length <= 200}>
                     <LabelList dataKey="mv" position="right" formatter={(v: number) => fmtCompact(v)} fontSize={9} />
                   </Bar>
                 </BarChart>
