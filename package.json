@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:vercel": "NITRO_PRESET=vercel vite build",
+    "test": "bun test",
+    "test:sql": "bash tests/run-sql.sh",
+    "test:e2e": "bash tests/run-e2e.sh",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",

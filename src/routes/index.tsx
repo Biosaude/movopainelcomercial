@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSharedDashboard } from "@/hooks/use-shared-dashboard";
+import { getDashboardState } from "@/lib/api/dashboard.functions";
 import {
   Bar, BarChart, CartesianGrid, Cell, LabelList, Legend,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -8,8 +10,6 @@ import {
   AlertCircle, Award, Building2, CheckCircle2, DollarSign, Filter as FilterIcon, Flag,
   MapPin, Package, Search, Stethoscope, Target, TrendingDown, TrendingUp, Users,
 } from "lucide-react";
-import rawFaturamento from "../data/faturamento.json";
-import rawMetas from "../data/metas.json";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MultiSelectFilter } from "@/components/dashboard/MultiSelectFilter";
 import { KpiCard } from "@/components/dashboard/KpiCard";
@@ -27,6 +27,7 @@ import {
 } from "@/lib/dashboard/domain";
 
 export const Route = createFileRoute("/")({
+  loader: () => getDashboardState(),
   head: () => ({
     meta: [
       { title: "Dashboard Comercial Biosaude · Faturamento e Metas" },
@@ -41,60 +42,6 @@ export const Route = createFileRoute("/")({
 });
 
 const str = (v: unknown) => String(v ?? "").trim();
-
-const INITIAL_FAT: Row[] = (rawFaturamento as Array<Record<string, unknown>>).map((r) => normalizeRowDate({
-  gr: str(r.gr),
-  rep: str(r.rep),
-  marca: str(r.marca),
-  uf: str(r.uf),
-  topico: str(r.topico),
-  tipo: str(r.tipo),
-  periodo: str(r.periodo),
-  valor: Number(r.valor) || 0,
-  data: str(r.data) || undefined,
-  mes: str(r.mes) || undefined,
-  cliente: str(r.cliente) || undefined,
-  hospital: str(r.hospital) || undefined,
-  medico: str(r.medico) || undefined,
-  assessor: str(r.assessor) || undefined,
-  ufCliente: str(r.ufCliente) || undefined,
-  ufHospital: str(r.ufHospital) || undefined,
-}));
-const INITIAL_METAS: Meta[] = (rawMetas as Array<Record<string, unknown>>).map((m) => normalizeMetaMonth({
-  gr: str(m.gr), rep: str(m.rep), marca: str(m.marca), uf: str(m.uf),
-  topico: str(m.topico), tipo: str(m.tipo), periodo: str(m.periodo), meta: Number(m.meta) || 0,
-  ufHospital: str(m.ufHospital) || undefined,
-  mes: str(m.mes) || undefined,
-  cliente: str(m.cliente) || undefined,
-  medico: str(m.medico) || undefined,
-  assessor: str(m.assessor) || undefined,
-  ufCliente: str(m.ufCliente) || undefined,
-  metaFinanceira: m.metaFinanceira === undefined || m.metaFinanceira === null || m.metaFinanceira === ""
-    ? undefined : Number(m.metaFinanceira) || 0,
-}));
-
-const LS_FAT = "biosaude.fat.representante.v2";
-const LS_METAS = "biosaude.metas.representante.v2";
-const LS_LAST_UPDATE = "biosaude.lastUpdate.v1";
-
-function loadLS<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return fallback;
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? (parsed as T) : fallback;
-  } catch { return fallback; }
-}
-function loadLastUpdate(): LastUpdate | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(LS_LAST_UPDATE);
-    if (!raw) return null;
-    const p = JSON.parse(raw) as { when: string; fileName: string; count: number; metaCount: number };
-    return { ...p, when: new Date(p.when) };
-  } catch { return null; }
-}
 
 /* ---------------- Filtros ---------------- */
 
@@ -355,22 +302,33 @@ function ComparisonLabel({ x, y, height, previousValue, currentValue, gap, value
 
 function Dashboard() {
   const isMobile = useIsMobile();
-  const [data, setData] = useState<Row[]>(() => loadLS<Row[]>(LS_FAT, INITIAL_FAT).map(normalizeRowDate));
-  const [metasData, setMetasData] = useState<Meta[]>(() => loadLS<Meta[]>(LS_METAS, INITIAL_METAS).map(normalizeMetaMonth));
-  const [lastUpdate, setLastUpdateState] = useState<LastUpdate | null>(() => loadLastUpdate());
+  const shared = useSharedDashboard(Route.useLoaderData());
+  const [data, setData] = useState<Row[]>(() => shared.dataset?.faturamento.map(normalizeRowDate) ?? []);
+  const [metasData, setMetasData] = useState<Meta[]>(() => shared.dataset?.metas.map(normalizeMetaMonth) ?? []);
+  const [lastUpdate, setLastUpdateState] = useState<LastUpdate | null>(() => {
+    const info = shared.dataset?.import;
+    return info ? { when: new Date(info.published_at), fileName: info.file_name, count: info.revenue_count, metaCount: info.target_count } : null;
+  });
+  const [temporary, setTemporary] = useState(false);
   const [f, setF] = useState<Filters>(EMPTY_FILTERS);
   const [drill, setDrill] = useState<{ title: string; scope: DrillScope } | null>(null);
   const [showAllTopicos, setShowAllTopicos] = useState(false);
   const [topicoSel, setTopicoSel] = useState<string | null>(null);
   const [medicoQuery, setMedicoQuery] = useState("");
 
-  const setLastUpdate = (v: LastUpdate | null) => {
-    setLastUpdateState(v);
-    try {
-      if (v) window.localStorage.setItem(LS_LAST_UPDATE, JSON.stringify({ ...v, when: v.when.toISOString() }));
-      else window.localStorage.removeItem(LS_LAST_UPDATE);
-    } catch { /* ignore */ }
-  };
+  const setLastUpdate = (v: LastUpdate | null) => setLastUpdateState(v);
+  useEffect(() => {
+    if (!shared.dataset) return;
+    setData(shared.dataset.faturamento.map(normalizeRowDate));
+    setMetasData(shared.dataset.metas.map(normalizeMetaMonth));
+    const info = shared.dataset.import;
+    setLastUpdateState(info ? { when: new Date(info.published_at), fileName: info.file_name, count: info.revenue_count, metaCount: info.target_count } : null);
+    setTemporary(false);
+    setF(EMPTY_FILTERS);
+    setTopicoSel(null);
+    setMedicoQuery("");
+    setDrill(null);
+  }, [shared.dataset]);
   const set = (key: FilterKey) => (v: string[]) => setF((prev) => ({ ...prev, [key]: v }));
   const clearFilters = () => { setF(EMPTY_FILTERS); setTopicoSel(null); setMedicoQuery(""); };
 
@@ -717,12 +675,7 @@ function Dashboard() {
     const normalizedMetas = newMetas.map(normalizeMetaMonth);
     setData(normalizedRows);
     setMetasData(normalizedMetas);
-    try {
-      window.localStorage.setItem(LS_FAT, JSON.stringify(normalizedRows));
-      window.localStorage.setItem(LS_METAS, JSON.stringify(normalizedMetas));
-    } catch (e) {
-      console.warn("Não foi possível persistir a base no navegador:", e);
-    }
+    setTemporary(true);
     clearFilters();
   };
 
@@ -749,6 +702,16 @@ function Dashboard() {
     );
   };
 
+  if (!shared.dataset || shared.blocked) {
+    return (
+      <main className="max-w-[1600px] mx-auto p-5 space-y-4">
+        <h1 className="text-lg font-bold">Dashboard Comercial · Biosaude</h1>
+        <p role="status">{shared.loading ? "Carregando a base compartilhada..." : shared.message}</p>
+        {!shared.loading && <BaseManagement current={[]} currentMetas={[]} onApply={handleApply} lastUpdate={null} setLastUpdate={setLastUpdate} shared={shared} temporary={false} />}
+      </main>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="bg-card border-b sticky top-0 z-30">
@@ -774,6 +737,11 @@ function Dashboard() {
       </header>
 
       <main className="max-w-[1600px] mx-auto p-5 space-y-4">
+        {(shared.message || temporary) && (
+          <div role="status" className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
+            {temporary ? "Prévia temporária neste navegador. Recarregar restaura a última base compartilhada." : shared.message}
+          </div>
+        )}
         {/* 1 · FILTROS */}
         <Card>
           <CardContent className="p-4">
@@ -1188,6 +1156,8 @@ function Dashboard() {
           onApply={handleApply}
           lastUpdate={lastUpdate}
           setLastUpdate={setLastUpdate}
+          shared={shared}
+          temporary={temporary}
         />
       </main>
 
