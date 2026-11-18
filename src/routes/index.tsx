@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useSharedDashboard } from "@/hooks/use-shared-dashboard";
 import { getDashboardState } from "@/lib/api/dashboard.functions";
+import { corporateAuthPaths } from "@/lib/corporate/access";
 import {
   Bar, BarChart, CartesianGrid, Cell, LabelList, Legend,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -319,17 +320,17 @@ function Dashboard() {
 
   const setLastUpdate = (v: LastUpdate | null) => setLastUpdateState(v);
   useEffect(() => {
-    if (!shared.dataset) return;
-    setData(shared.dataset.faturamento.map(normalizeRowDate));
-    setMetasData(shared.dataset.metas.map(normalizeMetaMonth));
-    const info = shared.dataset.import;
+    if (!shared.dataset && !shared.corporateAccessCode) return;
+    setData(shared.dataset?.faturamento.map(normalizeRowDate) ?? []);
+    setMetasData(shared.dataset?.metas.map(normalizeMetaMonth) ?? []);
+    const info = shared.dataset?.import;
     setLastUpdateState(info ? { when: new Date(info.published_at), fileName: info.file_name, count: info.revenue_count, metaCount: info.target_count } : null);
     setTemporary(false);
     setF(EMPTY_FILTERS);
     setTopicoSel(null);
     setMedicoQuery("");
     setDrill(null);
-  }, [shared.dataset]);
+  }, [shared.dataset, shared.corporateAccessCode]);
   useEffect(() => {
     if (!temporary || shared.isAdmin || !shared.dataset) return;
     setData(shared.dataset.faturamento.map(normalizeRowDate));
@@ -716,12 +717,15 @@ function Dashboard() {
     );
   };
 
-  if (!shared.dataset || shared.blocked) {
+  if (!shared.dataset || shared.blocked || shared.corporateAccessCode) {
     return (
       <main className="max-w-[1600px] mx-auto p-5 space-y-4">
         <h1 className="text-lg font-bold">Dashboard Comercial · Biosaude</h1>
         <p role="status">{shared.loading ? "Carregando a base compartilhada..." : shared.message}</p>
-        {!shared.loading && <BaseManagement current={[]} currentMetas={[]} onApply={handleApply} lastUpdate={null} setLastUpdate={setLastUpdate} shared={shared} temporary={false} />}
+        {shared.corporateAccessCode === "corporate_login" && (
+          <a className="underline font-medium" href={corporateAuthPaths.login}>Entrar com Microsoft</a>
+        )}
+        {!shared.loading && !shared.corporateAccessCode && <BaseManagement current={[]} currentMetas={[]} onApply={handleApply} lastUpdate={null} setLastUpdate={setLastUpdate} shared={shared} temporary={false} />}
       </main>
     );
   }

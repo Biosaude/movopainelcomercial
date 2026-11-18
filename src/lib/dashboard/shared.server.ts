@@ -7,6 +7,7 @@ import {
   type SharedSnapshot,
 } from "./shared";
 import { SMALL_SNAPSHOT_BYTES, type ReadManifest } from "./batches";
+import { corporatePreviewEnabled } from "../corporate/auth.server";
 
 export type PublicConfig = { url: string; publishableKey: string };
 export class DashboardError extends Error {
@@ -18,10 +19,23 @@ export class DashboardError extends Error {
   }
 }
 export function dashboardConfig(): PublicConfig | null {
-  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const publishableKey =
-    process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const publicUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const corporate = corporatePreviewEnabled();
+  const url = corporate ? process.env.COMMERCIAL_PREVIEW_SUPABASE_URL : publicUrl;
+  const publishableKey = corporate
+    ? process.env.COMMERCIAL_PREVIEW_SUPABASE_PUBLISHABLE_KEY
+    : process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !publishableKey) return null;
+  if (corporate) {
+    const preview = new URL(url);
+    const loopback = preview.hostname === "localhost" || preview.hostname === "127.0.0.1";
+    if ((preview.protocol !== "https:" && !(loopback && process.env.VERCEL_ENV !== "preview" && preview.protocol === "http:")) ||
+        preview.hostname === "yvsuaterzpekenlyzaoa.supabase.co" ||
+        preview.origin === (publicUrl && new URL(publicUrl).origin) ||
+        preview.username || preview.password || preview.pathname !== "/" || preview.search || preview.hash) {
+      throw new DashboardError("configuration", "Configure um Supabase isolado para a homologação.");
+    }
+  }
   let role: unknown;
   try {
     role = JSON.parse(Buffer.from(publishableKey.split(".")[1], "base64url").toString()).role;

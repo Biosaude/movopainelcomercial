@@ -7,6 +7,8 @@ import {
   verifySession,
 } from "./shared.server";
 import type { UploadManifest, SnapshotPage } from "./batches";
+import { CorporateAccessError } from "../corporate/access";
+import { requireCorporateRead } from "../corporate/auth.server";
 
 async function rpc(name: string, args: Record<string, unknown>, administrative: boolean) {
   setResponseHeader("Cache-Control", "private, no-store");
@@ -55,9 +57,9 @@ async function result<T>(action: () => Promise<T>) {
   } catch (error) {
     return {
       ok: false as const,
-      code: error instanceof DashboardError ? error.code : "transfer",
+      code: error instanceof DashboardError || error instanceof CorporateAccessError ? error.code : "transfer",
       message:
-        error instanceof DashboardError
+        error instanceof DashboardError || error instanceof CorporateAccessError
           ? error.message
           : "Não foi possível concluir a transferência. Tente novamente.",
     };
@@ -100,12 +102,13 @@ export function readPage(data: {
   kind: "faturamento" | "metas";
   offset: number;
 }) {
-  return result(
-    () =>
-      rpc(
-        "dashboard_read_page",
-        { p_import_id: data.importId, p_kind: data.kind, p_offset: data.offset },
-        false,
-      ) as Promise<SnapshotPage>,
-  );
+  return result(async () => {
+    setResponseHeader("Cache-Control", "private, no-store");
+    await requireCorporateRead(getRequest());
+    return rpc(
+      "dashboard_read_page",
+      { p_import_id: data.importId, p_kind: data.kind, p_offset: data.offset },
+      false,
+    ) as Promise<SnapshotPage>;
+  });
 }

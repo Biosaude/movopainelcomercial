@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { corporateAuthResponse, corporatePreviewEnabled } from "./lib/corporate/auth.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -40,9 +41,14 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const authResponse = await corporateAuthResponse(request);
+      if (authResponse) return authResponse;
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const response = await normalizeCatastrophicSsrResponse(await handler.fetch(request, env, ctx));
+      if (!corporatePreviewEnabled()) return response;
+      const headers = new Headers(response.headers);
+      headers.set("Cache-Control", "private, no-store");
+      return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
