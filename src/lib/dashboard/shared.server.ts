@@ -7,6 +7,7 @@ import {
   type SharedSnapshot,
 } from "./shared";
 import { SMALL_SNAPSHOT_BYTES, type ReadManifest } from "./batches";
+import { readPreview } from "./preview-reader.server";
 import { corporatePreviewEnabled } from "../corporate/auth.server";
 
 export type PublicConfig = { url: string; publishableKey: string };
@@ -29,11 +30,21 @@ export function dashboardConfig(): PublicConfig | null {
   if (corporate) {
     const preview = new URL(url);
     const loopback = preview.hostname === "localhost" || preview.hostname === "127.0.0.1";
-    if ((preview.protocol !== "https:" && !(loopback && process.env.VERCEL_ENV !== "preview" && preview.protocol === "http:")) ||
-        preview.hostname === "yvsuaterzpekenlyzaoa.supabase.co" ||
-        preview.origin === (publicUrl && new URL(publicUrl).origin) ||
-        preview.username || preview.password || preview.pathname !== "/" || preview.search || preview.hash) {
-      throw new DashboardError("configuration", "Configure um Supabase isolado para a homologação.");
+    if (
+      (preview.protocol !== "https:" &&
+        !(loopback && process.env.VERCEL_ENV !== "preview" && preview.protocol === "http:")) ||
+      preview.hostname === "yvsuaterzpekenlyzaoa.supabase.co" ||
+      preview.origin === (publicUrl && new URL(publicUrl).origin) ||
+      preview.username ||
+      preview.password ||
+      preview.pathname !== "/" ||
+      preview.search ||
+      preview.hash
+    ) {
+      throw new DashboardError(
+        "configuration",
+        "Configure um Supabase isolado para a homologação.",
+      );
     }
   }
   let role: unknown;
@@ -80,15 +91,32 @@ export async function verifyAdministrator(client: SupabaseClient, token?: string
   if (permission.error || permission.data !== true)
     throw new DashboardError("forbidden", "Sua conta não possui permissão administrativa.");
 }
-export async function readDashboard(client: SupabaseClient, token?: string) {
+export async function readDashboard(
+  client: SupabaseClient,
+  token?: string,
+  preview?: PublicConfig,
+) {
   await verifySession(client, token);
-  const { data, error } = await client.rpc("dashboard_read_manifest");
+  type Metadata = { access: boolean; isAdmin: boolean; manifest: ReadManifest | null };
+  type Snapshot = { access: boolean; isAdmin: boolean; snapshot: SharedSnapshot | null };
+  const { data, error } = preview
+    ? { data: await readPreview<Metadata>(preview, "manifest"), error: null }
+    : await client.rpc("dashboard_read_manifest");
   if (error)
     throw new DashboardError(
       "unavailable",
       "Não foi possível consultar a base compartilhada. Verifique a conexão e a migração do Supabase.",
     );
-  const metadata = data as { access: boolean; isAdmin: boolean; manifest: ReadManifest | null };
+  const metadata = data as Metadata;
+  if (preview && token) {
+    const permission = await client.rpc("dashboard_is_admin");
+    if (permission.error)
+      throw new DashboardError(
+        "unavailable",
+        "Não foi possível verificar a permissão administrativa.",
+      );
+    metadata.isAdmin = permission.data === true;
+  }
   let state: {
     access: boolean;
     isAdmin: boolean;
@@ -96,14 +124,13 @@ export async function readDashboard(client: SupabaseClient, token?: string) {
     manifest: ReadManifest | null;
   } = { ...metadata, snapshot: null };
   if (metadata.access && (!metadata.manifest || metadata.manifest.bytes <= SMALL_SNAPSHOT_BYTES)) {
-    const response = await client.rpc("dashboard_read_snapshot");
+    const response = preview
+      ? { data: await readPreview<Snapshot>(preview, "snapshot"), error: null }
+      : await client.rpc("dashboard_read_snapshot");
     if (response.error)
       throw new DashboardError("unavailable", "Não foi possível consultar a base compartilhada.");
-    const loaded = response.data as {
-      access: boolean;
-      isAdmin: boolean;
-      snapshot: SharedSnapshot | null;
-    };
+    const loaded = response.data as Snapshot;
+    if (preview) loaded.isAdmin = metadata.isAdmin;
     // A concurrent publication may have replaced the small version with a large
     // one. Never send that full payload through the Vercel server function.
     const bytes = loaded.snapshot
@@ -120,7 +147,9 @@ export async function readDashboard(client: SupabaseClient, token?: string) {
       "A leitura pública está desativada. Entre com uma conta autorizada.",
     );
   let history: ImportRecord[] = [];
-  if (state.isAdmin) {
+  if (state.isAdmin && preview) {
+    history = await readPreview<ImportRecord[]>(preview, "history");
+  } else if (state.isAdmin) {
     const result = await client
       .from("dashboard_imports")
       .select("id,published_at,file_name,revenue_count,target_count,created_by_label")

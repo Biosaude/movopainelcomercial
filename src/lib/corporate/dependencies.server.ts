@@ -12,6 +12,7 @@ export function entitlementService(
   key: KeyObject,
   keyId: string,
   fetcher: CorporateFetch,
+  vercelBypass?: string,
 ) {
   return async ({ tenantId, objectId }: CorporateIdentity) => {
     const now = Math.floor(Date.now() / 1000);
@@ -32,7 +33,12 @@ export function entitlementService(
     const assertion = `${signed}.${sign(null, Buffer.from(signed), key).toString("base64url")}`;
     const response = await fetcher(endpoint, {
       method: "POST",
-      headers: { Authorization: `Bearer ${assertion}`, Accept: "application/json" },
+      headers: {
+        Authorization: `Bearer ${assertion}`,
+        Accept: "application/json",
+        "Cache-Control": "no-store",
+        ...(vercelBypass ? { "x-vercel-protection-bypass": vercelBypass } : {}),
+      },
       cache: "no-store",
       redirect: "error",
       signal: AbortSignal.timeout(4000),

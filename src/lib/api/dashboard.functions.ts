@@ -58,9 +58,15 @@ export const getDashboardState = createServerFn({ method: "GET" }).handler(async
       };
     }
     const token = api.bearerToken(getRequest().headers.get("authorization"));
-    const state = await api.readDashboard(api.requestClient(config, token), token);
+    const state = await api.readDashboard(
+      api.requestClient(config, token),
+      token,
+      corporate ? config : undefined,
+    );
     const base =
-      corporate || state.snapshot || state.manifest ? null : await import("../dashboard/embedded.server");
+      corporate || state.snapshot || state.manifest
+        ? null
+        : await import("../dashboard/embedded.server");
     return {
       ok: true as const,
       config,

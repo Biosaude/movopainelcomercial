@@ -6,7 +6,7 @@ import { toJSON } from "seroval";
 const origin = "https://comercial-preview.example.invalid";
 const central = "https://central-preview.example.invalid/api/internal/commercial-entitlement";
 const store = "https://sessions-preview.example.invalid/";
-const supabase = "https://supabase-preview.example.invalid";
+const supabase = "https://syntheticpreview.supabase.co";
 const publicSupabase = "https://supabase-public.example.invalid";
 const tenantId = "11111111-1111-4111-8111-111111111111";
 const objectId = "33333333-3333-4333-8333-333333333333";
@@ -29,12 +29,53 @@ Object.assign(process.env, {
   CENTRAL_BI_ASSERTION_KEY_ID: "preview-test",
   CENTRAL_BI_ASSERTION_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }),
   COMMERCIAL_PREVIEW_SUPABASE_URL: supabase,
+  COMMERCIAL_PREVIEW_READER_DATABASE_URL:
+    "postgresql://commercial_preview_reader:fixture-only@db.syntheticpreview.supabase.co/postgres?sslmode=verify-full",
   COMMERCIAL_PREVIEW_SUPABASE_PUBLISHABLE_KEY: "synthetic-publishable",
   SUPABASE_URL: publicSupabase,
   SUPABASE_PUBLISHABLE_KEY: "synthetic-publishable",
 });
 
 let allowed = true;
+let secureGrants = true;
+const sql = [];
+const output = new URL("../.vercel/output/functions/__server.func/", import.meta.url);
+const { P: BundledPool } = await import(new URL("_libs/pg.mjs", output));
+BundledPool.prototype.connect = async function () {
+  return {
+    async query(statement) {
+      sql.push(statement);
+      if (statement === "BEGIN READ ONLY" || statement === "COMMIT" || statement === "ROLLBACK")
+        return {};
+      if (statement.includes("AS ready")) return { rows: [{ ready: secureGrants }] };
+      if (statement.includes("dashboard_read_manifest"))
+        return {
+          rows: [
+            {
+              data: {
+                access: true,
+                isAdmin: false,
+                manifest: { import: { id: importId }, bytes: 4000000 },
+              },
+            },
+          ],
+        };
+      if (statement.includes("dashboard_read_page"))
+        return {
+          rows: [
+            {
+              data: {
+                rows: [{ rep: "MARCADOR-SINTETICO-PAGINA" }],
+                nextOffset: 1,
+              },
+            },
+          ],
+        };
+      throw new Error("Consulta SQL fora da fixture.");
+    },
+    release() {},
+  };
+};
 const requests = [];
 globalThis.fetch = async (input, options) => {
   const url = String(input);
@@ -46,22 +87,16 @@ globalThis.fetch = async (input, options) => {
     return Response.json({ result: JSON.stringify(session) });
   }
   if (url === central) return Response.json({ allowed });
-  if (
-    [supabase, publicSupabase].some((base) => url === base + "/rest/v1/rpc/dashboard_read_manifest")
-  ) {
+  if (url === publicSupabase + "/rest/v1/rpc/dashboard_read_manifest") {
     return Response.json({
       access: true,
       isAdmin: false,
       manifest: { import: { id: importId }, bytes: 4000000 },
     });
   }
-  if (url === supabase + "/rest/v1/rpc/dashboard_read_page") {
-    return Response.json({ rows: [{ rep: "MARCADOR-SINTETICO-PAGINA" }], nextOffset: 1 });
-  }
   throw new Error("A suíte intercepta toda saída do servidor em homologação.");
 };
 
-const output = new URL("../.vercel/output/functions/__server.func/", import.meta.url);
 const { default: handler } = await import(new URL("index.mjs", output));
 const ssr = new URL("_ssr/", output);
 
@@ -112,12 +147,19 @@ assert.equal(
 );
 
 allowed = true;
+secureGrants = false;
+assert.match(await (await request(statePath, true, true)).text(), /configuration/);
+assert.equal(
+  sql.some((statement) => statement === "SELECT public.dashboard_read_manifest() AS data"),
+  false,
+);
+secureGrants = true;
 const state = await (await request(statePath, true, true)).text();
 assert.match(state, new RegExp(importId));
 allowed = false;
 assert.match(await (await request(page, true, true)).text(), /corporate_denied/);
 assert.equal(
-  requests.some((url) => url.endsWith("/dashboard_read_page")),
+  sql.some((statement) => statement.startsWith("SELECT public.dashboard_read_page")),
   false,
 );
 allowed = true;

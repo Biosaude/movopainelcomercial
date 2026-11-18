@@ -33,6 +33,7 @@ function setup() {
     COMMERCIAL_SESSION_STORE_URL: redis,
     COMMERCIAL_SESSION_STORE_TOKEN: "synthetic-fixture",
     CENTRAL_BI_ENTITLEMENT_URL: endpoint,
+    COMMERCIAL_CENTRAL_BI_VERCEL_BYPASS_TOKEN: "preview-fixture",
     CENTRAL_BI_ASSERTION_PRIVATE_KEY: applicationKeys.privateKey
       .export({ type: "pkcs8", format: "pem" })
       .toString(),
@@ -79,6 +80,7 @@ function setup() {
 
   const dependencies: typeof fetch = async (input, options) => {
     if (String(input) === redis) {
+      expect(new Headers(options?.headers).has("x-vercel-protection-bypass")).toBe(false);
       const [command, key, value] = JSON.parse(String(options?.body));
       expect(options?.redirect).toBe("error");
       const stored = records.get(key) ?? null;
@@ -92,6 +94,7 @@ function setup() {
     }
 
     expect(String(input)).toBe(endpoint);
+    expect(new Headers(options?.headers).get("x-vercel-protection-bypass")).toBe("preview-fixture");
     state.checks++;
     expect(options?.method).toBe("POST");
     expect(options?.redirect).toBe("error");

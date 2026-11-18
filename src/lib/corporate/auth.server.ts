@@ -72,6 +72,7 @@ export function createCorporateAuth(
     key,
     required(env, "CENTRAL_BI_ASSERTION_KEY_ID"),
     fetcher,
+    env.COMMERCIAL_CENTRAL_BI_VERCEL_BYPASS_TOKEN,
   );
   const store = sessionStore(
     redis,

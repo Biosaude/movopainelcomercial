@@ -57,7 +57,10 @@ async function result<T>(action: () => Promise<T>) {
   } catch (error) {
     return {
       ok: false as const,
-      code: error instanceof DashboardError || error instanceof CorporateAccessError ? error.code : "transfer",
+      code:
+        error instanceof DashboardError || error instanceof CorporateAccessError
+          ? error.code
+          : "transfer",
       message:
         error instanceof DashboardError || error instanceof CorporateAccessError
           ? error.message
@@ -104,7 +107,12 @@ export function readPage(data: {
 }) {
   return result(async () => {
     setResponseHeader("Cache-Control", "private, no-store");
-    await requireCorporateRead(getRequest());
+    if (await requireCorporateRead(getRequest())) {
+      const config = dashboardConfig();
+      if (!config) throw new DashboardError("configuration", "Supabase não configurado.");
+      const { readPreviewPage } = await import("./preview-reader.server");
+      return readPreviewPage(config, data);
+    }
     return rpc(
       "dashboard_read_page",
       { p_import_id: data.importId, p_kind: data.kind, p_offset: data.offset },
