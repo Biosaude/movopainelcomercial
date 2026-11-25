@@ -35,3 +35,6 @@ wait "$first_pid"
 docker_local exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/sql/reload.sql
 
 bun tests/sql/batch-publication.ts "$test_container"
+for file in tests/sql/preview-reader-fixture.sql supabase/operations/commercial-preview-reader.sql tests/sql/preview-reader.test.sql; do
+  docker_local exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < "$file"
+done

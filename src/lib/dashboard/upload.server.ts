@@ -5,20 +5,38 @@ import {
   DashboardError,
   requestClient,
   verifySession,
+  verifyAdministrator,
 } from "./shared.server";
 import type { UploadManifest, SnapshotPage } from "./batches";
+import { CorporateAccessError } from "../corporate/access";
+import { requireCorporateRead } from "../corporate/auth.server";
 
-async function rpc(name: string, args: Record<string, unknown>, administrative: boolean) {
+const publicationOperations = {
+  dashboard_upload_begin: "begin",
+  dashboard_upload_chunk: "chunk",
+  dashboard_upload_commit: "commit",
+} as const;
+
+async function rpc(name: keyof typeof publicationOperations | "dashboard_read_page", args: Record<string, unknown>) {
   setResponseHeader("Cache-Control", "private, no-store");
   const config = dashboardConfig();
   if (!config) throw new DashboardError("configuration", "Supabase não configurado.");
   const token = bearerToken(getRequest().headers.get("authorization"));
   const client = requestClient(config, token);
-  await verifySession(client, token, administrative);
-  if (administrative) {
-    const permission = await client.rpc("dashboard_is_admin");
-    if (permission.error || permission.data !== true)
-      throw new DashboardError("forbidden", "Sua conta não possui permissão administrativa.");
+  if (name === "dashboard_read_page") {
+    await verifySession(client, token);
+  } else {
+    await requireCorporateRead(getRequest());
+    const user = await verifyAdministrator(client, token);
+    if (process.env.VERCEL_ENV === "production") {
+      const { publishWithDatabase } = await import("./production-publisher.server");
+      const values = name === "dashboard_upload_begin"
+        ? [args.p_request_id, args.p_expected_version, args.p_file_name, args.p_revenue_count, args.p_target_count, JSON.stringify(args.p_plan)]
+        : name === "dashboard_upload_chunk"
+          ? [args.p_request_id, args.p_chunk_index, args.p_payload]
+          : [args.p_request_id];
+      return publishWithDatabase(config, user.id, publicationOperations[name], values);
+    }
   }
   const { data, error } = await client.rpc(name, args);
   if (error) {
@@ -55,9 +73,12 @@ async function result<T>(action: () => Promise<T>) {
   } catch (error) {
     return {
       ok: false as const,
-      code: error instanceof DashboardError ? error.code : "transfer",
+      code:
+        error instanceof DashboardError || error instanceof CorporateAccessError
+          ? error.code
+          : "transfer",
       message:
-        error instanceof DashboardError
+        error instanceof DashboardError || error instanceof CorporateAccessError
           ? error.message
           : "Não foi possível concluir a transferência. Tente novamente.",
     };
@@ -76,7 +97,6 @@ export function beginUpload(data: UploadManifest) {
           p_target_count: data.targetCount,
           p_plan: data.plan,
         },
-        true,
       ) as Promise<string>,
   );
 }
@@ -86,26 +106,28 @@ export function appendUpload(data: { requestId: string; index: number; payload: 
       rpc(
         "dashboard_upload_chunk",
         { p_request_id: data.requestId, p_chunk_index: data.index, p_payload: data.payload },
-        true,
       ) as Promise<string>,
   );
 }
 export function commitUpload(data: { requestId: string }) {
-  return result(
-    () => rpc("dashboard_upload_commit", { p_request_id: data.requestId }, true) as Promise<string>,
-  );
+  return result(() => rpc("dashboard_upload_commit", { p_request_id: data.requestId }) as Promise<string>);
 }
 export function readPage(data: {
   importId: string;
   kind: "faturamento" | "metas";
   offset: number;
 }) {
-  return result(
-    () =>
-      rpc(
-        "dashboard_read_page",
-        { p_import_id: data.importId, p_kind: data.kind, p_offset: data.offset },
-        false,
-      ) as Promise<SnapshotPage>,
-  );
+  return result(async () => {
+    setResponseHeader("Cache-Control", "private, no-store");
+    if (await requireCorporateRead(getRequest())) {
+      const config = dashboardConfig();
+      if (!config) throw new DashboardError("configuration", "Supabase não configurado.");
+      const { readPreviewPage } = await import("./preview-reader.server");
+      return readPreviewPage(config, data);
+    }
+    return rpc(
+      "dashboard_read_page",
+      { p_import_id: data.importId, p_kind: data.kind, p_offset: data.offset },
+    ) as Promise<SnapshotPage>;
+  });
 }

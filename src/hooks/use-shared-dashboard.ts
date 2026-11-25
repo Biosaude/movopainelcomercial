@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/dashboard-upload.functions";
 import { assembleSnapshot, transferUpload } from "@/lib/dashboard/batches";
 import { publicationSchema, type ImportRecord, type Publication } from "@/lib/dashboard/shared";
+import { CorporateAccessError, isCorporateAccessCode, type CorporateAccessCode } from "@/lib/corporate/access";
 import type { Row, Meta } from "@/lib/dashboard/domain";
 
 export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboardState>>) {
@@ -35,6 +36,9 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
   const [blocked, setBlocked] = useState(
     !initial.ok && ["forbidden", "unauthorized"].includes(initial.code),
   );
+  const [corporateAccessCode, setCorporateAccessCode] = useState<CorporateAccessCode | null>(
+    !initial.ok && isCorporateAccessCode(initial.code) ? initial.code : null,
+  );
   const [message, setMessage] = useState(initial.message);
   const generation = useRef(0);
   const clientRef = useRef<SupabaseClient | null>(null);
@@ -59,6 +63,7 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
         setClient(sdk);
       }
       if (!result.ok) {
+        if (isCorporateAccessCode(result.code)) throw new CorporateAccessError(result.code);
         setIsAdmin(false);
         setHistory([]);
         setMessage(result.message);
@@ -66,6 +71,7 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
         return false;
       }
       setBlocked(false);
+      setCorporateAccessCode(null);
       setIsAdmin(result.isAdmin);
       setHistory(result.history);
       setMessage(result.message);
@@ -77,7 +83,10 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
                 data,
                 headers: tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {},
               });
-              if (!response.ok) throw new Error(response.message);
+              if (!response.ok) {
+                if (isCorporateAccessCode(response.code)) throw new CorporateAccessError(response.code);
+                throw new Error(response.message);
+              }
               return response.data;
             },
             () => current === generation.current,
@@ -93,11 +102,19 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
           import: snapshot?.import ?? null,
         });
       return { version: snapshot?.import.id ?? null };
-    } catch {
-      if (current === generation.current)
+    } catch (error) {
+      if (current === generation.current && error instanceof CorporateAccessError) {
+        setCorporateAccessCode(error.code);
+        setDataset(null);
+        setHistory([]);
+        setIsAdmin(false);
+        setBlocked(true);
+        setMessage(error.message);
+      } else if (current === generation.current) {
         setMessage(
           "Não foi possível carregar a base compartilhada. Tente recarregar; a publicação anterior foi preservada.",
         );
+      }
       return false;
     } finally {
       if (current === generation.current) setLoading(false);
@@ -203,6 +220,7 @@ export function useSharedDashboard(initial: Awaited<ReturnType<typeof getDashboa
     dataset,
     loading,
     blocked,
+    corporateAccessCode,
     message,
     configured: Boolean(client),
     reload,

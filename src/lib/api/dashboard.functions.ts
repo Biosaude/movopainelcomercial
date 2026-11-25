@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { legacyPublicationSchema } from "../dashboard/shared";
+import { CorporateAccessError } from "../corporate/access";
 
 // Local workbook management also requires current, remotely verified permission.
 // No workbook data is uploaded or persisted by this authorization endpoint.
@@ -11,6 +12,8 @@ export const authorizeDashboardManagement = createServerFn({ method: "POST" }).h
     const config = api.dashboardConfig();
     if (!config) throw new api.DashboardError("configuration", "Supabase não configurado.");
     const token = api.bearerToken(getRequest().headers.get("authorization"));
+    const { requireCorporateRead } = await import("../corporate/auth.server");
+    await requireCorporateRead(getRequest());
     await api.verifyAdministrator(api.requestClient(config, token), token);
     return { ok: true as const };
   } catch (error) {
@@ -31,8 +34,10 @@ export const getDashboardState = createServerFn({ method: "GET" }).handler(async
   setResponseHeader("Cache-Control", "private, no-store");
   let config: import("../dashboard/shared.server").PublicConfig | null = null;
   try {
+    const { requireCorporateRead } = await import("../corporate/auth.server");
+    const corporate = await requireCorporateRead(getRequest());
     config = api.dashboardConfig();
-    if (!config && process.env.NODE_ENV === "production")
+    if (!config && (corporate || process.env.NODE_ENV === "production"))
       return {
         ok: false as const,
         config,
@@ -55,9 +60,15 @@ export const getDashboardState = createServerFn({ method: "GET" }).handler(async
       };
     }
     const token = api.bearerToken(getRequest().headers.get("authorization"));
-    const state = await api.readDashboard(api.requestClient(config, token), token);
+    const state = await api.readDashboard(
+      api.requestClient(config, token),
+      token,
+      corporate ? config : undefined,
+    );
     const base =
-      state.snapshot || state.manifest ? null : await import("../dashboard/embedded.server");
+      corporate || state.snapshot || state.manifest
+        ? null
+        : await import("../dashboard/embedded.server");
     return {
       ok: true as const,
       config,
@@ -66,9 +77,14 @@ export const getDashboardState = createServerFn({ method: "GET" }).handler(async
       message:
         state.snapshot || state.manifest
           ? ""
-          : "Ainda não há uma base publicada. Exibindo a base embarcada.",
+          : corporate
+            ? "Ainda não há uma base publicada na homologação."
+            : "Ainda não há uma base publicada. Exibindo a base embarcada.",
     };
   } catch (error) {
+    if (error instanceof CorporateAccessError) {
+      return { ok: false as const, config: null, code: error.code, message: error.message };
+    }
     return {
       ok: false as const,
       config,
@@ -91,6 +107,8 @@ export const publishSharedDashboard = createServerFn({ method: "POST" })
       const config = api.dashboardConfig();
       if (!config) throw new api.DashboardError("configuration", "Supabase não configurado.");
       const token = api.bearerToken(getRequest().headers.get("authorization"));
+      const { requireCorporateRead } = await import("../corporate/auth.server");
+      await requireCorporateRead(getRequest());
       const id = await api.publishDashboard(api.requestClient(config, token), token, data);
       return { ok: true as const, id };
     } catch (error) {

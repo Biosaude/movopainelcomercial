@@ -2,6 +2,8 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { corporateAuthPaths } from "./lib/corporate/access";
+import { corporateAuthResponse, corporatePreviewEnabled, previewEntryOrigin } from "./lib/corporate/auth.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -40,9 +42,23 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const { host, pathname } = new URL(request.url);
+      if (request.method === "GET" && (pathname === "/" || pathname === corporateAuthPaths.login)) {
+        const canonical = previewEntryOrigin(host);
+        if (canonical) {
+          return new Response(null, { status: 303, headers: {
+            "Location": canonical.href, "Cache-Control": "private, no-store", "Referrer-Policy": "no-referrer",
+          } });
+        }
+      }
+      const authResponse = await corporateAuthResponse(request);
+      if (authResponse) return authResponse;
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const response = await normalizeCatastrophicSsrResponse(await handler.fetch(request, env, ctx));
+      if (!corporatePreviewEnabled()) return response;
+      const headers = new Headers(response.headers);
+      headers.set("Cache-Control", "private, no-store");
+      return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
