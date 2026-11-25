@@ -21,12 +21,21 @@ export class DashboardError extends Error {
 }
 export function dashboardConfig(): PublicConfig | null {
   const publicUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const corporate = corporatePreviewEnabled();
+  const production = process.env.VERCEL_ENV === "production";
+  const corporate = !production && corporatePreviewEnabled();
   const url = corporate ? process.env.COMMERCIAL_PREVIEW_SUPABASE_URL : publicUrl;
   const publishableKey = corporate
     ? process.env.COMMERCIAL_PREVIEW_SUPABASE_PUBLISHABLE_KEY
     : process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !publishableKey) return null;
+  if (production) {
+    const ref = process.env.COMMERCIAL_PRODUCTION_SUPABASE_REF;
+    if (!ref || !/^[a-z0-9]+$/.test(ref) ||
+        new URL(url).origin !== `https://${ref}.supabase.co` ||
+        ![`https://${ref}.supabase.co`, `https://${ref}.supabase.co/`].includes(url) ||
+        URL.parse(process.env.COMMERCIAL_PREVIEW_SUPABASE_URL ?? "")?.hostname === `${ref}.supabase.co`)
+      throw new DashboardError("configuration", "Configuração operacional do Supabase Comercial inválida.");
+  }
   if (corporate) {
     const preview = new URL(url);
     const loopback = preview.hostname === "localhost" || preview.hostname === "127.0.0.1";
@@ -86,10 +95,11 @@ export async function verifySession(client: SupabaseClient, token?: string, requ
 }
 /** Revalidate management access server-side, including revoked administrator roles. */
 export async function verifyAdministrator(client: SupabaseClient, token?: string) {
-  await verifySession(client, token, true);
+  const user = await verifySession(client, token, true);
   const permission = await client.rpc("dashboard_is_admin");
-  if (permission.error || permission.data !== true)
+  if (!user || permission.error || permission.data !== true)
     throw new DashboardError("forbidden", "Sua conta não possui permissão administrativa.");
+  return user;
 }
 export async function readDashboard(
   client: SupabaseClient,
@@ -169,11 +179,17 @@ export async function publishDashboard(
   token: string | undefined,
   payload: Publication,
 ) {
-  await verifySession(client, token, true);
-  const permission = await client.rpc("dashboard_is_admin");
-  if (permission.error || permission.data !== true)
-    throw new DashboardError("forbidden", "Sua conta não possui permissão administrativa.");
+  const user = await verifyAdministrator(client, token);
   const value = normalizePublication(legacyPublicationSchema.parse(payload));
+  if (process.env.VERCEL_ENV === "production") {
+    const config = dashboardConfig();
+    if (!config) throw new DashboardError("configuration", "Supabase não configurado.");
+    const { publishWithDatabase } = await import("./production-publisher.server");
+    return publishWithDatabase(config, user.id, "publish", [
+      value.requestId, value.expectedVersion, value.fileName,
+      JSON.stringify(value.faturamento), JSON.stringify(value.metas),
+    ]);
+  }
   const { data, error } = await client.rpc("dashboard_publish", {
     p_request_id: value.requestId,
     p_expected_version: value.expectedVersion,

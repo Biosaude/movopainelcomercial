@@ -11,8 +11,13 @@ const storedAttemptSchema = attemptSchema.extend({ expiresAt: z.number().int() }
 const sessionSchema = identitySchema.extend({ expiresAt: z.number().int() });
 const authPaths: readonly string[] = Object.values(corporateAuthPaths);
 
+export function corporateOriginSetting(env = process.env) {
+  return env.VERCEL_ENV === "production" ? "COMMERCIAL_PRODUCTION_ORIGIN" : "COMMERCIAL_PREVIEW_ORIGIN";
+}
+
 export function corporatePreviewEnabled(env = process.env) {
-  return env.COMMERCIAL_AUTH_MODE === "preview" && env.VERCEL_ENV !== "production";
+  if (env.VERCEL_ENV === "production") return true;
+  return env.COMMERCIAL_AUTH_MODE === "preview";
 }
 
 function required(env: NodeJS.ProcessEnv, name: string) {
@@ -42,8 +47,8 @@ export function createCorporateAuth(
   entraFetch?: CustomFetch,
 ) {
   const origin = urlSetting(
-    required(env, "COMMERCIAL_PREVIEW_ORIGIN"),
-    env.VERCEL_ENV !== "preview",
+    required(env, corporateOriginSetting(env)),
+    !["preview", "production"].includes(env.VERCEL_ENV ?? ""),
   );
   const endpoint = urlSetting(required(env, "CENTRAL_BI_ENTITLEMENT_URL"));
   const redis = urlSetting(required(env, "COMMERCIAL_SESSION_STORE_URL"));
@@ -79,6 +84,7 @@ export function createCorporateAuth(
     required(env, "COMMERCIAL_SESSION_STORE_TOKEN"),
     origin.origin,
     fetcher,
+    env.VERCEL_ENV === "production" ? "production" : "preview",
   );
   const secure = origin.protocol === "https:";
   const sessionCookie = secure ? "__Host-comercial-session" : "comercial-local-session";

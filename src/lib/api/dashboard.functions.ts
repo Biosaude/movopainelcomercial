@@ -12,6 +12,8 @@ export const authorizeDashboardManagement = createServerFn({ method: "POST" }).h
     const config = api.dashboardConfig();
     if (!config) throw new api.DashboardError("configuration", "Supabase não configurado.");
     const token = api.bearerToken(getRequest().headers.get("authorization"));
+    const { requireCorporateRead } = await import("../corporate/auth.server");
+    await requireCorporateRead(getRequest());
     await api.verifyAdministrator(api.requestClient(config, token), token);
     return { ok: true as const };
   } catch (error) {
@@ -105,6 +107,8 @@ export const publishSharedDashboard = createServerFn({ method: "POST" })
       const config = api.dashboardConfig();
       if (!config) throw new api.DashboardError("configuration", "Supabase não configurado.");
       const token = api.bearerToken(getRequest().headers.get("authorization"));
+      const { requireCorporateRead } = await import("../corporate/auth.server");
+      await requireCorporateRead(getRequest());
       const id = await api.publishDashboard(api.requestClient(config, token), token, data);
       return { ok: true as const, id };
     } catch (error) {

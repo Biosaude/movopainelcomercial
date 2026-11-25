@@ -2,7 +2,8 @@ import { Pool } from "pg";
 import type { SnapshotPage } from "./batches";
 import { DashboardError, type PublicConfig } from "./shared.server";
 
-const readerRole = "commercial_preview_reader";
+const previewReaderRole = "commercial_preview_reader";
+export const productionPublisherRole = "commercial_runtime_publisher";
 const readFunctions = [
   "public.dashboard_read_manifest()",
   "public.dashboard_read_snapshot()",
@@ -19,23 +20,29 @@ const protectedRelations = [
   "dashboard_upload_chunks",
   "faturamento_comercial",
   "metas_representante",
+  "metas_representante_nova",
   "vw_dashboard_representante",
   "vw_metas_representante_validacao",
 ];
 
 export function previewReaderSettings(
   config: PublicConfig,
-  value = process.env.COMMERCIAL_PREVIEW_READER_DATABASE_URL,
+  value = process.env.VERCEL_ENV === "production" ? process.env.COMMERCIAL_PRODUCTION_READER_DATABASE_URL : process.env.COMMERCIAL_PREVIEW_READER_DATABASE_URL,
 ) {
+  const readerRole = process.env.VERCEL_ENV === "production" ? "commercial_runtime_reader" : previewReaderRole;
+  return restrictedDatabaseSettings(config, value, readerRole);
+}
+
+export function restrictedDatabaseSettings(config: PublicConfig, value: string | undefined, role: string) {
   const project = /^([a-z0-9]+)\.supabase\.co$/.exec(new URL(config.url).hostname)?.[1];
   const url = value && URL.parse(value);
   const direct =
-    project && url && url.hostname === `db.${project}.supabase.co` && url.username === readerRole;
+    project && url && url.hostname === `db.${project}.supabase.co` && url.username === role;
   const pooled =
     project &&
     url &&
     /^aws-[0-9]+-[a-z0-9-]+\.pooler\.supabase\.com$/.test(url.hostname) &&
-    url.username === `${readerRole}.${project}`;
+    url.username === `${role}.${project}`;
   if (
     (!direct && !pooled) ||
     !url ||
@@ -48,7 +55,7 @@ export function previewReaderSettings(
   )
     throw new DashboardError(
       "configuration",
-      "Configure o leitor PostgreSQL exclusivo do Supabase de homologação.",
+      "Configure o papel PostgreSQL exclusivo do Supabase neste ambiente.",
     );
   return {
     host: url.hostname,
@@ -105,12 +112,12 @@ export async function readPreview<T>(
            CROSS JOIN unnest(ARRAY['anon','authenticated',current_user::text]) AS principal(name)
            WHERE pg_catalog.has_any_column_privilege(principal.name, pg_catalog.to_regclass('public.' || relation.name), 'SELECT')
          ) AS ready`,
-      [readFunctions, readerRole, protectedRelations],
+      [readFunctions, settings.user.split(".")[0], protectedRelations],
     );
     if (!security?.ready)
       throw new DashboardError(
         "configuration",
-        "A proteção das RPCs do Supabase de homologação ainda não está ativa.",
+        "A proteção das RPCs do Supabase ainda não está ativa.",
       );
     const {
       rows: [result],

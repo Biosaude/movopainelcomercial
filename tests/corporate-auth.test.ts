@@ -290,13 +290,16 @@ afterEach(() => {
   }
 });
 
-test("modo público preservado e Preview incompleto falha fechado", async () => {
+test("Production exige autenticação corporativa mesmo sem flag e falha fechado sem configuração", async () => {
   const route = new Request(origin + corporateAuthPaths.login);
   expect(corporatePreviewEnabled({})).toBe(false);
   process.env.COMMERCIAL_AUTH_MODE = "preview";
   process.env.VERCEL_ENV = "production";
-  await expect(requireCorporateRead(route)).resolves.toBe(false);
-  expect((await corporateAuthResponse(route))?.status).toBe(404);
+  delete process.env.COMMERCIAL_AUTH_MODE;
+  expect(corporatePreviewEnabled()).toBe(true);
+  await expect(requireCorporateRead(route)).rejects.toMatchObject({ code: "corporate_unavailable" });
+  expect((await corporateAuthResponse(route))?.status).toBe(503);
+  process.env.COMMERCIAL_AUTH_MODE = "preview";
   process.env.VERCEL_ENV = "preview";
   delete process.env.COMMERCIAL_PREVIEW_ORIGIN;
   await expect(requireCorporateRead(route)).rejects.toMatchObject({
