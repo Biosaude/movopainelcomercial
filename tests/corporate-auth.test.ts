@@ -6,6 +6,7 @@ import {
   corporateAuthResponse,
   corporatePreviewEnabled,
   createCorporateAuth,
+  previewEntryOrigin,
   requireCorporateRead,
 } from "../src/lib/corporate/auth.server";
 import { dashboardConfig } from "../src/lib/dashboard/shared.server";
@@ -253,9 +254,9 @@ test("revalida concessão, expiração e logout e bloqueia indisponibilidade", a
   });
   state.allowed = true;
   state.centralUnavailable = true;
-  await expect(auth.authorize(request(session))).rejects.toThrow(
-    "Consulta de concessão indisponível.",
-  );
+  await expect(auth.authorize(request(session))).rejects.toMatchObject({
+    stage: "central", reason: "http_error", details: { upstreamStatus: 503 },
+  });
   state.centralUnavailable = false;
   for (const [key, record] of records)
     records.set(key, JSON.stringify({ ...JSON.parse(record), expiresAt: 1 }));
@@ -325,4 +326,13 @@ test("Preview exige um Supabase isolado sem fallback para a configuração públ
     url: "https://isolado.example.invalid",
     publishableKey: "synthetic-preview-key",
   });
+});
+
+test("Preview hospedado exige autenticação e só aceita a entrada pelo deployment informado pela Vercel", () => {
+  const settings = { VERCEL: "1", VERCEL_ENV: "preview", VERCEL_URL: "commercial-deploy.vercel.app",
+    COMMERCIAL_PREVIEW_ORIGIN: origin };
+  expect(corporatePreviewEnabled(settings)).toBe(true);
+  expect(previewEntryOrigin(settings.VERCEL_URL, settings)?.href).toBe(origin + "/");
+  expect(previewEntryOrigin("other.vercel.app", settings)).toBeUndefined();
+  expect(previewEntryOrigin(settings.VERCEL_URL, { ...settings, VERCEL_ENV: "production" })).toBeUndefined();
 });

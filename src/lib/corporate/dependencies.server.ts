@@ -1,5 +1,6 @@
 import { createHash, randomUUID, sign, type KeyObject } from "node:crypto";
 import { z } from "zod";
+import { CorporateFailure } from "./diagnostics";
 import type { CorporateIdentity } from "./entra.server";
 
 const dashboard = "painel-comercial-r1";
@@ -42,9 +43,13 @@ export function entitlementService(
       cache: "no-store",
       redirect: "error",
       signal: AbortSignal.timeout(4000),
-    });
-    if (!response.ok) throw new Error("Consulta de concessão indisponível.");
-    return z.object({ allowed: z.boolean() }).parse(await response.json()).allowed;
+    }).catch(() => { throw new CorporateFailure("central", "unreachable"); });
+    if (!response.ok) throw new CorporateFailure("central", "http_error", { upstreamStatus: response.status });
+    try {
+      return z.object({ allowed: z.boolean() }).parse(await response.json()).allowed;
+    } catch {
+      throw new CorporateFailure("central", "invalid_response");
+    }
   };
 }
 
@@ -56,20 +61,29 @@ export function sessionStore(
   scope: "preview" | "production" = "preview",
 ) {
   const namespace = `comercial:${scope}:${createHash("sha256").update(origin).digest("hex")}:`;
-  async function command(args: (number | string)[]) {
+  async function command(command: "SET" | "GET" | "GETDEL" | "DEL", ...args: (number | string)[]) {
     const response = await fetcher(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(args),
+      body: JSON.stringify([command, ...args]),
       cache: "no-store",
       redirect: "error",
       signal: AbortSignal.timeout(4000),
+    }).catch(() => { throw new CorporateFailure("redis", "unreachable", { command }); });
+    const details = { command, upstreamStatus: response.status };
+    if (!response.ok) throw new CorporateFailure("redis", "http_error", details);
+    const body: unknown = await response.json().catch(() => {
+      throw new CorporateFailure("redis", "invalid_response", details);
     });
-    if (!response.ok) throw new Error("Armazenamento corporativo indisponível.");
-    const result = z
-      .object({ result: z.union([z.string(), z.number(), z.null()]) })
-      .parse(await response.json());
-    return result.result;
+    const rejection = z.object({ error: z.string() }).safeParse(body);
+    if (rejection.success) {
+      const reason = /^(?:ERR )?NOPERM\b/i.test(rejection.data.error) ? "permission_denied" :
+        /^(?:ERR )?(?:NOAUTH|WRONGPASS)\b/i.test(rejection.data.error) ? "authentication_rejected" : "command_rejected";
+      throw new CorporateFailure("redis", reason, details);
+    }
+    const result = z.object({ result: z.union([z.string(), z.number(), z.null()]) }).safeParse(body);
+    if (!result.success) throw new CorporateFailure("redis", "invalid_response", details);
+    return result.data.result;
   }
   const key = (kind: "login" | "session", handle: string) =>
     namespace + kind + ":" + createHash("sha256").update(handle).digest("hex");
@@ -77,18 +91,24 @@ export function sessionStore(
   return {
     async save(kind: "login" | "session", handle: string, value: object, maxAge: number) {
       if (
-        (await command(["SET", key(kind, handle), JSON.stringify(value), "EX", maxAge, "NX"])) !==
+        (await command("SET", key(kind, handle), JSON.stringify(value), "EX", maxAge, "NX")) !==
         "OK"
       ) {
-        throw new Error("Não foi possível persistir a sessão corporativa.");
+        throw new CorporateFailure("redis", "command_rejected", { command: "SET" });
       }
     },
     async read(kind: "login" | "session", handle: string, consume = false): Promise<unknown> {
-      const value = await command([consume ? "GETDEL" : "GET", key(kind, handle)]);
-      return typeof value === "string" ? JSON.parse(value) : null;
+      const action = consume ? "GETDEL" : "GET";
+      const value = await command(action, key(kind, handle));
+      if (typeof value !== "string") return null;
+      try {
+        return JSON.parse(value);
+      } catch {
+        throw new CorporateFailure("redis", "invalid_response", { command: action });
+      }
     },
     async revoke(handle: string) {
-      await command(["DEL", key("session", handle)]);
+      await command("DEL", key("session", handle));
     },
   };
 }
